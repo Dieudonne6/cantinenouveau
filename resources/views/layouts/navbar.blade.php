@@ -8,13 +8,25 @@
       </button>
     </div>
   </div>
-  <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
-    <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center " type="button" data-toggle="offcanvas">
+ 
+  <div class="navbar-menu-wrapper d-flex align-items-center justify-content-between">
+    <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
       <span class="typcn typcn-th-menu"></span>
     </button>
-    <form action="{{ route('logout') }}" method="POST">
+    <div class="">
+   
+      @if (Session::has('nom_user') || Session::has('prenom_user'))
+      <h5 class="mb-0">
+          Bienvenue {{ Session::get('nom_user') }} {{ Session::get('prenom_user') }}
+      </h5>
+      @endif
+    </div>
+    <div>   
+      <form action="{{ route('logout') }}" method="POST">
       @csrf
       <button type="submit" class="nav-logout">Déconnexion</button>            
-    </form>
+      </form>
+    </div>
+ 
   </div>
 </nav>
