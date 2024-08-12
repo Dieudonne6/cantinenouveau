@@ -157,7 +157,7 @@ display: block;
 <script>
 $(document).ready(function(){
     $('#myTable').DataTable({
-        "paging": false, // Désactiver la pagination
+        // "paging": false, // Désactiver la pagination
         "language": {
             "sProcessing":     "Traitement en cours...",
             "sSearch":         "Rechercher&nbsp;:",
