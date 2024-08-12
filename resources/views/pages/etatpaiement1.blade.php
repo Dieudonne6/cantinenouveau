@@ -23,8 +23,9 @@
 </style>
 
 
-    <div class="container">
+    {{-- <div class="container "> --}}
 
+<div class="col-lg-12 grid-margin stretch-card">
         {{-- <form action="{{ url('/traitementetatpaiement') }}" method="POST">
             @csrf
             <div class="form-group row">
@@ -52,10 +53,13 @@
 
             </div>
         </form> --}}
+<div class="card">
+    <div class="card-body">
+
 
         <div class="col">
             <label for="debut" style="visibility: hidden">Du</label>
-            <button onclick="imprimerPage()" type="button" class="btn btn-primary">
+            <button onclick="imprimerPage()" type="button" class="btn btn-primary" style="display: block">
                 Imprimer Etat
             </button>
         </div>
@@ -127,9 +131,11 @@
 
     </div>
 
-
+</div>
+</div>
+</div>
         {{-- @endif --}}
-    </div>
+    {{-- </div> --}}
 
     <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
