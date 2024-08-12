@@ -13,8 +13,7 @@
     <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
       <span class="typcn typcn-th-menu"></span>
     </button>
-    <div class="">
-   
+    <div>
       @if (Session::has('nom_user') || Session::has('prenom_user'))
       <h5 class="mb-0">
           Bienvenue {{ Session::get('nom_user') }} {{ Session::get('prenom_user') }}
