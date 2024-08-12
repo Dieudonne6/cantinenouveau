@@ -3,7 +3,7 @@
     <div class="col-lg-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title" style="text-align: center">Paiement</h4>
+                <h4 class="card-title" style="text-align: center">Paiement pour <strong>{{ $nomCompletEleveCon }}</strong></h4>
 
                 <form action="{{url('/savepaiementcontrat')}}" method="POST">
                     @csrf

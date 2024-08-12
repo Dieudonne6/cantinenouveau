@@ -612,11 +612,13 @@
       </a>
       <div class="collapse" id="Cantine">
         <ul class="nav flex-column sub-menu">
-          <li class="nav-item"> <a class="nav-link" href="{{url('/inscriptioncantine')}}">Inscriptions</a></li>
+          {{-- <li class="nav-item"> <a class="nav-link" href="{{url('/inscriptioncantine')}}">Inscriptions</a></li> --}}
 
-          <li class="nav-item"> <a class="nav-link" href="{{url('/classes')}}">Toutes les classes</a></li>
+          {{-- <li class="nav-item"> <a class="nav-link" href="{{url('/classes')}}">Toutes les classes</a></li> --}}
+
+          <li class="nav-item"> <a class="nav-link" href="{{url('/listecontrat')}}">Liste des Contrats</a></li>
           
-          <li class="nav-item menu-item-has-children">
+          {{-- <li class="nav-item menu-item-has-children">
             <a href="" class="nav-link">Etats</a>
             <ul class="sub-menus">
               <li>
@@ -625,11 +627,11 @@
               <li>
                 <a href="{{url('/etatdroits')}}">Etat des droits constatés</a>
               </li>
-              {{-- <li>
-                <a href="{{url('/lettrederelance')}}">Lettre de relance</a>
-              </li> --}}
+            
             </ul>
-          </li>
+          </li> --}}
+          <li class="nav-item"> <a class="nav-link" href="{{url('/etat')}}">Les Etats</a></li>
+
           <li class="nav-item"> <a class="nav-link" href="{{url('/duplicatafacture')}}">Duplicata facture</a></li>
 
           {{-- <div class="dropdown">

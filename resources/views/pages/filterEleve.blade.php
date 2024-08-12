@@ -6,16 +6,26 @@
   <div class="card">
     <div class="card-body">
       <h4 class="card-title">Toutes les classes</h4>
-      @if(Session::has('status'))
-      <div id="statusAlert" class="alert alert-succes btn-primary">
-      {{ Session::get('status')}}
-      </div>
-      @endif
-      @if(Session::has('erreur'))
-      <div class="alert alert-danger btn-primary">
-      {{ Session::get('erreur')}}
-      </div>
-      @endif
+        @if(Session::has('status'))
+        <div id="statusAlert" class="alert alert-succes btn-primary">
+        {{ Session::get('status')}}
+        </div>
+        @endif
+        @if(Session::has('erreur'))
+        <div class="alert alert-danger btn-primary">
+        {{ Session::get('erreur')}}
+        </div>
+        @endif
+        {{-- erreur concernant un nouveau contrat --}}
+        @if($errors->any())
+            <div id="statusAlert" class="alert alert-danger">
+                <ul>
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
       <div class="form-group row">
         <div class="col-3">
         <select class="js-example-basic-multiple w-100" onchange="window.location.href=this.value">
@@ -24,6 +34,11 @@
              <option value="{{$classes->CODECLAS}}">{{$classes->CODECLAS}}</option>
             @endforeach
         </select>
+      </div>
+      <div class="col-3">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nouveaucontrat">
+          Nouveau Contrat
+        </button>
       </div>
       {{-- <div class="col-3">
         <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#exampleModal">
@@ -93,8 +108,83 @@
     </div>
     
 
+    <div class="modal fade" id="nouveaucontrat" tabindex="-1" aria-labelledby="examplePaiementLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title fs-3" id="exampleModalLabel">Nouveau contrat</h4>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <div class="col-md-12 mx-auto grid-margin stretch-card">
+                {{-- <div class="card"> --}}
+                    {{-- <div class="card-body"> --}}
+          
+                      {{-- <h4 class="card-title">Nouveau contrat</h4> --}}
+                      {{-- affichage des erreur et les message de succes --}}
+                      
+                      <form id="myModalForm" method="POST" action="{{url('creercontrat')}}">
+                        {{csrf_field()}}
+                        @if(Session::has('id_usercontrat'))
+                        <?php $id_usercontrat = Session::get('id_usercontrat'); ?>
+                        <input type="hidden" value="{{$id_usercontrat}}" name="id_usercontrat">
+                        @endif
+                        <div class="form-group w-100 mb-6">
+                          @csrf
+                          <label for="classSelect">Sélectionner la classe</label>
+                          <select class="js-example-basic-multiple w-100" id="classSelect" name="classes">
+                            {{-- <option value="">Sélectionner la classe</option> --}}
+                            @foreach ($classe as $eleves)
+                            <option value="{{$eleves->CODECLAS}}">{{$eleves->CODECLAS}}</option>
+                            @endforeach
+                          </select>
+                        </div>
+                        <div class="form-group w-100">
+                          <label for="eleveSelect">Sélectionner un élève</label>
+                          <select id="eleveSelect" class="js-example-basic-multiple w-100" name="matricules">
+                            {{-- <option value="">Sélectionner un élève</option> --}}
+                          </select>
+                        </div>
+                        <div class="form-group">
+                          <div class="form-group row">
+                            <div class="col">
+                              <label>Date</label>
+                              <div id="the-basics">
+                                <input class="typeaheads" type="date" id="date" name="date"
+                                value="{{ date('Y-m-d') }}">
+                              </div>
+                            </div>
+                            <div class="col">
+                              <label>Montant</label>
+                              <div id="bloodhound">
+                                <input class="typeaheads mater" type="text" readonly name="montant"  id="montant" value="">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {{-- <div class="">
+                          <input type="reset" class="btn btn-secondary" data-bs-dismiss="modal" value="Annuler">
+                          <button type="submit" class="btn btn-primary">Enregister</button>
+                        </div> --}}
+                    {{-- </div> --}}
+                    
+                  {{-- </div> --}}
+              </div>
+    
+            
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            <button type="submit"  class="btn btn-primary" >Enregister</button>
+          </div>
+        </form>
+    
+        </div>
+      </div>
+    </div>
 
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    {{-- <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -162,7 +252,7 @@
         </form>
         </div>
       </div>
-    </div>
+    </div> --}}
     {{-- @foreach ($filterEleve as  $filterEleves)
 
       <div class="modal fade" id="examplePaiement{{$filterEleves->MATRICULE}}" tabindex="-1" aria-labelledby="examplePaiementLabel" aria-hidden="true">
@@ -248,8 +338,23 @@
 
       @endforeach --}}
 <!-- Scripts -->
-{{-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> --}}
 
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var myModal = document.getElementById('nouveaucontrat');
+    myModal.addEventListener('hidden.bs.modal', function () {
+        // Réinitialiser les champs du formulaire
+        document.getElementById('myModalForm').reset();
+        
+        // Réinitialiser les champs de sélection
+        var selects = document.querySelectorAll('#myModalForm select');
+        selects.forEach(function(select) {
+            select.selectedIndex = 0;
+        });
+    });
+});
+  </script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 @endsection
