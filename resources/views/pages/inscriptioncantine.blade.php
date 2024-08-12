@@ -1,7 +1,7 @@
 @extends('layouts.master')
 @section('content')
 <div class="main-panel-16">        
-  <div class="content-wrapper">
+  <div class="container">
     
     <div class="row">
       <div class="col-md-8 mx-auto grid-margin stretch-card">
