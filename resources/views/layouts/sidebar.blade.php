@@ -43,8 +43,9 @@
           {{-- <li class="nav-item"> <a class="nav-link {{ request()->is('inscriptioncantine') ? 'active' : '' }}" href="{{url('/inscriptioncantine')}}">Inscriptions</a></li> --}}
           {{-- <li class="nav-item"> <a class="nav-link" href="{{url('/listecontrat')}}">Liste des Contrats</a></li> --}}
           <li class="nav-item"> <a class="nav-link {{ request()->is('listecontrat') ? 'active' : '' }}"  href="{{url('/listecontrat')}}">Liste des Contrats</a></li>
-          <li class="nav-item"> <a class="nav-link {{ request()->is('etat') ? 'active' : '' }}"  href="{{url('/etat')}}">Etats</a></li>
+          <li class="nav-item"> <a class="nav-link {{ request()->is('etat' || 'filteretat') ? 'active' : '' }}"  href="{{url('/etat')}}">Etats</a></li>
           <li class="nav-item"> <a class="nav-link {{ request()->is('duplicatafacture') ? 'active' : '' }}" href="{{url('/duplicatafacture')}}">Duplicata facture</a></li>
+          {{-- <li class="nav-item"> <a class="nav-link {{ request()->is('filteretat') ? 'active' : '' }}" href="{{url('/filteretat')}}"></a></li> --}}
         </ul>
       </div>
     </li>
