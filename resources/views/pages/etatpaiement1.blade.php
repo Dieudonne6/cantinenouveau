@@ -158,13 +158,23 @@
 
 @endsection
 
-<script>
-    function imprimerPage() {
-        var table = document.getElementById('myTable');
-        table.classList.remove('dataTable');
 
+
+<script>
+
+function imprimerPage() {
+    // Désactiver la pagination
+    let table = $('#myTable').DataTable();
+    let currentPage = table.page();  // Sauvegarder la page actuelle
+    table.page.len(-1).draw();  // Afficher toutes les lignes
+
+    // Attendre un court instant pour être sûr que le tableau est complètement rendu
+    setTimeout(function() {
         // Masque les colonnes avec la classe hide-on-print
-        var columns = table.querySelectorAll('.hide-on-print');
+        var tableElement = document.getElementById('myTable');
+        tableElement.classList.remove('dataTable');
+
+        var columns = tableElement.querySelectorAll('.hide-on-print');
         columns.forEach(function(column) {
             column.style.display = 'none';
         });
@@ -183,13 +193,20 @@
         page.onload = function() {
             page.print();
             page.close();
-        };
 
-        // Restaure les colonnes après l'impression
-        columns.forEach(function(column) {
-            column.style.display = '';
-        });
-    }
+            // Restaurer la pagination après l'impression
+            table.page.len(10).draw();  // Remettre la taille de la page comme avant (par exemple : 10)
+            table.page(currentPage).draw(false);  // Retour à la page actuelle
+
+            // Restaure les colonnes après l'impression
+            columns.forEach(function(column) {
+                column.style.display = '';
+            });
+        };
+    }, 200);
+}
+
+
 </script>
 
 

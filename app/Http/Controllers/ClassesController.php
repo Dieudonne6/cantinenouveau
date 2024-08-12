@@ -33,6 +33,8 @@ use Illuminate\Support\Facades\Validator;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Writer\PngWriter;
 use DateTime;
+use Carbon\Carbon;
+
 
 
 
@@ -1145,7 +1147,25 @@ public function etat() {
                 $eleveId = $request->input('matricules');
                 $montant = $request->input('montant');
                 $idUserContrat = $request->input('id_usercontrat');
-                $dateContrat = $request->input('date');
+                // $dateContrat = $request->input('date');
+       
+        // $dateContrat = $request->input('date');
+        // Récupérer la date avec l'heure depuis la requête
+    $dateContrt = $request->input('date');
+
+    // Convertir en objet Carbon
+    $dateContratt = Carbon::parse($dateContrt);
+
+    // Formater la date pour l'affichage
+    $dateContrat = $dateContratt->format('Y-m-d H:i:s');
+
+
+        // Si la date n'est pas spécifiée, utiliser la date du jour
+        if (empty($dateContrat)) {
+            $dateContrat = date('Y-m-d H:i:s');
+        }
+        // Trouver l'élève en fonction de la classe (CODECLAS)
+         $elevy = Eleve::where('MATRICULE', $eleveId)->get();
         
                 // Si la date n'est pas spécifiée, utiliser la date du jour
                 if (empty($dateContrat)) {

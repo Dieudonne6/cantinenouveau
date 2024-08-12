@@ -259,7 +259,7 @@ class PagesController extends Controller
         }return redirect('/');
     } 
 
-    public function duplicatafacture(){
+    public function duplicatafacture(Request $request){
         if(Session::has('account')){
         $duplicatafactures = Duplicatafacture::all();
 

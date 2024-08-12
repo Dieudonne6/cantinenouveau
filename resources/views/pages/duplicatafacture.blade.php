@@ -1,3 +1,7 @@
+@php
+use Carbon\Carbon;
+@endphp
+
 @extends('layouts.master')
 @section('content')
 
@@ -11,12 +15,6 @@
                         <div class="col-sm-6">
                             <div class="page-title"><h4>Reçus de paiement</h4></div>
                         </div>
-                        <div class="col-sm-6">
-                            {{-- <div class="dt-search mt-3 mx-6">
-                                <label for="dt-search-0">Rechercher&nbsp;:</label>
-                                <input type="search" class="dt-input" id="dt-search-0" placeholder="" aria-controls="myTable">
-                            </div> --}}
-                        </div>
                     </div>
                 </div>
                 <div class="card-body">
@@ -26,7 +24,7 @@
                                 <table id="myTable" class="table custom-table">
                                     <thead>
                                         <tr>
-                                            <th> Type de Facture</th>
+                                            <th>Type de Facture</th>
                                             <th>Classe</th>
                                             <th>Eleve</th>
                                             <th>Date de paiement</th>
@@ -41,7 +39,21 @@
                                                 <td>{{ $duplicatafacture['reference'] }}</td>
                                                 <td>{{ $duplicatafacture['classe'] }}</td>
                                                 <td>{{ $duplicatafacture['nomeleve'] }}</td>
-                                                <td>{{ $duplicatafacture['datepaiement'] }}</td>
+                                                
+                                                @php
+                                                $dateInput = $duplicatafacture['datepaiement'];
+
+if (Carbon::hasFormat($dateInput, 'Y-m-d H:i:s')) {
+    $dateFormatted = Carbon::createFromFormat('Y-m-d H:i:s', $dateInput)->format('d/m/Y H:i:s');
+} elseif (Carbon::hasFormat($dateInput, 'd/m/Y H:i:s')) {
+    $dateFormatted = Carbon::createFromFormat('d/m/Y H:i:s', $dateInput)->format('d/m/Y H:i:s');
+} else {
+    $dateFormatted = 'Format de date non supporté';
+}
+@endphp
+
+<td>{{ $dateFormatted }}</td>
+                                                {{-- <td>{{ $duplicatafacture['datepaiement'] }}</td> --}}
                                                 {{-- <td>{{ $duplicatafacture['reference'] }}</td> --}}
                                                 <td>
                                                     {{-- {{ public_path('qrcodes/' . $fileNameqrcode) }} --}}
@@ -60,6 +72,26 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-">
+                    <!-- Affichage des liens de pagination -->
+                    {{-- {{ $duplicatafactures->appends(request()->query())->links() }} --}}
+                </div>
+                {{-- <div class="col-sm-6">
+                    <!-- Formulaire stylisé pour sélectionner le nombre de données par page -->
+                    <div class="data-per-page">
+                        <form method="GET" action="{{ url()->current() }}">
+                            <label for="per_page" class="d-none">Afficher par page :</label>
+                            <select name="per_page" id="per_page" class="form-control custom-select" onchange="this.form.submit()">
+                                <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
+                                <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                                <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                                <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
+                            </select>
+                        </form>
+                    </div>
+                </div> --}}
             </div>
         </div>
     </div>
