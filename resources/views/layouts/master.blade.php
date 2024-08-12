@@ -76,6 +76,17 @@ transition: transform 0.6s;
   box-shadow: 0px 1px 15px 1px rgba(230, 234, 236, 0.35);
   border: 1px solid #f3f3f3;
 }
+
+.footer {
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  margin-top: auto;
+  padding: 0;
+}
+
 .sub-menus li a {
   color: #000 !important;
 }
@@ -89,8 +100,55 @@ transition: transform 0.6s;
 .menu-item-has-children:hover .sub-menus{
 display: block;
 }
+.nav-logout {
+  box-shadow: 0 5px 10px 0 rgba(176, 176, 217, 0.88);
+  border: 1px solid #e4e4f4;
+  padding-left: .875rem;
+  padding-right: .875rem;
+  border-radius: 0.25rem;
+  height: 2.5rem;
+  background-color: #fff;
+}
+.sidebar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  max-width: 240px;
+  width: 100%;
+  overflow-y: auto; 
+  z-index: 1000; 
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); 
+} 
+.main-panel {
+  margin-left: 240px; 
+  width: calc(100% - 240px);
+  padding: 20px;
+  position: relative;
+  /* height: 100%; */
+}
+/* .main-panel {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+} */
+.nav-link.active {
+  color: #ffffff !important; /* Couleur du texte lorsque le lien est actif */
+  background-color: #713dad !important; /* Couleur de fond lorsque le lien est actif */
+}
 
-
+.sub-menu .nav-link:hover {
+  color: #ffffff !important; /* Couleur du texte au survol */
+}
+.nav-link:hover {
+  background-color: #713dad; /* Couleur de fond au survol */
+}
+.nav-link.hover .menu-title{
+  color: #000 !important;
+}
+ 
+/* body{
+  background-color: #f4f5fa;
+} */
   </style>
   
 </head>
@@ -103,8 +161,9 @@ display: block;
       @include('layouts.sidebar')
       <div class="main-panel">  
         @yield('content')
-        @include('layouts.footer')
+      @include('layouts.footer')
       </div>
+      
     </div>
   </div>
   <script src="{{asset('assets/vendors/js/vendor.bundle.base.js')}}"></script>
@@ -158,6 +217,7 @@ display: block;
 $(document).ready(function(){
     $('#myTable').DataTable({
         // "paging": false, // Désactiver la pagination
+        // "paging": false,
         "language": {
             "sProcessing":     "Traitement en cours...",
             "sSearch":         "Rechercher&nbsp;:",

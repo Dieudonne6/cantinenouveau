@@ -12,5 +12,9 @@
     <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center " type="button" data-toggle="offcanvas">
       <span class="typcn typcn-th-menu"></span>
     </button>
+    <form action="{{ route('logout') }}" method="POST">
+      @csrf
+      <button type="submit" class="nav-logout">Déconnexion</button>            
+    </form>
   </div>
 </nav>
