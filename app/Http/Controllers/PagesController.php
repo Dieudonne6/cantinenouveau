@@ -15,6 +15,10 @@ use App\Models\User;
 use App\Models\Params2;
 use App\Models\Classes;
 use App\Models\Duplicatafacture;
+use App\Http\Requests\CreateUserRequest;
+use App\Http\Requests\FraisAnneeRequest;
+use App\Http\Requests\FactureRequest;
+
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
@@ -103,7 +107,7 @@ class PagesController extends Controller
         return back()->with('status','Enregistrer avec succes');
     }
     
-    public function modifierfrais($id_paramcontrat, Request $request){
+    public function modifierfrais(FraisAnneeRequest $request, $id_paramcontrat){
         // $test = $request->input('id_paramcontrat');
         // dd($test);
         $params = Paramcontrat::find($id_paramcontrat);
@@ -221,16 +225,16 @@ class PagesController extends Controller
     public function echeancier(){
         return view('pages.inscriptions.echeancier');
     }
-    public function paramsemecef(Request $request){
+    public function paramsemecef(FactureRequest $request){
 
         $emcef = Paramsfacture::first();
         $emcef->ifu = $request->input('ifu');
         $emcef->token = $request->input('token');
         $emcef->taxe = $request->input('taxe');
         $emcef->type = $request->input('type');
-        $request->validate([
-            'logo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        // $request->validate([
+        //     'logo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        // ]);
         $imagename = $request->file('logo');
         $imagecontent = file_get_contents($imagename->getRealPath());
         $emcef->logo = $imagecontent;
@@ -241,12 +245,12 @@ class PagesController extends Controller
     public function inscriptions(){
         return view('pages.etat.inscriptions');
     }
-    public function enregistreruser(Request $request){
+    public function enregistreruser(CreateUserRequest $request){
         $login = new User();
         $password_crypte = Hash::make($request->password);
-        $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        // $request->validate([
+        //     'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        // ]);
         $login->nomgroupe = 1;
         $login->login = $request->input('login');
         $login->nomuser = $request->input('nom');
@@ -258,7 +262,7 @@ class PagesController extends Controller
         $login->administrateur = 1;
         $login->user_actif = 1;
         $login->save();
-        return back()->with('status','Enregistrer avec succes');
+        return redirect()->back()->with('status','Enregistrer avec succes');
 
     }
 
