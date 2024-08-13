@@ -30,11 +30,11 @@
             <div class="form-group row">
                 <div class="col">
                     <label for="debut">Du</label>
-                    <input name="debut" id="debut" type="date" class="typeaheads">
+                    <input name="debut" id="debut" type="date" value="{{ old('date', now()->subMonths(3)->format('Y-m-d')) }}" class="typeaheads">
                 </div>
                 <div class="col">
                     <label for="fin">Au</label>
-                    <input name="fin" id="fin" type="date" class="typeaheads">
+                    <input name="fin" id="fin" type="date" value="{{ old('date', now()->format('Y-m-d')) }}" class="typeaheads">
                 </div>
 
                 <div class="col">
@@ -114,8 +114,16 @@
                     <td>{{ $resultatsIndividuel['nomcomplet_eleve'] }}</td>
                     <td>{{ $resultatsIndividuel['montant'] }}</td>
                     <td>{{ $resultatsIndividuel['mois'] }}</td>
-                    <td>{{ $resultatsIndividuel['date_paiement'] }}</td>
-                    <td>{{ $resultatsIndividuel['reference'] }}</td>
+                    <td>
+                        {{
+                            \Carbon\Carbon::hasFormat($resultatsIndividuel['date_paiement'], 'Y-m-d H:i:s') 
+                                ? \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $resultatsIndividuel['date_paiement'])->format('d/m/Y H:i:s') 
+                                : (\Carbon\Carbon::hasFormat($resultatsIndividuel['date_paiement'], 'd/m/Y H:i:s') 
+                                    ? \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', $resultatsIndividuel['date_paiement'])->format('d/m/Y H:i:s') 
+                                    : 'Format de date non supporté')
+                        }}
+                    </td>
+                                        <td>{{ $resultatsIndividuel['reference'] }}</td>
                     {{-- <td class="cell-action hide-on-print">
                         <div class="d-flex justify-content-between">
                             <a type="button" style="height: 45px" class="btn btn-primary w-50 me-1" href="{{ url('imprimerfiche/' . $resultatsIndividuel['id_paiementcontrat']) }}">Imprimer fiche</a>
