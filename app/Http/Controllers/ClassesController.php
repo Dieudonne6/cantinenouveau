@@ -26,6 +26,9 @@ use App\Models\Paramsfacture;
 use App\Models\Qrcode;
 use App\Models\Params2;
 use GuzzleHttp\Client;
+use App\Http\Requests\InscriptionCantineRequest;
+use Illuminate\Support\Facades\Validator;
+
 // use Barryvdh\DomPDF\PDF;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Writer\PngWriter;
@@ -76,7 +79,60 @@ class ClassesController extends Controller
         } 
         return redirect('/');
     }
+
+    // page liste de tout les contrat disponible 
+
+    public function listecontrat() {
+        if(Session::has('account')){
+            $elev = Eleve::get();
+
+        // Récupérer les matricules des élèves dont le statut de contrat est égal à 1
+        $contratValideMatricules = Contrat::where('statut_contrat', 1)->pluck('eleve_contrat');
+
+        // Récupérer les noms et prénoms des élèves correspondants
+        $eleves = Eleve::whereIn('MATRICULE', $contratValideMatricules)
+            ->select('MATRICULE', 'NOM', 'PRENOM', 'CODECLAS')
+            ->orderBy('NOM', 'asc')
+            ->get();
+            // dd($eleves);
+
+            // Les noms des classes à exclure
+            $classesAExclure = ['NON', 'DELETE'];
+
+            // Récupérer toutes les classes sauf celles à exclure
+            $classes = Classes::whereNotIn('CODECLAS', $classesAExclure)->get();
+            // $classes = Classes::get();
+            $fraiscontrat = Paramcontrat::first(); 
+            Session::put('eleves', $eleves);
+            Session::put('classes', $classes);
+            Session::put('fraiscontrats', $fraiscontrat);
+            // Convertir une chaîne de latin1 à UTF-8
+
+            // -------------------------------------------------
+
+                    // // Liste des mots à exclure
+                    // $excludedWords = ["DELETE", 'NON'];
+                        
+                    // // Construire la requête initiale
+                    // $query = Classes::query();
+
+                    // // Ajouter des conditions pour exclure les mots
+                    // foreach ($excludedWords as $word) {
+                    //     $query->where('CODECLAS', 'not like', '%' . $word . '%');
+                    // }
+
+                    // // Récupérer les résultats
+                    // $class = $query->get();
+                   
+
+            // -------------------------------------------------
+
+            return view('pages.listecontrat')->with('eleve', $eleves)->with('classe', $classes)->with('fraiscontrats', $fraiscontrat)->with('elev', $elev);
+        } 
+        return redirect('/');
+    }
     
+
     public function filterEleve($CODECLAS){
         $eleves = Eleve::orderBy('NOM', 'asc')->get();
         // Les noms des classes à exclure
@@ -107,6 +163,7 @@ class ClassesController extends Controller
         return view('pages.filterEleve')->with("filterEleve", $filterEleves)->with('classe', $classes)->with('eleve', $eleves)->with('fraiscontrats', $fraiscontrat);
     }
     
+  
     
     
 
@@ -145,6 +202,9 @@ class ClassesController extends Controller
             Session::put('matricule', $MATRICULE);
 
             $contrat = Contrat::where('eleve_contrat', $MATRICULE)->first();
+            $eleveCon = Eleve::where('MATRICULE', $MATRICULE)->first();
+            $nomCompletEleveCon = $eleveCon->NOM .' '. $eleveCon->PRENOM;
+            // dd($nomCompletEleveCon);
 
             if ($contrat){
 
@@ -220,7 +280,7 @@ class ClassesController extends Controller
                         // dd($inscriptioncontrat);
                         // dd($moiscontrat);
                         
-                        return view('pages.paiementcontrat')->with('fraismensuelle', $fraismensuelle)->with('moisCorrespondants', $moisCorrespondants);
+                        return view('pages.paiementcontrat')->with('fraismensuelle', $fraismensuelle)->with('moisCorrespondants', $moisCorrespondants)->with('nomCompletEleveCon', $nomCompletEleveCon);
 
                     }
                     else {
@@ -228,7 +288,7 @@ class ClassesController extends Controller
 
                         // echo("le contrat n'existe pas dans la table inscriptioncontrat");
                         
-                        return view('pages.paiementcontrat')->with('fraismensuelle', $fraismensuelle)->with('moisCorrespondants', $moisCorrespondants);
+                        return view('pages.paiementcontrat')->with('fraismensuelle', $fraismensuelle)->with('moisCorrespondants', $moisCorrespondants)->with('nomCompletEleveCon', $nomCompletEleveCon);
 
                     }
 
@@ -246,13 +306,13 @@ class ClassesController extends Controller
                         // dd($inscriptioncontrat);
                         // dd($moiscontrat);
                         
-                        return view('pages.paiementcontrat')->with('fraismensuelle', $fraismensuelle)->with('moisCorrespondants', $moisCorrespondants);
+                        return view('pages.paiementcontrat')->with('fraismensuelle', $fraismensuelle)->with('moisCorrespondants', $moisCorrespondants)->with('nomCompletEleveCon', $nomCompletEleveCon);
 
                     }
                     else {
                         // $moisCorrespondants = Moiscontrat::pluck('nom_moiscontrat', 'id_moiscontrat')->toArray();
 
-                        return view('pages.paiementcontrat')->with('fraismensuelle', $fraismensuelle)->with('moisCorrespondants', $moisCorrespondants);
+                        return view('pages.paiementcontrat')->with('fraismensuelle', $fraismensuelle)->with('moisCorrespondants', $moisCorrespondants)->with('nomCompletEleveCon', $nomCompletEleveCon);
 
                     }
 
@@ -918,6 +978,12 @@ public function essaipdf() {
 }
 
 
+public function etat() {
+    $annees = Paramcontrat::distinct()->pluck('anneencours_paramcontrat'); 
+    $classes = Classes::get();
+    return view('pages.etat')->with('annee', $annees)->with('classe', $classes);
+}
+
 
 
 
@@ -1066,12 +1132,23 @@ public function essaipdf() {
     
     //     return back()->with('status','Contrat enregistré avec succès');
     // }
-    public function creercontrat(Request $request){
+
+
+    public function creercontrat(InscriptionCantineRequest $request){
         // Récupérer les informations de la requête
-        $classes = $request->input('classes');
-        $eleveId = $request->input('matricules');
-        $montant = $request->input('montant');
-        $idUserContrat = $request->input('id_usercontrat');
+
+        // validation des donne 
+
+           
+            
+                $data = $request->validated();
+                // recuperer les donne entrer par l'utilisateur
+                $classes = $request->input('classes');
+                $eleveId = $request->input('matricules');
+                $montant = $request->input('montant');
+                $idUserContrat = $request->input('id_usercontrat');
+                // $dateContrat = $request->input('date');
+       
         // $dateContrat = $request->input('date');
         // Récupérer la date avec l'heure depuis la requête
     $dateContrt = $request->input('date');
@@ -1090,67 +1167,85 @@ public function essaipdf() {
         // Trouver l'élève en fonction de la classe (CODECLAS)
          $elevy = Eleve::where('MATRICULE', $eleveId)->get();
         
-         $nom = Eleve::where('MATRICULE', $eleveId)->value('NOM');
-         $prenom = Eleve::where('MATRICULE', $eleveId)->value('PRENOM');
-         $elevyo = $nom .' '. $prenom;
-         
-        if ($eleveId) {
-            // $eleveId = $eleve->MATRICULE;
-
-            // Chercher un contrat existant pour cet élève avec statut_contrat = 0
-            $contratExistant = Contrat::where('eleve_contrat', $eleveId)
-                                       ->where('statut_contrat', 0)
-                                       ->first();
-
-                                       $paramse = Paramsfacture::first(); 
-
-                                       $logoUrl = $paramse ? $paramse->logo: null; 
-            if ($contratExistant) {
-                // Mettre à jour le contrat existant
-                $contratExistant->cout_contrat = $montant;
-                $contratExistant->id_usercontrat = $idUserContrat;
-                $contratExistant->statut_contrat = 1;
-                $contratExistant->datecreation_contrat = $dateContrat;
-                $contratExistant->save();
-                Session::put('amount', $montant);
-                Session::put('classe', $classes);
-                Session::put('logoUrl', $logoUrl);
-                Session::put('dateContrat', $dateContrat);
-                Session::put('elevyo', $elevyo);
-
-                return view('pages.Etats.pdfinscription')
-                ->with('amount', $montant)
-                ->with('classe', $classes )
-                ->with('logoUrl', $logoUrl )
-                ->with('dateContrat', $dateContrat)
-                ->with('elevyo', $elevyo);
+                // Si la date n'est pas spécifiée, utiliser la date du jour
+                if (empty($dateContrat)) {
+                    $dateContrat = date('Y-m-d');
+                }
+        
+                // Trouver l'élève en fonction de la classe (CODECLAS)
+                $elevy = Eleve::where('MATRICULE', $eleveId)->get();
                 
-                // return back()->with('status', 'Contrat mis à jour avec succès');
-            } else {
-                // Créer un nouveau contrat
-                $nouveauContrat = new Contrat();
-                $nouveauContrat->eleve_contrat = $eleveId;
-                $nouveauContrat->cout_contrat = $montant;
-                $nouveauContrat->id_usercontrat = $idUserContrat;
-                $nouveauContrat->statut_contrat = 1;
-                $nouveauContrat->datecreation_contrat = $dateContrat;
-                $nouveauContrat->save();
-                Session::put('amount', $montant);
-                Session::put('classe', $classes);
-                Session::put('logoUrl', $logoUrl);
-                Session::put('dateContrat', $dateContrat);
-                Session::put('elevyo', $elevyo);
-                return view('pages.Etats.pdfinscription')
-                ->with('amount', $montant)
-                ->with('classe', $classes )
-                ->with('logoUrl', $logoUrl )
-                ->with('dateContrat', $dateContrat)
-                ->with('elevyo', $elevyo);
-                // return back()->with('status', 'Contrat créé avec succès');
-            }
-        } else {
-            return back()->with('error', 'Élève non trouvé');
-        }
+                $nom = Eleve::where('MATRICULE', $eleveId)->value('NOM');
+                $prenom = Eleve::where('MATRICULE', $eleveId)->value('PRENOM');
+                $elevyo = $nom .' '. $prenom;
+
+
+
+                if ($eleveId) {
+                    // $eleveId = $eleve->MATRICULE;
+        
+                    // Chercher un contrat existant pour cet élève avec statut_contrat = 0
+                    $contratExistant = Contrat::where('eleve_contrat', $eleveId)
+                                               ->where('statut_contrat', 0)
+                                               ->first();
+        
+                                               $paramse = Paramsfacture::first(); 
+        
+                                               $logoUrl = $paramse ? $paramse->logo: null; 
+                    if ($contratExistant) {
+                        // Mettre à jour le contrat existant
+                        $contratExistant->cout_contrat = $montant;
+                        $contratExistant->id_usercontrat = $idUserContrat;
+                        $contratExistant->statut_contrat = 1;
+                        $contratExistant->datecreation_contrat = $dateContrat;
+                        $contratExistant->save();
+                        Session::put('amount', $montant);
+                        Session::put('classe', $classes);
+                        Session::put('logoUrl', $logoUrl);
+                        Session::put('dateContrat', $dateContrat);
+                        Session::put('elevyo', $elevyo);
+        
+                        return view('pages.Etats.pdfinscription')
+                        ->with('amount', $montant)
+                        ->with('classe', $classes )
+                        ->with('logoUrl', $logoUrl )
+                        ->with('dateContrat', $dateContrat)
+                        ->with('elevyo', $elevyo);
+                        
+                        return back()->with('status', 'Contrat mis à jour avec succès');
+                    } else {
+                        // Créer un nouveau contrat
+                        $nouveauContrat = new Contrat();
+                        $nouveauContrat->eleve_contrat = $eleveId;
+                        $nouveauContrat->cout_contrat = $montant;
+                        $nouveauContrat->id_usercontrat = $idUserContrat;
+                        $nouveauContrat->statut_contrat = 1;
+                        $nouveauContrat->datecreation_contrat = $dateContrat;
+                        $nouveauContrat->save();
+                        Session::put('amount', $montant);
+                        Session::put('classe', $classes);
+                        Session::put('logoUrl', $logoUrl);
+                        Session::put('dateContrat', $dateContrat);
+                        Session::put('elevyo', $elevyo);
+                        return view('pages.Etats.pdfinscription')
+                        ->with('amount', $montant)
+                        ->with('classe', $classes )
+                        ->with('logoUrl', $logoUrl )
+                        ->with('dateContrat', $dateContrat)
+                        ->with('elevyo', $elevyo);
+                        return back()->with('status', 'Contrat créé avec succès');
+                    }
+                } else {
+                    return back()->with('errors', 'Élève non trouvé');
+                }
+
+            // }
+
+
+
+
+         
+        
     }
     
    

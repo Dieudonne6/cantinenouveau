@@ -29,6 +29,7 @@ Route::get('/nouveaucontrat', [PagesController::class, 'nouveaucontrat']);
 Route::get('/paiement', [PagesController::class, 'paiement']);
 
 Route::get('/classes', [ClassesController::class, 'classe']);
+Route::get('/listecontrat', [ClassesController::class, 'listecontrat']);
 Route::get('/connexiondonnees', [PagesController::class, 'connexiondonnees']);
 Route::get('/', [PagesController::class, 'connexion']);
 
@@ -76,6 +77,7 @@ Route::post('/connexions', [PagesController::class, 'connexions']);
 Route::post('/logins', [PagesController::class, 'logins']);
 
 Route::get('/inscription', [EleveController::class, 'inscription']);
+Route::get('/etat', [ClassesController::class, 'etat'])->name('etat');
 Route::get('/etatpaiement', [ClassesController::class, 'etatpaiement'])->name('etatpaiement');
 Route::post('/traitementetatpaiement', [ClassesController::class, 'traitementetatpaiement'])->name('traitementetatpaiement');
 Route::delete('/supprimercontrat/{MATRICULE}', [ClassesController::class, 'supprimercontrat']);

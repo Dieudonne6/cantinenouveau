@@ -30,7 +30,7 @@
     <div class="card">
       <div class="card-body">
         <h4 class="card-title">Etats des droits constatés</h4>
-        <form action="{{url('/filteretat')}}" method="POST">
+        {{-- <form action="{{url('/filteretat')}}" method="POST">
           {{csrf_field()}}
           <div class="form-group row">
             <div class="col-lg-3">
@@ -56,14 +56,15 @@
               <button onclick="imprimePage()" class="btn btn-primary">Imprimer</button>
             </div>
           </div>
-        </form>
+        </form> --}}
         
         <div id="contenu">
           <div>
             <h4 class="card-title" style="text-align: center; font-weight:bold;">Etats des droits constatés ANNEE-ACADEMIQUE: {{ $annee }} - {{ $anneesuivant }} | CLASSE: {{ $classe }}</h4>
           </div><br>
-          <div>
-            <table id="myTable" class="table table-striped table-sm">
+          <div class="table-responsive pt-3">
+            {{-- <table id="myTable" class="table table-striped table-sm" > --}}
+            <table id="myTable" class="table table-bordered" >
               <thead>
                 <tr>
                   <th>N</th>
