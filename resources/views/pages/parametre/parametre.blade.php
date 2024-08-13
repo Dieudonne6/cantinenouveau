@@ -288,7 +288,7 @@
                                   <div class="form-group row">
                                     <label for="exampleInputPassword" class="col-sm-3 col-form-label" _msttexthash="157794" _msthash="114">Mot de passe</label>
                                     <div class="col-sm-9">
-                                      <input type="password" class="form-control" id="exampleInputPassword" name="password" placeholder="Mot de passe" _mstplaceholder="117572" _msthash="117" required>
+                                      <input type="password" class="form-control" id="exampleInputPassword" name="password" placeholder="Mot de passe" _mstplaceholder="117572" _msthash="117">
                                     </div>
                                   </div>
                                   <div class="mb-5">
