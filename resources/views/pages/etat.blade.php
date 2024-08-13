@@ -13,7 +13,7 @@
                       <button class="nav-link active" id="nav-etatpaiement-tab" data-bs-toggle="tab" data-bs-target="#nav-etatpaiement" type="button" role="tab" aria-controls="nav-etatpaiement" aria-selected="true">Etat Paiement</button>
                       <button class="nav-link" id="nav-etatdroitconstate-tab" data-bs-toggle="tab" data-bs-target="#nav-etatdroitconstate" type="button" role="tab" aria-controls="nav-etatdroitconstate" aria-selected="false">Etat Droit constate</button>
                     </div>
-                  </nav>
+                  </nav><br><br>
                   <div class="tab-content" id="nav-tabContent1">
                     <div class="tab-pane fade show active" id="nav-etatpaiement" role="tabpanel" aria-labelledby="nav-etatpaiement-tab">
                         {{-- <div class="container"> --}}

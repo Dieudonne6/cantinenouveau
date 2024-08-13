@@ -30,7 +30,7 @@
     <div class="card">
       <div class="card-body">
         <h4 class="card-title">Etats des droits constatés</h4>
-        <form action="{{url('/filteretat')}}" method="POST">
+        {{-- <form action="{{url('/filteretat')}}" method="POST">
           {{csrf_field()}}
           <div class="form-group row">
             <div class="col-lg-3">
@@ -56,7 +56,7 @@
               <button onclick="imprimePage()" class="btn btn-primary">Imprimer</button>
             </div>
           </div>
-        </form>
+        </form> --}}
         
         <div id="contenu">
           <div>

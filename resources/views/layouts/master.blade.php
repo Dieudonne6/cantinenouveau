@@ -143,7 +143,10 @@ display: block;
 /* .nav-link.hover .menu-title{
   color: #000 !important;
 } */
- 
+
+.nav-tabs .nav-link:hover, .nav-tabs .nav-link:focus {
+  color: #ffff;
+}
 /* body{
   background-color: #f4f5fa;
 } */
