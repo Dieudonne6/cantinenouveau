@@ -175,7 +175,11 @@ class PagesController extends Controller
 
                 Session::put('account', $account);
                 $id_usercontrat = $account->id_usercontrat;
+                $image = $account->image;
+
                 $nom_user = $account->nomuser;
+                Session::put('image', $image);
+
                 $prenom_user = $account->prenomuser;
                 Session::put('id_usercontrat', $id_usercontrat);
                 Session::put('nom_user', $nom_user);
@@ -240,19 +244,19 @@ class PagesController extends Controller
     public function enregistreruser(Request $request){
         $login = new User();
         $password_crypte = Hash::make($request->password);
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+        $login->nomgroupe = 1;
         $login->login = $request->input('login');
         $login->nomuser = $request->input('nom');
         $login->prenomuser = $request->input('prenom');
+        $imagenam = $request->file('image');
+        $imageconten = file_get_contents($imagenam->getRealPath());
+        $login->image = $imageconten;
         $login->motdepasse = $password_crypte;
-        //$login->nomgroupe = 'groupe';
         $login->administrateur = 1;
         $login->user_actif = 1;
-        // $login->motdepasse ='';
-        // $login->motdepasse ='';
-
-        
-        // $login->motdepasse ='';
-
         $login->save();
         return back()->with('status','Enregistrer avec succes');
 

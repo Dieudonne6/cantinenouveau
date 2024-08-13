@@ -101,13 +101,11 @@ transition: transform 0.6s;
 display: block;
 }
 .nav-logout {
-  box-shadow: 0 5px 10px 0 rgba(176, 176, 217, 0.88);
-  border: 1px solid #e4e4f4;
-  padding-left: .875rem;
-  padding-right: .875rem;
-  border-radius: 0.25rem;
-  height: 2.5rem;
+  box-shadow: none;
+  border: none;
   background-color: #fff;
+  padding: 0;
+  margin-left: 1.5rem;
 }
 .sidebar {
   position: fixed;
@@ -135,16 +133,16 @@ display: block;
   color: #ffffff !important; /* Couleur du texte lorsque le lien est actif */
   background-color: #713dad !important; /* Couleur de fond lorsque le lien est actif */
 }
-
-.sub-menu .nav-link:hover {
-  color: #ffffff !important; /* Couleur du texte au survol */
+.sidebar .nav.sub-menu .nav-item::before {
+  content: none !important;
 }
 .nav-link:hover {
-  background-color: #713dad; /* Couleur de fond au survol */
+  /* margin: 0.5rem 0; */
+  background-color: #2c26341d; 
 }
-.nav-link.hover .menu-title{
+/* .nav-link.hover .menu-title{
   color: #000 !important;
-}
+} */
  
 /* body{
   background-color: #f4f5fa;
@@ -214,6 +212,16 @@ display: block;
 </script> --}}
 
 <script>
+  $(document).ready(function() {
+    $('.sub-menu .nav-link').each(function() {
+        if ($(this).hasClass('active')) {
+            var parentCollapse = $(this).closest('.collapse');
+            parentCollapse.addClass('show');
+            parentCollapse.prev('a.nav-link').removeClass('collapsed').attr('aria-expanded', 'true');         
+        }
+    });
+});
+
 $(document).ready(function(){
     $('#myTable').DataTable({
         // "paging": false, // Désactiver la pagination
