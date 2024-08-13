@@ -16,16 +16,7 @@
         {{ Session::get('erreur')}}
         </div>
         @endif
-        {{-- erreur concernant un nouveau contrat --}}
-        @if($errors->any())
-            <div id="statusAlert" class="alert alert-danger">
-                <ul>
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+
       <div class="form-group row">
         <div class="col-3">
         <select class="js-example-basic-multiple w-100" onchange="window.location.href=this.value">
@@ -116,6 +107,16 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
+                              {{-- erreur concernant un nouveau contrat --}}
+                              @if($errors->any())
+                              <div id="statusAlert" class="alert alert-danger">
+                                  <ul>
+                                      @foreach($errors->all() as $error)
+                                          <li>{{ $error }}</li>
+                                      @endforeach
+                                  </ul>
+                              </div>
+                              @endif
               <div class="col-md-12 mx-auto grid-margin stretch-card">
                 {{-- <div class="card"> --}}
                     {{-- <div class="card-body"> --}}
@@ -131,7 +132,7 @@
                         @endif
                         <div class="form-group w-100 mb-6">
                           @csrf
-                          <label for="classSelect">Sélectionner la classe</label>
+                          <label for="classSelect">Classe</label>
                           <select class="js-example-basic-multiple w-100" id="classSelect" name="classes">
                             {{-- <option value="">Sélectionner la classe</option> --}}
                             @foreach ($classe as $eleves)
@@ -140,7 +141,7 @@
                           </select>
                         </div>
                         <div class="form-group w-100">
-                          <label for="eleveSelect">Sélectionner un élève</label>
+                          <label for="eleveSelect">Elève</label>
                           <select id="eleveSelect" class="js-example-basic-multiple w-100" name="matricules">
                             {{-- <option value="">Sélectionner un élève</option> --}}
                           </select>
@@ -341,20 +342,49 @@
 
 
 
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    var myModal = document.getElementById('nouveaucontrat');
-    myModal.addEventListener('hidden.bs.modal', function () {
-        // Réinitialiser les champs du formulaire
-        document.getElementById('myModalForm').reset();
-        
-        // Réinitialiser les champs de sélection
-        var selects = document.querySelectorAll('#myModalForm select');
-        selects.forEach(function(select) {
-            select.selectedIndex = 0;
+
+// $(document).ready(function() {
+//     $('#nouveaucontrat').on('hidden.bs.modal', function () {
+//         // Réinitialiser les champs du formulaire
+//         $('#myModalForm')[0].reset();
+
+//         // Réinitialiser les selects
+//         $('#myModalForm select').each(function() {
+//             $(this).prop('selectedIndex', 0);
+//         });
+//     });
+// });
+
+        document.addEventListener('DOMContentLoaded', function() {
+        var myModal = new bootstrap.Modal(document.getElementById('nouveaucontrat'));
+
+        @if ($errors->any())
+            myModal.show();
+        @endif
+
+        // Réinitialiser les champs du formulaire à la fermeture du modal
+        document.getElementById('nouveaucontrat').addEventListener('hidden.bs.modal', function () {
+            document.getElementById('myModalForm').reset();
+            document.querySelectorAll('#myModalForm .form-control').forEach(input => input.value = '');
         });
     });
-});
+
+// document.addEventListener('DOMContentLoaded', function() {
+//     var myModal = document.getElementById('nouveaucontrat');
+//     myModal.addEventListener('hidden.bs.modal', function () {
+//         // Réinitialiser les champs du formulaire
+//         document.getElementById('myModalForm').reset();
+        
+//         // Réinitialiser les champs de sélection
+//         var selects = document.querySelectorAll('#myModalForm select');
+//         selects.forEach(function(select) {
+//             select.selectedIndex = 0;
+//         });
+//     });
+// });
   </script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 @endsection

@@ -196,7 +196,7 @@ display: block;
     if (statusAlert) {
       setTimeout(function() {
         statusAlert.style.display = 'none';
-      }, 5050); 
+      }, 9050); 
     }
 </script>
 

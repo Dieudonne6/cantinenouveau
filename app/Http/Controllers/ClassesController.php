@@ -27,6 +27,7 @@ use App\Models\Qrcode;
 use App\Models\Params2;
 use GuzzleHttp\Client;
 use App\Http\Requests\InscriptionCantineRequest;
+use App\Http\Requests\PaiementCantineRequest;
 use Illuminate\Support\Facades\Validator;
 
 // use Barryvdh\DomPDF\PDF;
@@ -334,7 +335,7 @@ class ClassesController extends Controller
 
     
         
-public function savepaiementcontrat(Request $request) {
+public function savepaiementcontrat(PaiementCantineRequest $request) {
 
                 $idcontratEleve = Session::get('idcontratEleve');
                 $moisCoches = $request->input('moiscontrat');
@@ -1151,13 +1152,13 @@ public function etat() {
        
         // $dateContrat = $request->input('date');
         // Récupérer la date avec l'heure depuis la requête
-    $dateContrt = $request->input('date');
+        $dateContrt = $request->input('date');
 
-    // Convertir en objet Carbon
-    $dateContratt = Carbon::parse($dateContrt);
+        // Convertir en objet Carbon
+        $dateContratt = Carbon::parse($dateContrt);
 
-    // Formater la date pour l'affichage
-    $dateContrat = $dateContratt->format('Y-m-d H:i:s');
+        // Formater la date pour l'affichage
+        $dateContrat = $dateContratt->format('Y-m-d H:i:s');
 
 
         // Si la date n'est pas spécifiée, utiliser la date du jour
@@ -1233,10 +1234,11 @@ public function etat() {
                         ->with('logoUrl', $logoUrl )
                         ->with('dateContrat', $dateContrat)
                         ->with('elevyo', $elevyo);
-                        return back()->with('status', 'Contrat créé avec succès');
+                        return redirect()->back()->with('success', 'Élève ajouté avec succès');
                     }
                 } else {
-                    return back()->with('errors', 'Élève non trouvé');
+                    return redirect()->back()->with('errors', 'Élève non trouvé');
+                    // return back()->with('errors', 'Élève non trouvé');
                 }
 
             // }
