@@ -36,6 +36,16 @@
                                   {{ Session::get('status')}}
                                   </div>
                                   @endif
+                                  {{-- erreur concernant un nouveau utilisateur --}}
+                                  @if($errors->any())
+                                  <div id="statusAlert" class="alert alert-danger">
+                                      <ul>
+                                          @foreach($errors->all() as $error)
+                                              <li>{{ $error }}</li>
+                                          @endforeach
+                                      </ul>
+                                  </div>
+                                  @endif
                                   <h4 class="card-title">Enregistrement d'un utilisateur</h4>
                                   <form action="{{ url('/enregistreruser') }}" method="POST" enctype="multipart/form-data">
                                     @csrf
@@ -59,8 +69,10 @@
                                       <label for="exampleInputConfirmPassword1">Photos</label>
                                       <input type="file" class="form-control" name="image" id="exampleInputConfirmPassword1" placeholder="Photo">
                                     </div>
-                                    <button type="submit" class="btn btn-primary mr-2">Enregistrer</button>
-                                    <button class="btn btn-light">Annuler</button>
+                                    <div class="mb-5">
+                                      <button type="submit" class="btn btn-primary mr-2">Enregistrer</button>
+                                      <button class="btn btn-light">Annuler</button>
+                                    </div>
                                   </form>
                                 </div>
                               </div>
@@ -76,6 +88,17 @@
                               {{ Session::get('status')}}
                               </div>
                             @endif
+
+                            {{-- erreur concernant un nouveau utilisateur --}}
+                            {{-- @if($errors->any())
+                            <div id="statusAlert" class="alert alert-danger">
+                                <ul>
+                                    @foreach($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                            @endif --}}
                             @if($param)
                               <form action="{{url('modifierfrais/'.$param->id_paramcontrat)}}" method="POST">
                                 {{csrf_field()}}
@@ -89,7 +112,7 @@
                                         <div class="form-group row">
                                           <label for="exampleInputUsername" class="col-sm-3 col-form-label" _msttexthash="202930" _msthash="116"></label>
                                           <div class="col-sm-12">
-                                            <input type="text" name="anneencours_paramcontrat" class="form-control" id="exampleInputUserannée"  value="{{$param->anneencours_paramcontrat}}" _mstplaceholder="117572" _msthash="115">
+                                            <input type="text" name="anneencours_paramcontrat" class="form-control" id="exampleInputUserannée"  value="{{$param->anneencours_paramcontrat}}" _mstplaceholder="117572" _msthash="115" required>
                                           </div>
                                         </div>
                                       </div>
@@ -103,7 +126,7 @@
                                         <div class="form-group row">
                                           <label for="exampleInputUsername" class="col-sm-3 col-form-label" _msttexthash="202930" _msthash="116"></label>
                                           <div class="col-sm-9">
-                                            <input type="text" name="fraisinscription_paramcontrat" value="{{$param->fraisinscription_paramcontrat}}" class="form-control" id="exampleInputUserannée" placeholder="2024" _mstplaceholder="117572" _msthash="115">
+                                            <input type="text" name="fraisinscription_paramcontrat" value="{{$param->fraisinscription_paramcontrat}}" class="form-control" id="exampleInputUserannée" placeholder="2024" _mstplaceholder="117572" _msthash="115" required>
                                           </div>
                                         </div>
                                       </div>
@@ -116,7 +139,7 @@
                                         <div class="form-group row">
                                           <label for="exampleInputUsername" class="col-sm-3 col-form-label" _msttexthash="202930" _msthash="116"></label>
                                           <div class="col-sm-9">
-                                            <input type="text" name="fraisinscription_mat" value="{{$param->fraisinscription_mat}}" class="form-control" id="exampleInputUserannée" placeholder="2024" _mstplaceholder="117572" _msthash="115">
+                                            <input type="text" name="fraisinscription_mat" value="{{$param->fraisinscription_mat}}" class="form-control" id="exampleInputUserannée" placeholder="2024" _mstplaceholder="117572" _msthash="115" required>
                                           </div>
                                         </div>
                                       </div>
@@ -129,7 +152,7 @@
                                         <div class="form-group row">
                                           <label for="exampleInputUsername" class="col-sm-3 col-form-label" _msttexthash="202930" _msthash="116"></label>
                                           <div class="col-sm-9">
-                                            <input type="text" name="fraisinscription2_paramcontrat" value="{{$param->fraisinscription2_paramcontrat}}"  class="form-control" id="exampleInputUserannée"  _mstplaceholder="117572" _msthash="115">
+                                            <input type="text" name="fraisinscription2_paramcontrat" value="{{$param->fraisinscription2_paramcontrat}}"  class="form-control" id="exampleInputUserannée"  _mstplaceholder="117572" _msthash="115" required>
                                           </div>
                                         </div>
                                       </div>
@@ -142,13 +165,15 @@
                                           <div class="form-group row">
                                             <label for="exampleInputUsername" class="col-sm-3 col-form-label" _msttexthash="202930" _msthash="116"></label>
                                             <div class="col-sm-9">
-                                              <input type="text" name="coutmensuel_paramcontrat" class="form-control" value="{{$param->coutmensuel_paramcontrat}}"  id="exampleInputUserannée" _mstplaceholder="117572" _msthash="115">
+                                              <input type="text" name="coutmensuel_paramcontrat" class="form-control" value="{{$param->coutmensuel_paramcontrat}}"  id="exampleInputUserannée" _mstplaceholder="117572" _msthash="115" required>
                                             </div>
                                           </div>
                                       </div>
                                     </div>
                                   </div>
-                                  <button type="submit" class="btn btn-primary w-100" _msttexthash="98280" _msthash="118">Modifier</button>
+                                  <div class="mb-5">
+                                    <button type="submit" class="btn btn-primary" _msttexthash="98280" _msthash="118">Modifier</button>
+                                  </div>
                                 </div>
                               </form>
                             @else
@@ -225,27 +250,38 @@
                                 {{ Session::get('status')}}
                                 </div>
                                 @endif
+
+                                {{-- erreur concernant la connexion a la base de donne --}}
+                                {{-- @if($errors->any())
+                                <div id="statusAlert" class="alert alert-danger">
+                                    <ul>
+                                        @foreach($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                                @endif --}}
                                 <h4 class="mb-5">Connexion à la base de donnée</h4>
                                 <form action="{{url('connexion')}}" method="POST">
                                   {{csrf_field()}}
                                   <div class="form-group row">
                                     <label for="exampleInputServeur" class="col-sm-3 col-form-label" _msttexthash="564538" _msthash="108">Serveur</label>
                                     <div class="col-sm-9">
-                                      <input type="text" class="form-control" id="exampleInputServeur" name="nameserveur" placeholder="localhost" _mstplaceholder="113997" _msthash="109">
+                                      <input type="text" class="form-control" id="exampleInputServeur" name="nameserveur" placeholder="localhost" _mstplaceholder="113997" _msthash="109" required>
                                     </div>
                                   </div>
                           
                                   <div class="form-group row">
                                     <label for="exampleInputDatabase" class="col-sm-3 col-form-label" _msttexthash="564538"  _msthash="110">Base de donnée</label>
                                     <div class="col-sm-9">
-                                      <input type="text" class="form-control" id="exampleInputDatabase" name="namebase" placeholder="Nom de la base de donnée" _mstplaceholder="58058" _msthash="111">
+                                      <input type="text" class="form-control" id="exampleInputDatabase" name="namebase" placeholder="Nom de la base de donnée" _mstplaceholder="58058" _msthash="111" required>
                                     </div>
                                   </div>
                           
                                   <div class="form-group row">
                                     <label for="exampleInputUsername" class="col-sm-3 col-form-label" _msttexthash="202930" _msthash="116">Utilisateur</label>
                                     <div class="col-sm-9">
-                                      <input type="text" class="form-control" id="exampleInputUsername" name="user"  placeholder="Utilisateur" _mstplaceholder="117572" _msthash="115">
+                                      <input type="text" class="form-control" id="exampleInputUsername" name="user"  placeholder="Utilisateur" _mstplaceholder="117572" _msthash="115" required>
                                     </div>
                                   </div>
                           
@@ -255,7 +291,9 @@
                                       <input type="password" class="form-control" id="exampleInputPassword" name="password" placeholder="Mot de passe" _mstplaceholder="117572" _msthash="117">
                                     </div>
                                   </div>
-                                  <button type="submit" class="btn btn-primary mr-2" _msttexthash="98280" _msthash="118">Tester</button>
+                                  <div class="mb-5">
+                                    <button type="submit" class="btn btn-primary mr-2" _msttexthash="98280" _msthash="118">Connexion</button>
+                                  </div>
                                 </form>
                               </div>
                             </div>
@@ -286,32 +324,45 @@
                                       {{ Session::get('status')}}
                                     </div>
                                   @endif
+
+                                  {{-- erreur concernant les infos emecef dans facture --}}
+                                  {{-- @if($errors->any())
+                                  <div id="statusAlert" class="alert alert-danger">
+                                      <ul>
+                                          @foreach($errors->all() as $error)
+                                              <li>{{ $error }}</li>
+                                          @endforeach
+                                      </ul>
+                                  </div>
+                                  @endif --}}
                                   <form action="{{url('paramsemecef')}}" method="POST"  enctype="multipart/form-data" id="div1" class="d-block">
                                     {{csrf_field()}}
                                     <h4 class="card-title">Informations Emecef</h4>
                       
                                     <div class="form-group">
                                       <label for="exampleInputUsername1">IFU</label>
-                                      <input type="text" class="form-control" name="ifu" id="exampleInputUsername1" placeholder="IFU">
+                                      <input type="text" class="form-control" name="ifu" id="exampleInputUsername1" placeholder="IFU" required>
                                     </div>
                                     <div class="form-group">
                                       <label for="exampleInputEmail1">Token</label>
-                                      <input type="text" class="form-control" name="token" id="exampleInputEmail1" placeholder="Token">
+                                      <input type="text" class="form-control" name="token" id="exampleInputEmail1" placeholder="Token" required>
                                     </div>
                                     <div class="form-group row">
                                       <label for="exampleInputUsername1">Groupe de taxe</label>
-                                      <input type="text" class="form-control" name="taxe"  id="exampleInputUsername1" placeholder="Groupe de taxe">
+                                      <input type="text" class="form-control" name="taxe"  id="exampleInputUsername1" placeholder="Groupe de taxe" required>
                                     </div>
                                     <div class="form-group row">
                                       <label for="exampleInputUsername1">Type de facture</label>
-                                      <input type="text" class="form-control" name="type" id="exampleInputUsername1" placeholder="Type de facture">
+                                      <input type="text" class="form-control" name="type" id="exampleInputUsername1" placeholder="Type de facture" required>
                                     </div>
                                     <div class="form-group row">
                                       <label for="exampleInputUsername1">LOGO</label>
-                                      <input type="file" class="form-control" name="logo" id="exampleInputUsername1" placeholder="Logo">
+                                      <input type="file" class="form-control" name="logo" id="exampleInputUsername1" placeholder="Logo" required>
                                     </div>
-                                    <button type="submit" class="btn btn-primary mr-2">Envoyer</button>
-                                    <input type="reset" class="btn btn-light" value="Annuler">
+                                    <div class="mb-5">
+                                      <button type="submit" class="btn btn-primary mr-2">Envoyer</button>
+                                      <input type="reset" class="btn btn-light" value="Annuler">
+                                    </div>
                                   </form>
                                   <form class="forms-sample d-none" id="div2">
                                     <h4 class="card-title">Informations Mcef</h4>
@@ -319,8 +370,10 @@
                                       <label for="exampleInputUsername1">IFU</label>
                                       <input type="text" class="form-control" id="exampleInputUsername1" placeholder="IFU">
                                     </div>
-                                    <button type="submit" class="btn btn-primary mr-2">Enregistrer</button>
-                                    <button class="btn btn-light">Annuler</button>
+                                    <div class="mb-5">
+                                      <button type="submit" class="btn btn-primary mr-2">Enregistrer</button>
+                                      <button class="btn btn-light">Annuler</button>
+                                    </div>
                                   </form>
                                 </div>
                               </div>

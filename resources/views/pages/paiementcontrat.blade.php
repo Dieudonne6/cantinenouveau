@@ -3,6 +3,17 @@
     <div class="col-lg-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
+
+                                  {{-- erreur concernant le paiement --}}
+                                  @if($errors->any())
+                                  <div id="statusAlert" class="alert alert-danger">
+                                      <ul>
+                                          @foreach($errors->all() as $error)
+                                              <li>{{ $error }}</li>
+                                          @endforeach
+                                      </ul>
+                                  </div>
+                                  @endif
                 <h4 class="card-title" style="text-align: center">Paiement pour <strong>{{ $nomCompletEleveCon }}</strong></h4>
 
                 <form action="{{url('/savepaiementcontrat')}}" method="POST">
@@ -84,7 +95,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-8 mx-auto grid-margin stretch-card mt-5">
+                    <div class="col-md-8 mx-auto grid-margin stretch-card mt-5 mb-5">
 
                         <input type="submit" class="btn btn-primary mr-2" value="Enregistrer">
                         <input type="reset" class="btn btn-light" value="Annuler">
@@ -98,8 +109,8 @@
 @endsection
 
 <script>
-// Attend que le document soit prêt
-document.addEventListener("DOMContentLoaded", function() {
+    // Attend que le document soit prêt
+    document.addEventListener("DOMContentLoaded", function() {
     // Sélectionne tous les éléments avec la classe checkbox-mois
     var checkboxes = document.querySelectorAll('.checkbox-mois');
     var fraismensuelle = document.querySelector('#fraismensuelle');
