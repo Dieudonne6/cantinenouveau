@@ -178,6 +178,7 @@ display: block;
   <!-- endinject -->
   <!-- plugin js for this page -->
   <script src="{{asset('assets/jquery-3.6.0.min.js')}}"></script>
+  <script src="{{asset('assets/bootstrap.bundle.min.js')}}"></script>
 
   <script src="{{asset('assets/vendors/typeahead.js/typeahead.bundle.min.js')}}"></script>
   <script src="{{asset('assets/vendors/select2/select2.min.js')}}"></script>
@@ -187,7 +188,6 @@ display: block;
 
   <script src="{{asset('assets/js/typeahead.js')}}"></script>
   {{-- <script src="{{asset('assets/js/select2.js')}}"></script> --}}
-  <script src="{{asset('assets/jquery-3.6.0.min.js')}}" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
 <script src="{{asset('assets/dataTables.js')}}"></script>
   <script>
