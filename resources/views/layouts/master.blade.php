@@ -10,11 +10,11 @@
   <!-- base:css -->
   <link rel="stylesheet" href="{{asset('assets/vendors/typicons/typicons.css')}}">
   <link rel="stylesheet" href="{{asset('assets/vendors/css/vendor.bundle.base.css')}}">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link href="{{asset('assets/bootstrap.min.css')}}" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
   <script src="{{ asset('davidshimjs-qrcodejs-04f46c6/qrcode.js') }}"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  <link rel="stylesheet" href="https://cdn.datatables.net/2.0.7/css/dataTables.dataTables.css" />
+  <link rel="stylesheet" href="{{asset('assets/all.min.css')}}">
+  <link rel="stylesheet" href="{{asset('assets/dataTables.css')}}" />
   <!-- endinject -->
   <!-- plugin css for this page -->
   <link rel="stylesheet" href="{{asset('assets/vendors/select2/select2.min.css')}}">
@@ -177,7 +177,7 @@ display: block;
   <script src="{{asset('assets/js/todolist.js')}}"></script>
   <!-- endinject -->
   <!-- plugin js for this page -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="{{asset('assets/jquery-3.6.0.min.js')}}"></script>
 
   <script src="{{asset('assets/vendors/typeahead.js/typeahead.bundle.min.js')}}"></script>
   <script src="{{asset('assets/vendors/select2/select2.min.js')}}"></script>
@@ -187,9 +187,9 @@ display: block;
 
   <script src="{{asset('assets/js/typeahead.js')}}"></script>
   {{-- <script src="{{asset('assets/js/select2.js')}}"></script> --}}
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script src="{{asset('assets/jquery-3.6.0.min.js')}}" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
-<script src="https://cdn.datatables.net/2.0.7/js/dataTables.js"></script>
+<script src="{{asset('assets/dataTables.js')}}"></script>
   <script>
     var statusAlert = document.getElementById('statusAlert');
     if (statusAlert) {
