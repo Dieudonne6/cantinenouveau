@@ -354,7 +354,7 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
                 do {
                      // Génère un nombre aléatoire entre 10000000 et 99999999
                     $valeurDynamiqueNumerique = mt_rand(10000000, 99999999);
-                } while (DB::table('paiementglobalcontrat')->where('reference_paiementcontrat', $valeurDynamiqueNumerique)->exists());
+                } while (DB::table('paiementcontrat')->where('reference_paiementcontrat', $valeurDynamiqueNumerique)->exists());
                 
 
 
@@ -408,11 +408,11 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
     $classeeleve = Eleve::where('MATRICULE', $matriculeeleve)->value('CODECLAS');
     $nomcompleteleve = $nomeleve .' '. $prenomeleve;
 
-    $parametrefacture = Paramsfacture::first();
+    $parametrefacture = Params2::first();
     $ifuentreprise = $parametrefacture->ifu;
     $tokenentreprise = $parametrefacture->token;
     $taxe = $parametrefacture->taxe;
-    $type = $parametrefacture->type;
+    $type = $parametrefacture->typefacture;
 
     $parametreetab = Params2::first();
     // $nometab = $parametreetab->NOMETAB;
@@ -595,6 +595,8 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
 
         $nim = $decodedResponseConfirmation['nim'];
 
+        $dateTime = $decodedResponseConfirmation['dateTime'];
+
         // dd($decodedResponseConfirmation);
 
         // Générer le code QR
@@ -622,31 +624,31 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
 
 
                 // ENREGISTREMENT DANS LA TABLE PAIEMENTGLOBALCONTRAT
-               $paiementglobalcontrat =  new Paiementglobalcontrat();
+            //    $paiementglobalcontrat =  new Paiementglobalcontrat();
                     
-               $paiementglobalcontrat->soldeavant_paiementcontrat = $montanttotal;
-               $paiementglobalcontrat->montant_paiementcontrat = $montanttotal;
-               $paiementglobalcontrat->soldeapres_paiementcontrat = 0;
-               $paiementglobalcontrat->id_contrat = $idcontratEleve;
-               $paiementglobalcontrat->id_usercontrat = $id_usercontrat;
-               $paiementglobalcontrat->date_paiementcontrat = $datepaiementcontrat;
-               //     $paiementglobalcontrat->id_usercontrat = null;
-               $paiementglobalcontrat->anne_paiementcontrat = $anneeActuelle;
-               $paiementglobalcontrat->reference_paiementcontrat = $valeurDynamiqueNumerique;
-               $paiementglobalcontrat->statut_paiementcontrat = 1;
-               //     $paiementglobalcontrat->datesuppr_paiementcontrat = null;
-               //    $paiementglobalcontrat->idsuppr_usercontrat = null;
-               //    $paiementglobalcontrat->motifsuppr_paiementcontrat = null;
-               $paiementglobalcontrat->mois_paiementcontrat = $moisConcatenes;
+            //    $paiementglobalcontrat->soldeavant_paiementcontrat = $montanttotal;
+            //    $paiementglobalcontrat->montant_paiementcontrat = $montanttotal;
+            //    $paiementglobalcontrat->soldeapres_paiementcontrat = 0;
+            //    $paiementglobalcontrat->id_contrat = $idcontratEleve;
+            //    $paiementglobalcontrat->id_usercontrat = $id_usercontrat;
+            //    $paiementglobalcontrat->date_paiementcontrat = $datepaiementcontrat;
+            //    //     $paiementglobalcontrat->id_usercontrat = null;
+            //    $paiementglobalcontrat->anne_paiementcontrat = $anneeActuelle;
+            //    $paiementglobalcontrat->reference_paiementcontrat = $valeurDynamiqueNumerique;
+            //    $paiementglobalcontrat->statut_paiementcontrat = 1;
+            //    //     $paiementglobalcontrat->datesuppr_paiementcontrat = null;
+            //    //    $paiementglobalcontrat->idsuppr_usercontrat = null;
+            //    //    $paiementglobalcontrat->motifsuppr_paiementcontrat = null;
+            //    $paiementglobalcontrat->mois_paiementcontrat = $moisConcatenes;
 
-               $paiementglobalcontrat->save();
+            //    $paiementglobalcontrat->save();
 
 
 
                // Récupérer l'id_paiementcontrat de la table paiementglobalcontrat qui correspond a l'id du contrat
-                $idPaiementContrat = Paiementglobalcontrat::where('id_contrat', $idcontratEleve)
-                ->orderBy('id_paiementcontrat', 'desc')
-                ->value('id_paiementcontrat');
+                // $idPaiementContrat = Paiementglobalcontrat::where('id_contrat', $idcontratEleve)
+                // ->orderBy('id_paiementcontrat', 'desc')
+                // ->value('id_paiementcontrat');
                 // dd($idPaiementContrat);                
 
                 // ENREGISTREMENT DANS LA TABLE PAIEMENTCONTRAT
@@ -655,6 +657,7 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
 
                 // Parcourir les mois cochés et insérer chaque id de mois dans la table Inscriptioncontrat
                 foreach ($moisCoches as $id_moiscontrat) {
+
                     Paiementcontrat::create([
                         // 'id_paiementcontrat ' => $valeurDynamiqueidpaiemnetcontrat, 
                         'soldeavant_paiementcontrat' => $montantmoiscontrat,
@@ -670,49 +673,60 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
                         // 'datesuppr_paiementcontrat' => $anneeActuelle,
                         // 'idsuppr_usercontrat' => $anneeActuelle,
                         // 'motifsuppr_paiementcontrat' => $anneeActuelle,
-                        'id_paiementglobalcontrat' => $idPaiementContrat,
+                        // 'id_paiementglobalcontrat' => 90,
+                        'montanttotal' => $montanttotal,
+
                     ]);
                 }
+
 
 
     
         // $commandeId =  \App\Models\Commandes::find(id);
         // $commande = \App\Models\Commandes::find($commandid);
         // dd($codemecef);
+
+                // gestion du code qr sous forme d'image
+
+                $fileNameqrcode = $nomcompleteleve . time() . '.png';
+                $result = Builder::create()
+                    ->writer(new PngWriter())
+                    ->data($qrCodeString)
+                    ->size(100)
+                    // ->margin(10)
+                    ->build();
+        
+                    $qrcodecontent = $result->getString();
+        
+                    // $qrcode = new Qrcode();
+                    // $qrcode->id = $fileNameqrcode;
+                    // $qrcode->nom = $fileNameqrcode;
+                    // $qrcode->qrcode = $qrcodecontent;
+        
+        
+                    // $qrcode->save();
     
         $facturenormalise = new Facturenormalise();
             $facturenormalise->id = $reffacture;
             $facturenormalise->codemecef = $codemecef;
+            $facturenormalise->counters = $counters;
+            $facturenormalise->nim = $nim;
+            $facturenormalise->dateHeure = $dateTime;
+            $facturenormalise->ifuEcole = $ifuentreprise;
             $facturenormalise->MATRICULE = $matriculeeleve;
             $facturenormalise->idcontrat = $idcontratEleve;
-            $facturenormalise->id_paiementglobalcontrat = $idPaiementContrat;
+            $facturenormalise->moispayes = $toutmoiscontrat;
             $facturenormalise->classe = $classeeleve;
             $facturenormalise->nom = $nomcompleteleve;
             $facturenormalise->montant_total = $montanttotal;
+            $facturenormalise->qrcode = $qrcodecontent;
+            $facturenormalise->statut = 1;
         
         $facturenormalise->save();
 
 
 
-        // gestion du code qr sous forme d'image
 
-        $fileNameqrcode = $nomcompleteleve . time() . '.png';
-        $result = Builder::create()
-            ->writer(new PngWriter())
-            ->data($qrCodeString)
-            ->size(100)
-            // ->margin(10)
-            ->build();
-
-            $qrcodecontent = $result->getString();
-
-            $qrcode = new Qrcode();
-            $qrcode->id = $fileNameqrcode;
-            $qrcode->nom = $fileNameqrcode;
-            $qrcode->qrcode = $qrcodecontent;
-
-
-            $qrcode->save();
     
         //$filePath = public_path('qrcodes/' . $fileNameqrcode);
     
@@ -723,15 +737,15 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
     
         //$result->saveToFile($filePath);
 
-        $paramse = Paramsfacture::first(); 
+        $paramse = Params2::first(); 
 
-        $logoUrl = $paramse ? $paramse->logo: null; 
+        $logoUrl = $paramse ? $paramse->logoimage: null; 
     
     
-            $id = $fileNameqrcode;
-            $qrcodesin = Qrcode::find($id);
+            // $id = $fileNameqrcode;
+            // $qrcodesin = Qrcode::find($id);
     
-            $qrcodecontent = $qrcodesin->qrcode;
+            // $qrcodecontent = $qrcodesin->qrcode;
     
         Session::put('factureconfirm', $decodedResponseConfirmation);
         Session::put('fileNameqrcode', $fileNameqrcode);
