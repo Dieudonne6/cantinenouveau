@@ -469,23 +469,41 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
     
     //         $jsonData = json_encode($invoiceRequestDto, JSON_UNESCAPED_UNICODE);
 
+        
+                    // -------------------------------
+                        //  CREATION DE LA FACTURE
+                    // -------------------------------
+    
             // Préparez les données JSON pour l'API
-                $jsonData = json_encode([
-                    "ifu" => $ifuentreprise, // ici on doit rendre la valeur de l'ifu dynamique
-                                "type" => $type,
-                    "items" => [
-                        [
-                            'name' => 'contrat de cantine',
-                            // 'price' => intval($infocontrateleve->montant_paiementcontrat),
-                            'price' => intval($montanttotal), 
-                            'quantity' => 1,
-                            'taxGroup' => $taxe,
-                        ]
-                    ],
-                    "operator" => [
-                        "name" => "test"
+            $jsonData = json_encode([
+                "ifu" => $ifuentreprise, // ici on doit rendre la valeur de l'ifu dynamique
+                // "aib" => "A",
+                "type" => $type,
+                "items" => [
+                    [
+                        'name' => 'Frais cantine pour :'.$toutmoiscontrat,
+                        // 'price' => intval($infocontrateleve->montant_paiementcontrat),
+                        'price' => intval($montanttotal), 
+                        'quantity' => 1,
+                        'taxGroup' => $taxe,
                     ]
-                ]);
+                ],
+                "client" => [
+                    // "ifu" => "string",
+                    "name"=>  $nomcompleteleve,
+                    // "contact" => "string",
+                    // "address"=> "string"
+                ],
+                "operator" => [
+                    "name" => "test"
+                ],
+                "payment" => [
+                    [
+                    "name" => "ESPECES",
+                    //   "amount": 0
+                    ]
+                  ],
+            ]);
             // $jsonDataliste = json_encode($jsonData, JSON_FORCE_OBJECT);
 
 
@@ -495,7 +513,7 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
             $apiUrl = 'https://developper.impots.bj/sygmef-emcf/api/invoice';
     
             // Définissez le jeton d'authentification
-            $token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjAyMDIzODAwNjgwNzR8VFMwMTAwNzgyMiIsInJvbGUiOiJUYXhwYXllciIsIm5iZiI6MTcxMzk2NDA3MSwiZXhwIjoxNzQ1NDQ5MjAwLCJpYXQiOjE3MTM5NjQwNzEsImlzcyI6ImltcG90cy5iaiIsImF1ZCI6ImltcG90cy5iaiJ9.CuR4P9gaXP1T-I5vWuR0i_iXlRHSZhyu8Hry73GO5o8';
+            $token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjAyMDIzODU5MTExMzh8VFMwMTAxMTQ3MiIsInJvbGUiOiJUYXhwYXllciIsIm5iZiI6MTcyNDI1NzQyMywiZXhwIjoxNzM3NDE0MDAwLCJpYXQiOjE3MjQyNTc0MjMsImlzcyI6ImltcG90cy5iaiIsImF1ZCI6ImltcG90cy5iaiJ9.sRcSeEbIuQNSgFebRRaxW4zPLCqlF6PQXc90e2xfHCs';
             // $token = $tokenentreprise;
     
             // Effectuez la requête POST à l'API
@@ -535,7 +553,55 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
     
         // Affichez l'UID
         // echo "L'UID de la demande est : $uid";
+
+        
+                // -------------------------------
+                    //  RECUPERATION DE LA FACTURE PAR SON UID
+                // -------------------------------
+
+            // Définissez l'URL de l'API de confirmation de facture
+            $recuperationUrl = 'https://developper.impots.bj/sygmef-emcf/api/invoice/'.$uid;
     
+            // Configuration de la requête cURL pour la confirmation
+            $chRecuperation = curl_init($recuperationUrl);
+            curl_setopt($chRecuperation, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($chRecuperation, CURLOPT_CUSTOMREQUEST, 'GET');
+            curl_setopt($chRecuperation, CURLOPT_HTTPHEADER, [
+                'Authorization: Bearer ' . $token,
+                'Content-Length: 0'
+            ]);
+            curl_setopt($chRecuperation, CURLOPT_CAINFO, storage_path('certificates/cacert.pem'));
+
+            // Exécutez la requête cURL pour la confirmation
+            $responseRecuperation = curl_exec($chRecuperation);
+            // dd($responseConfirmation);
+            // Vérifiez les erreurs de cURL pour la confirmation
+
+
+            // Fermez la session cURL pour la confirmation
+            curl_close($chRecuperation);
+
+        // Convertissez la réponse JSON en tableau associatif PHP
+        $decodedDonneFacture = json_decode($responseRecuperation, true);
+
+        $facturedetaille = json_decode($jsonData, true);
+        $ifuEcoleFacture = $decodedDonneFacture['ifu'];
+        // dd($ifuEcoleFacture);
+        $itemFacture = $decodedDonneFacture['items'];
+        $doneeDetailleItemFacture = $itemFacture['0'];
+        $nameItemFacture = $doneeDetailleItemFacture['name'];
+        $prixTotalItemFacture = $doneeDetailleItemFacture['price'];
+        $quantityItemFacture = $doneeDetailleItemFacture['quantity'];
+        $taxGroupItemFacture = $doneeDetailleItemFacture['taxGroup'];
+        // $idd = $responseRecuperation.ifu;
+        $nameClient = $decodedDonneFacture['client']['name'];
+        // dd($decodedDonneFacture);
+
+    
+                // -------------------------------
+                    //  CONFIRMATION DE LA FACTURE 
+                // -------------------------------
+
         // ACTION pour la confirmation
         $actionConfirmation = 'confirm';
     
@@ -567,28 +633,8 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
     
     // Convertissez la réponse JSON en tableau associatif PHP
     $decodedResponseConfirmation = json_decode($responseConfirmation, true);
-    
-    $facturedetaille = json_decode($jsonData, true);
-    // dd($facturedetaille);
-    
-    // $reffacture = uniqid('f_');
     // dd($decodedResponseConfirmation);
-    // dd($facturedetaille);
     
-    // Vérifiez si la conversion a réussi
-    if ($decodedResponseConfirmation === null) {
-        // La conversion a échoué
-        // echo 'Erreur lors de la conversion JSON : ' . json_last_error_msg();
-        return back()->with('erreur','Erreur lors de la convertion json');
-
-    } else {
-    
-        // 'codemecef',
-        // 'commande_id',
-        // 'user_id',
-        // 'nom_utilisateur',
-        // 'montant_total',
-        // 'details',
     
         $codemecef = $decodedResponseConfirmation['codeMECeFDGI'];
 
@@ -624,33 +670,7 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
 
 
 
-                // ENREGISTREMENT DANS LA TABLE PAIEMENTGLOBALCONTRAT
-            //    $paiementglobalcontrat =  new Paiementglobalcontrat();
-                    
-            //    $paiementglobalcontrat->soldeavant_paiementcontrat = $montanttotal;
-            //    $paiementglobalcontrat->montant_paiementcontrat = $montanttotal;
-            //    $paiementglobalcontrat->soldeapres_paiementcontrat = 0;
-            //    $paiementglobalcontrat->id_contrat = $idcontratEleve;
-            //    $paiementglobalcontrat->id_usercontrat = $id_usercontrat;
-            //    $paiementglobalcontrat->date_paiementcontrat = $datepaiementcontrat;
-            //    //     $paiementglobalcontrat->id_usercontrat = null;
-            //    $paiementglobalcontrat->anne_paiementcontrat = $anneeActuelle;
-            //    $paiementglobalcontrat->reference_paiementcontrat = $valeurDynamiqueNumerique;
-            //    $paiementglobalcontrat->statut_paiementcontrat = 1;
-            //    //     $paiementglobalcontrat->datesuppr_paiementcontrat = null;
-            //    //    $paiementglobalcontrat->idsuppr_usercontrat = null;
-            //    //    $paiementglobalcontrat->motifsuppr_paiementcontrat = null;
-            //    $paiementglobalcontrat->mois_paiementcontrat = $moisConcatenes;
-
-            //    $paiementglobalcontrat->save();
-
-
-
-               // Récupérer l'id_paiementcontrat de la table paiementglobalcontrat qui correspond a l'id du contrat
-                // $idPaiementContrat = Paiementglobalcontrat::where('id_contrat', $idcontratEleve)
-                // ->orderBy('id_paiementcontrat', 'desc')
-                // ->value('id_paiementcontrat');
-                // dd($idPaiementContrat);                
+           
 
                 // ENREGISTREMENT DANS LA TABLE PAIEMENTCONTRAT
 
@@ -681,12 +701,6 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
                 }
 
 
-
-    
-        // $commandeId =  \App\Models\Commandes::find(id);
-        // $commande = \App\Models\Commandes::find($commandid);
-        // dd($codemecef);
-
                 // gestion du code qr sous forme d'image
 
                 $fileNameqrcode = $nomcompleteleve . time() . '.png';
@@ -699,49 +713,34 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
         
                     $qrcodecontent = $result->getString();
         
-                    // $qrcode = new Qrcode();
-                    // $qrcode->id = $fileNameqrcode;
-                    // $qrcode->nom = $fileNameqrcode;
-                    // $qrcode->qrcode = $qrcodecontent;
+                    $facturenormalise = new Facturenormalise();
+                    $facturenormalise->id = $reffacture;
+                    $facturenormalise->codemecef = $codemecef;
+                    $facturenormalise->counters = $counters;
+                    $facturenormalise->nim = $nim;
+                    $facturenormalise->dateHeure = $dateTime;
+                    $facturenormalise->ifuEcole = $ifuEcoleFacture;
+                    $facturenormalise->MATRICULE = $matriculeeleve;
+                    $facturenormalise->idcontrat = $idcontratEleve;
+                    $facturenormalise->moispayes = $moisConcatenes;
+                    $facturenormalise->classe = $classeeleve;
+                    $facturenormalise->nom = $nameClient;
+                    $facturenormalise->designation = $nameItemFacture;
+                    $facturenormalise->montant_total = $prixTotalItemFacture;
+                    $facturenormalise->datepaiementcontrat = $datepaiementcontrat;
+                    $facturenormalise->qrcode = $qrcodecontent;
+                    $facturenormalise->statut = 1;
         
-        
-                    // $qrcode->save();
-    
-        $facturenormalise = new Facturenormalise();
-            $facturenormalise->id = $reffacture;
-            $facturenormalise->codemecef = $codemecef;
-            $facturenormalise->counters = $counters;
-            $facturenormalise->nim = $nim;
-            $facturenormalise->dateHeure = $dateTime;
-            $facturenormalise->ifuEcole = $ifuentreprise;
-            $facturenormalise->MATRICULE = $matriculeeleve;
-            $facturenormalise->idcontrat = $idcontratEleve;
-            $facturenormalise->moispayes = $toutmoiscontrat;
-            $facturenormalise->classe = $classeeleve;
-            $facturenormalise->nom = $nomcompleteleve;
-            $facturenormalise->montant_total = $montanttotal;
-            $facturenormalise->qrcode = $qrcodecontent;
-            $facturenormalise->statut = 1;
-        
-        $facturenormalise->save();
+                    $facturenormalise->save();
 
 
-
-
-    
-        //$filePath = public_path('qrcodes/' . $fileNameqrcode);
-    
-        // Assurez-vous que le répertoire qrcodes existe, sinon créez-le
-        //if (!file_exists(public_path('qrcodes'))) {
-        //    mkdir(public_path('qrcodes'), 0755, true);
-        //}
-    
-        //$result->saveToFile($filePath);
 
         $paramse = Params2::first(); 
 
         $logoUrl = $paramse ? $paramse->logoimage: null; 
     
+        $NOMETAB = $paramse->NOMETAB;
+
     
             // $id = $fileNameqrcode;
             // $qrcodesin = Qrcode::find($id);
@@ -755,8 +754,14 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
         Session::put('classeeleve', $classeeleve);
         Session::put('nomcompleteleve', $nomcompleteleve);
         Session::put('toutmoiscontrat', $toutmoiscontrat);
+        Session::put('nameItemFacture', $nameItemFacture);
+        Session::put('prixTotalItemFacture', $prixTotalItemFacture);
+        Session::put('quantityItemFacture', $quantityItemFacture);
+        Session::put('taxGroupItemFacture', $taxGroupItemFacture);
+        Session::put('ifuEcoleFacture', $ifuEcoleFacture);
         Session::put('qrCodeString', $qrCodeString);
         Session::put('qrcodecontent', $qrcodecontent);
+        Session::put('NOMETAB', $NOMETAB);
         // Session::put('nometab', $nometab);
         // Session::put('villeetab', $villeetab);
 
@@ -768,13 +773,18 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
             'fileNameqrcode' => $fileNameqrcode,
             'facturedetaille' => $facturedetaille,
             'reffacture' => $reffacture,
+            'ifuEcoleFacture' => $ifuEcoleFacture,
+            'nameItemFacture' => $nameItemFacture,
+            'prixTotalItemFacture' => $prixTotalItemFacture,
+            'quantityItemFacture' => $quantityItemFacture,
+            'taxGroupItemFacture' => $taxGroupItemFacture,
             'classeeleve' => $classeeleve,
             'nomcompleteleve' => $nomcompleteleve,
             'toutmoiscontrat' => $toutmoiscontrat,
             'qrCodeString' => $qrCodeString,
             'logoUrl' => $logoUrl,
             'qrcodecontent' => $qrcodecontent,
-            // 'nometab' => $nometab,
+            'NOMETAB' => $NOMETAB,
             // 'villeetab' => $villeetab,
             // 'qrCodeImage' => $qrCodeImage,
     
@@ -785,12 +795,7 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
     
     
     }
-    } else {
-        // La réponse ne contient pas d'UID
-        // echo 'Erreur : Aucun UID trouvé dans la réponse de l\'API.';
-        return back()->with('erreur','Aucun iud trouver dans la reponse de l\'API');
 
-    }
     
 }
 
@@ -876,14 +881,7 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
             // dd($id_usercontrat);
             $anneeActuelle = date('Y');
     
-            // generer une valeur aleatoire comprise entre 10000000 et 99999999 et verifier si elle existe deja dans la table.
-            // Si la valeur est déjà présente, exists() renverra true, et la boucle continuera à s'exécuter pour générer une nouvelle valeur.
-            // Si la valeur n'est pas présente (c'est-à-dire qu'elle est unique), la condition exists() renverra false, et la boucle s'arrêtera.
-    
-            // do {
-            //      // Génère un nombre aléatoire entre 10000000 et 99999999
-            //     $valeurDynamiqueNumerique = mt_rand(10000000, 99999999);
-            // } while (DB::table('paiementcontrat')->where('reference_paiementcontrat', $valeurDynamiqueNumerique)->exists());
+           
             
     
     
@@ -908,27 +906,6 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
             // Convertir le tableau en une chaîne de caractères
             $moisConcatenes = implode(',', $nomsMoisCoches);
     
-            // dd($moisConcatenes);
-            // Récupérer la somme des montants de paiement précédents
-            // $soldeavant_paiementcontrat = DB::table('paiementglobalcontrat')
-            // ->where('id_contrat', $idcontratEleve)
-            // ->sum('montant_paiementcontrat');
-    
-            // // dd($soldeavant_paiementcontrat);
-            // // Calculer le solde après le paiement en ajoutant le montant du paiement actuel à la somme des montants précédents
-            // $soldeapres_paiementcontrat = $soldeavant_paiementcontrat + $montanttotal;
-            // // dd($soldeapres_paiementcontrat);
-    
-    
-    
-    
-            
-    
-    
-    
-                // echo('paiement effectuer avec succes');
-    
-    
     
                         // GESTION DE LA FACTURE NORMALISE
     
@@ -943,7 +920,7 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
                     $tokenentreprise = $parametrefacture->token;
                     $taxe = $parametrefacture->taxe;
                     $type = $parametrefacture->typefacture;
-    
+                    // dd($ifuentreprise);
                     $parametreetab = Params2::first();
                     // $nometab = $parametreetab->NOMETAB;
                     // $villeetab = $parametreetab->VILLE;
@@ -951,69 +928,39 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
     
     
     
-                // dd($classeeleve);
-    
-                // $infocontrateleve = Paiementglobalcontrat::where('id_contrat', $idcontratEleve)
-                // ->orderBy('id_paiementcontrat', 'desc')->first();
-    
-                // $toutmoiscontrat = $infocontrateleve->mois_paiementcontrat;
-                // $moisavecvirg = implode(',', $nomsMoisCoches);
-                // $toutmoiscontrat = $moisavecvirg;
-    
-    
-                // dd($toutmoiscontrat);
-    
-    
-                // $invoiceItems = 
-                //      [
-                //         [
-                //                 // 'date' => $infocontrateleve->date_paiementcontrat,
-                //                 // 'montantpaiement' => intval($infocontrateleve->montant_paiementcontrat), // Convertir le prix en entier
-                //                 // 'mois' => $infocontrateleve->mois_paiementcontrat,
-                //                 // 'eleve' => $nomcompleteleve,
-                //                 // 'classe' => $classeeleve,
-                //                 // 'taxGroup' => 'B', // La taxe reste la même, adaptez si nécessaire
-    
-                //                 'name' => 'contrat de cantine',
-                //                 // 'price' => intval($infocontrateleve->montant_paiementcontrat),
-                //                 'price' => intval($montanttotal), 
-                //                 'quantity' => 1,
-                //                 'taxGroup' => $taxe, // La taxe reste la même, adaptez si nécessaire
-                //         ]
-                //             ];
-                    
-                    
-                        
-                //         $invoiceRequestDto = [
-                //             "ifu" => $ifuentreprise, // ici on doit rendre la valeur de l'ifu dynamique
-                //             "type" => $type,
-                //             "items" => $invoiceItems,
-                //             "operator" => [
-                //                 // "name" => $nomecole
-                //                 "name" => "test"
-                //             ]
-                //         ];
-    
-                //         // dd($invoiceRequestDto);
-    
-                //         $jsonData = json_encode($invoiceRequestDto, JSON_UNESCAPED_UNICODE);
+                    // -------------------------------
+                        //  CREATION DE LA FACTURE
+                    // -------------------------------
     
                         // Préparez les données JSON pour l'API
                             $jsonData = json_encode([
                                 "ifu" => $ifuentreprise, // ici on doit rendre la valeur de l'ifu dynamique
-                                            "type" => $type,
+                                // "aib" => "A",
+                                "type" => $type,
                                 "items" => [
                                     [
-                                        'name' => 'Cantine de :'.$moisConcatenes,
+                                        'name' => 'Frais cantine pour :'.$moisConcatenes,
                                         // 'price' => intval($infocontrateleve->montant_paiementcontrat),
                                         'price' => intval($montanttotal), 
                                         'quantity' => 1,
                                         'taxGroup' => $taxe,
                                     ]
                                 ],
+                                "client" => [
+                                    // "ifu" => "string",
+                                    "name"=>  $nomcompleteleve,
+                                    // "contact" => "string",
+                                    // "address"=> "string"
+                                ],
                                 "operator" => [
                                     "name" => "test"
-                                ]
+                                ],
+                                "payment" => [
+                                    [
+                                    "name" => "ESPECES",
+                                    //   "amount": 0
+                                    ]
+                                  ],
                             ]);
                         // $jsonDataliste = json_encode($jsonData, JSON_FORCE_OBJECT);
     
@@ -1048,6 +995,43 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
                 // echo 'Erreur cURL : ' . curl_error($ch);
                 return back()->with('erreur','Erreur curl , mauvaise connexion a l\'API');
             }
+
+            // {
+            //     "ifu": "string",
+            //     "aib": "A",
+            //     "type": "FV",
+            //     "items": [
+            //       {
+            //         "code": "string",
+            //         "name": "string",
+            //         "price": 0,
+            //         "quantity": 0,
+            //         "taxGroup": "A",
+            //         "taxSpecific": 0,
+            //         "originalPrice": 0,
+            //         "priceModification": "string"
+            //       }
+            //     ],
+            //     "client": {
+            //       "ifu": "string",
+            //       "name": "string",
+            //       "contact": "string",
+            //       "address": "string"
+            //     },
+            //     "operator": {
+            //       "id": "string",
+            //       "name": "string"
+            //     },
+            //     "payment": [
+            //       {
+            //         "name": "ESPECES",
+            //         "amount": 0
+            //       }
+            //     ],
+            //     "reference": "string",
+            //     "innat": "NA",
+            //     "usconf": true
+            //   }
     
             // Fermez la session cURL
             curl_close($ch);
@@ -1065,12 +1049,63 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
                 // Affichez l'UID
                 // echo "L'UID de la demande est : $uid";
     
-                // ACTION pour la confirmation
-                $actionConfirmation = 'confirm';
+               
     
+
+                // -------------------------------
+                    //  RECUPERATION DE LA FACTURE PAR SON UID
+                // -------------------------------
+
+                // Définissez l'URL de l'API de confirmation de facture
+                $recuperationUrl = 'https://developper.impots.bj/sygmef-emcf/api/invoice/'.$uid;
+    
+                // Configuration de la requête cURL pour la confirmation
+                $chRecuperation = curl_init($recuperationUrl);
+                curl_setopt($chRecuperation, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($chRecuperation, CURLOPT_CUSTOMREQUEST, 'GET');
+                curl_setopt($chRecuperation, CURLOPT_HTTPHEADER, [
+                    'Authorization: Bearer ' . $token,
+                    'Content-Length: 0'
+                ]);
+                curl_setopt($chRecuperation, CURLOPT_CAINFO, storage_path('certificates/cacert.pem'));
+    
+                // Exécutez la requête cURL pour la confirmation
+                $responseRecuperation = curl_exec($chRecuperation);
+                // dd($responseConfirmation);
+                // Vérifiez les erreurs de cURL pour la confirmation
+
+    
+                // Fermez la session cURL pour la confirmation
+                curl_close($chRecuperation);
+    
+            // Convertissez la réponse JSON en tableau associatif PHP
+            $decodedDonneFacture = json_decode($responseRecuperation, true);
+    
+            // $facturedetaille = json_decode($jsonData, true);
+            $ifuEcoleFacture = $decodedDonneFacture['ifu'];
+            // dd($ifuEcoleFacture);
+            $itemFacture = $decodedDonneFacture['items'];
+            $doneeDetailleItemFacture = $itemFacture['0'];
+            $nameItemFacture = $doneeDetailleItemFacture['name'];
+            $prixTotalItemFacture = $doneeDetailleItemFacture['price'];
+            $quantityItemFacture = $doneeDetailleItemFacture['quantity'];
+            $taxGroupItemFacture = $doneeDetailleItemFacture['taxGroup'];
+            // $idd = $responseRecuperation.ifu;
+            $nameClient = $decodedDonneFacture['client']['name'];
+            // dd($decodedDonneFacture);
+
+
+
+                // -------------------------------
+                    //  CONFIRMATION DE LA FACTURE 
+                // -------------------------------
+
+                 // ACTION pour la confirmation
+                 $actionConfirmation = 'confirm';
+
                 // Définissez l'URL de l'API de confirmation de facture
                 $confirmationUrl = 'https://developper.impots.bj/sygmef-emcf/api/invoice/'.$uid.'/'.$actionConfirmation;
-    
+            
                 // Configuration de la requête cURL pour la confirmation
                 $chConfirmation = curl_init($confirmationUrl);
                 curl_setopt($chConfirmation, CURLOPT_RETURNTRANSFER, true);
@@ -1080,44 +1115,18 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
                     'Content-Length: 0'
                 ]);
                 curl_setopt($chConfirmation, CURLOPT_CAINFO, storage_path('certificates/cacert.pem'));
-    
+            
                 // Exécutez la requête cURL pour la confirmation
                 $responseConfirmation = curl_exec($chConfirmation);
-    
-                // Vérifiez les erreurs de cURL pour la confirmation
-                if (curl_errno($chConfirmation)) {
-                    // echo 'Erreur cURL pour la confirmation : ' . curl_error($chConfirmation);/
-                    return redirect('classes')->with('erreur','Erreur curl pour la confirmation');
-    
-                }
-    
+            
+            
                 // Fermez la session cURL pour la confirmation
                 curl_close($chConfirmation);
-    
+            
             // Convertissez la réponse JSON en tableau associatif PHP
             $decodedResponseConfirmation = json_decode($responseConfirmation, true);
-    
-            $facturedetaille = json_decode($jsonData, true);
-            // dd($facturedetaille);
-    
-            // $reffacture = uniqid('f_');
             // dd($decodedResponseConfirmation);
-            // dd($facturedetaille);
-    
-            // Vérifiez si la conversion a réussi
-            if ($decodedResponseConfirmation === null) {
-                // La conversion a échoué
-                // echo 'Erreur lors de la conversion JSON : ' . json_last_error_msg();
-                return back()->with('erreur','Erreur lors de la convertion json');
-    
-            } else {
-    
-                // 'codemecef',
-                // 'commande_id',
-                // 'user_id',
-                // 'nom_utilisateur',
-                // 'montant_total',
-                // 'details',
+
     
                 $codemecef = $decodedResponseConfirmation['codeMECeFDGI'];
     
@@ -1127,95 +1136,14 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
     
                 $dateTime = $decodedResponseConfirmation['dateTime'];
     
-                // dd($decodedResponseConfirmation);
     
                 // Générer le code QR
                 $qrCodeString = $decodedResponseConfirmation['qrCode'];
     
                 $reffacture = $nim.'_'.$counters;
     
-    
-    
-    
-    
-                        // Effectuer lrs enregistrement dans les tables inscriptioncontrat, paiementglobalcontrat et paiementcontrat ici pour etre sur que c'est apres que tout soit bien passe que les enregistrement dans ces tables sont effectue
-                
-                        // ENREGISTREMENT DANS LA TABLE INSCRIPTIONCONTRAT
-                        // // Parcourir les mois cochés et insérer chaque id de mois dans la table Inscriptioncontrat
-                        // foreach ($moisCoches as $id_moiscontrat) {
-                        //     Inscriptioncontrat::create([
-                        //         'id_contrat' => $idcontratEleve, 
-                        //         'id_moiscontrat' => $id_moiscontrat,
-                        //         'anne_inscrption' => $anneeActuelle
-                        //     ]);
-                        // }
-    
-    
-    
-    
-                        // ENREGISTREMENT DANS LA TABLE PAIEMENTGLOBALCONTRAT
-                    //    $paiementglobalcontrat =  new Paiementglobalcontrat();
-                            
-                    //    $paiementglobalcontrat->soldeavant_paiementcontrat = $montanttotal;
-                    //    $paiementglobalcontrat->montant_paiementcontrat = $montanttotal;
-                    //    $paiementglobalcontrat->soldeapres_paiementcontrat = 0;
-                    //    $paiementglobalcontrat->id_contrat = $idcontratEleve;
-                    //    $paiementglobalcontrat->id_usercontrat = $id_usercontrat;
-                    //    $paiementglobalcontrat->date_paiementcontrat = $datepaiementcontrat;
-                    //    //     $paiementglobalcontrat->id_usercontrat = null;
-                    //    $paiementglobalcontrat->anne_paiementcontrat = $anneeActuelle;
-                    //    $paiementglobalcontrat->reference_paiementcontrat = $valeurDynamiqueNumerique;
-                    //    $paiementglobalcontrat->statut_paiementcontrat = 1;
-                    //    //     $paiementglobalcontrat->datesuppr_paiementcontrat = null;
-                    //    //    $paiementglobalcontrat->idsuppr_usercontrat = null;
-                    //    //    $paiementglobalcontrat->motifsuppr_paiementcontrat = null;
-                    //    $paiementglobalcontrat->mois_paiementcontrat = $moisConcatenes;
-    
-                    //    $paiementglobalcontrat->save();
-    
-    
-    
-                    // Récupérer l'id_paiementcontrat de la table paiementglobalcontrat qui correspond a l'id du contrat
-                        // $idPaiementContrat = Paiementglobalcontrat::where('id_contrat', $idcontratEleve)
-                        // ->orderBy('id_paiementcontrat', 'desc')
-                        // ->value('id_paiementcontrat');
-                        // dd($idPaiementContrat);                
-    
-                        // ENREGISTREMENT DANS LA TABLE PAIEMENTCONTRAT
-    
-                        // dd($soldeavant_paiementcontrat);
-    
-                        // Parcourir les mois cochés et insérer chaque id de mois dans la table Inscriptioncontrat
-                        // foreach ($moisCoches as $id_moiscontrat) {
-    
-                        //     Paiementcontrat::create([
-                        //         // 'id_paiementcontrat ' => $valeurDynamiqueidpaiemnetcontrat, 
-                        //         'soldeavant_paiementcontrat' => $montantmoiscontrat,
-                        //         'montant_paiementcontrat' => $montantmoiscontrat,
-                        //         'soldeapres_paiementcontrat' => 0,
-                        //         'id_contrat' => $idcontratEleve,
-                        //         'date_paiementcontrat' => $datepaiementcontrat,
-                        //         'id_usercontrat' => $id_usercontrat,
-                        //         'mois_paiementcontrat' => $id_moiscontrat,
-                        //         'anne_paiementcontrat' => $anneeActuelle,
-                        //         'reference_paiementcontrat' => $valeurDynamiqueNumerique,
-                        //         'statut_paiementcontrat' => 1,
-                        //         // 'datesuppr_paiementcontrat' => $anneeActuelle,
-                        //         // 'idsuppr_usercontrat' => $anneeActuelle,
-                        //         // 'motifsuppr_paiementcontrat' => $anneeActuelle,
-                        //         // 'id_paiementglobalcontrat' => 90,
-                        //         'montanttotal' => $montanttotal,
-    
-                        //     ]);
-                        // }
-    
-    
-    
-    
-                // $commandeId =  \App\Models\Commandes::find(id);
-                // $commande = \App\Models\Commandes::find($commandid);
-                // dd($codemecef);
-    
+                // dd($reffacture);
+
             // gestion du code qr sous forme d'image
     
             // $fileNameqrcode = $nomcompleteleve . time() . '.png';
@@ -1228,53 +1156,32 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
     
                 $qrcodecontent = $result->getString();
     
-                // $qrcode = new Qrcode();
-                // $qrcode->id = $fileNameqrcode;
-                // $qrcode->nom = $fileNameqrcode;
-                // $qrcode->qrcode = $qrcodecontent;
-    
-    
-                // $qrcode->save();
+                // dd($qrcodecontent);
+
+            // ENREGISTREMENT DE LA FACTURE
             $facturenormalise = new Facturenormalise();
             $facturenormalise->id = $reffacture;
             $facturenormalise->codemecef = $codemecef;
             $facturenormalise->counters = $counters;
             $facturenormalise->nim = $nim;
             $facturenormalise->dateHeure = $dateTime;
-            $facturenormalise->ifuEcole = $ifuentreprise;
+            $facturenormalise->ifuEcole = $ifuEcoleFacture;
             $facturenormalise->MATRICULE = $matriculeeleve;
             $facturenormalise->idcontrat = $idcontratEleve;
             $facturenormalise->moispayes = $moisConcatenes;
             $facturenormalise->classe = $classeeleve;
-            $facturenormalise->nom = $nomcompleteleve;
-            $facturenormalise->montant_total = $montanttotal;
+            $facturenormalise->nom = $nameClient;
+            $facturenormalise->designation = $nameItemFacture;
+            $facturenormalise->montant_total = $prixTotalItemFacture;
             $facturenormalise->datepaiementcontrat = $datepaiementcontrat;
             $facturenormalise->qrcode = $qrcodecontent;
             $facturenormalise->statut = 1;
         
             $facturenormalise->save();
-    
-    
-    
-    
-    
-            //$filePath = public_path('qrcodes/' . $fileNameqrcode);
-    
-            // Assurez-vous que le répertoire qrcodes existe, sinon créez-le
-            //if (!file_exists(public_path('qrcodes'))) {
-            //    mkdir(public_path('qrcodes'), 0755, true);
-            //}
-    
-            //$result->saveToFile($filePath);
-    
-            // $paramse = Params2::first(); 
-    
-            // $logoUrl = $paramse ? $paramse->logoimage: null; 
-    
+
     
              }
     
-            }
     
     
     
@@ -1354,60 +1261,67 @@ public function show($id)
         $classeeleve = Session::get('classeeleve');
         $nomcompleteleve = Session::get('nomcompleteleve');
         $toutmoiscontrat = Session::get('toutmoiscontrat');
+        $nameItemFacture = Session::get('nameItemFacture');
+        $prixTotalItemFacture = Session::get('prixTotalItemFacture');
+        $quantityItemFacture = Session::get('quantityItemFacture');
+        $taxGroupItemFacture = Session::get('taxGroupItemFacture');
+        $ifuEcoleFacture = Session::get('ifuEcoleFacture');
         $qrCodeString = Session::get('qrCodeString');
         $fileNameqrcode = Session::get('fileNameqrcode');
         $qrcodecontent = Session::get('qrcodecontent');
         $fileNameqrcode = Session::get('fileNameqrcode');
 
-        $paramse = Paramsfacture::first(); 
+        $paramse = Params2::first(); 
 
-        $logoUrl = $paramse ? $paramse->logo: null; 
+        $logoUrl = $paramse ? $paramse->logoimage: null;
+        $NOMETAB = $paramse->NOMETAB; 
+        // dd($NOMETAB);
         // $villeetab = Session::get('villeetab');
         // $nometab = Session::get('nometab');
 
 
                     // // Générer le PDF
 
-                    $data = [
-                        'decodedResponseConfirmation' => $decodedResponseConfirmation,
-                        'facturedetaille' => $facturedetaille,
-                        'reffacture' => $reffacture,
-                        'classeeleve' => $classeeleve,
-                        'nomcompleteleve' => $nomcompleteleve,
-                        'toutmoiscontrat' => $toutmoiscontrat,
-                        'qrCodeString' => $qrCodeString,
-                        'fileNameqrcode' => $fileNameqrcode,
-                        'logoUrl' => $logoUrl,
-                        'qrcodecontent' => $qrcodecontent,
-                    ];
+                    // $data = [
+                    //     'decodedResponseConfirmation' => $decodedResponseConfirmation,
+                    //     'facturedetaille' => $facturedetaille,
+                    //     'reffacture' => $reffacture,
+                    //     'classeeleve' => $classeeleve,
+                    //     'nomcompleteleve' => $nomcompleteleve,
+                    //     'toutmoiscontrat' => $toutmoiscontrat,
+                    //     'qrCodeString' => $qrCodeString,
+                    //     'fileNameqrcode' => $fileNameqrcode,
+                    //     'logoUrl' => $logoUrl,
+                    //     'qrcodecontent' => $qrcodecontent,
+                    // ];
 
-                    $datepaiement = $decodedResponseConfirmation['dateTime'];
-                    // dd($datepaiement);
+                    // $datepaiement = $decodedResponseConfirmation['dateTime'];
+                    // // dd($datepaiement);
                 
-                    // Spécifiez le nom du fichier avec un timestamp pour garantir l'unicité
-                    $fileName = $nomcompleteleve . time() . '.pdf';
+                    // // Spécifiez le nom du fichier avec un timestamp pour garantir l'unicité
+                    // $fileName = $nomcompleteleve . time() . '.pdf';
                 
-                    // Spécifiez le chemin complet vers le sous-dossier pdfs dans public
-                    $filePaths = public_path('pdfs/' . $fileName);
+                    // // Spécifiez le chemin complet vers le sous-dossier pdfs dans public
+                    // $filePaths = public_path('pdfs/' . $fileName);
                 
-                    // Assurez-vous que le répertoire pdfs existe, sinon créez-le
-                    if (!file_exists(public_path('pdfs'))) {
-                        mkdir(public_path('pdfs'), 0755, true);
-                    }
+                    // // Assurez-vous que le répertoire pdfs existe, sinon créez-le
+                    // if (!file_exists(public_path('pdfs'))) {
+                    //     mkdir(public_path('pdfs'), 0755, true);
+                    // }
                 
                     // Générer et enregistrer le PDF dans le sous-dossier pdfs
-                    $pdf = PDF::loadView('pages.Etats.essaipdf', $data);
-                    $pdfcontent = $pdf->output();
+                    // $pdf = PDF::loadView('pages.Etats.essaipdf', $data);
+                    // $pdfcontent = $pdf->output();
                 
                 
-                       // Enregistrer le chemin du PDF dans la base de données
-                                    $duplicatafacture = new Duplicatafacture();
-                                    $duplicatafacture->url = $pdfcontent;
-                                    $duplicatafacture->nomeleve = $nomcompleteleve;
-                                    $duplicatafacture->classe = $classeeleve;
-                                    $duplicatafacture->reference = 'Facture de paiement';
-                                    $duplicatafacture->datepaiement = $datepaiement;
-                                    $duplicatafacture->save();
+                    //    // Enregistrer le chemin du PDF dans la base de données
+                    //                 $duplicatafacture = new Duplicatafacture();
+                    //                 $duplicatafacture->url = $pdfcontent;
+                    //                 $duplicatafacture->nomeleve = $nomcompleteleve;
+                    //                 $duplicatafacture->classe = $classeeleve;
+                    //                 $duplicatafacture->reference = 'Facture de paiement';
+                    //                 $duplicatafacture->datepaiement = $datepaiement;
+                    //                 $duplicatafacture->save();
 
 
 // dd($fileName);
@@ -1418,8 +1332,14 @@ public function show($id)
             'classeeleve' => $classeeleve,
             'nomcompleteleve' => $nomcompleteleve,
             'toutmoiscontrat' => $toutmoiscontrat,
+            'prixTotalItemFacture' => $prixTotalItemFacture,
+            'quantityItemFacture' => $quantityItemFacture,
+            'nameItemFacture' => $nameItemFacture,
+            'taxGroupItemFacture' => $taxGroupItemFacture,
+            'ifuEcoleFacture' => $ifuEcoleFacture,
             'qrCodeString' => $qrCodeString,
             'logoUrl' => $logoUrl,
+            'NOMETAB' => $NOMETAB,
             'fileNameqrcode' => $fileNameqrcode,
             'qrcodecontent' => $qrcodecontent,
 

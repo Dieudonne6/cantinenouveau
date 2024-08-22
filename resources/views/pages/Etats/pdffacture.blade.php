@@ -220,8 +220,8 @@
 
                 <div class="entreprise">
                     <p><i class="title">Ecole</i></p>
-                    <p>IFU:<strong>0202380068074</strong></p>
-                    <p>Ecole:<strong> complexe scolaire "le petit poucet" </strong></p>
+                    <p>IFU:<strong>{{ $ifuEcoleFacture }}</strong></p>
+                    <p>Ecole:<strong> {{ $NOMETAB }} </strong></p>
                 </div>
 
 
@@ -250,67 +250,36 @@
                 <table id="customers">
                     <thead>
                         <tr>
-                            <th scope="col">Designation (B)</th>
+                            <th scope="col">Designation </th>
                             {{-- <th scope="col">Prix unitaire</th> --}}
                             {{-- <th scope="col">Quantite</th> --}}
                             <th scope="col">Montant HT</th>
-                            <th scope="col">TVA</th>
-                            <th scope="col">Mois</th>
+                            {{-- <th scope="col">TVA</th> --}}
+                            {{-- <th scope="col">Mois</th> --}}
                         </tr>
                     </thead>
                     <tbody>
 
-                        @php
-                            $totalHT = 0;
-                            $totalTTC = 0;
-                        @endphp
 
-                        @foreach ($facturedetaille['items'] as $item)
-                                @php
-                                // Définition du taux de TVA initial
-                                $tauxTVA = 0;
-                            
-                                // Vérification de la valeur de taxGroup
-                                if ($item['taxGroup'] == 'B') {
-                                    // Si taxGroup est 'B', appliquer le taux de TVA 18%
-                                    $tauxTVA = 0.18;
-                                } elseif ($item['taxGroup'] == 'A') {
-                                    // Si taxGroup est 'A', appliquer le taux de TVA 1%
-                                    $tauxTVA = 0.01;
-                                }
-                            
-                                // Calcul du montant de TVA
-                                $tva = $item['price'] * $tauxTVA;
-                            
-                                // Calcul du montant TTC pour chaque article en ajoutant la TVA
-                                $totalTTCItem = $item['price'] + $tva;
-                            
-                                // Ajout du montant TTC de l'article au total TTC
-                                $totalTTC += $totalTTCItem;
-                            
-                                // Ajout du montant HT de l'article au total HT
-                                $totalHT += $item['price'];
-                            @endphp
                             <tr>
                                 <td>
-                                    {{ $item['name'] }}
+                                    {{ $nameItemFacture }}
                                 </td>
 
 
                                 <td>
-                                    {{ $item['price'] }}
+                                    {{ $prixTotalItemFacture }}
                                 </td>
 
-                                <td>
+                                {{-- <td>
                                     {{ $tva }}
-                                </td>
-
+                                </td> --}}
+{{-- 
                                 <td>
                                     {{ $toutmoiscontrat }}
-                                </td>
+                                </td> --}}
 
                             </tr>
-                        @endforeach
                     </tbody>
                 </table>
 
@@ -331,11 +300,11 @@
                             
 
                             <td>
-                                {{ $totalHT }}
+                                {{ $prixTotalItemFacture }}
                             </td>
 
                             <td>
-                                {{ $totalTTC }}
+                                {{ $prixTotalItemFacture }}
                             </td>
 
 
@@ -345,7 +314,7 @@
 
             </div>
             <p class="textmontant">Arretée, la presente facture a la somme de <span
-                    class="prix">{{ $totalTTC }}</span> FCFA .</p>
+                    class="prix">{{ $prixTotalItemFacture }}</span> FCFA .</p>
 
             {{-- <h2>Operator: {{ $facturedetaille['operator']['name'] }}</h2> --}}
 

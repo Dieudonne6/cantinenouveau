@@ -7,15 +7,12 @@
 
     .invoice {
         width: 100%;
-        /* margin: 20px auto; */
-        /* border: 1px solid #ccc; */
         background-color: #fffff;
         padding: 0;
-        /* height: 100% */
+        page-break-before: always;
     }
 
     .entete {
-        /* margin:20px  auto; */
         border: 1px solid #ccc;
         font-size: 15px;
         background: #cccccc34;
@@ -47,9 +44,7 @@
 
     .titre {
         margin: 20px auto;
-        /* border: 1px solid #ccc; */
         font-size: 15px;
-        /* background: #ccc; */
     }
 
     h2 {
@@ -67,30 +62,23 @@
         text-align: center;
     }
 
-
-
-    /* .info{
-                            float: left;
-                        } */
-
     .entreprise {
         margin-left: 40px;
         border: 1px solid black;
         background: #aeadad35;
         width: 14rem;
+        height: 9rem;
         text-align: center;
         margin-top: 2rem;
-
     }
 
-
     .client {
-        margin-top: -8.4rem;
+        margin-top: -9.4rem;
         margin-left: 28rem;
         border: 1px solid black;
         width: 14rem;
+        height: 9rem;
         text-align: center;
-
     }
 
     .infomecef {
@@ -120,9 +108,7 @@
 
     .textremerciement {
         margin-left: 18px;
-        /* text-align: center; */
         margin-top: 6px;
-
     }
 
     .logo1 {
@@ -135,17 +121,18 @@
         margin-left: 28.5rem;
     }
 
-
     .prix {
-        /* background: rgb(27, 27, 27); */
         font-weight: bold;
         color: black;
         font-size: 16px;
         text-align: center;
-        padding: 6px 6px
-            /* background-size: 50px */
-            /* height: 50px;
-                            width: 50px; */
+        padding: 6px 6px;
+    }
+
+    @media print {
+        .ko {
+            background-color: red !important; 
+        }
     }
 
     #customers {
@@ -153,14 +140,19 @@
         border-collapse: collapse;
         width: 90%;
         margin-left: 40px;
-        margin-top: 1.5rem;
+        margin-top: 4rem;
     }
 
     #customers td,
     #customers th {
         border: 1px solid #ddd;
         padding: 8px;
+        text-align: left;
+        max-width: 200px; /* Taille maximale des colonnes */
+        word-wrap: break-word; /* Permet de couper les mots et de passer à la ligne */
+        word-break: break-all; /* Casse les mots plus longs que la taille de la colonne */
     }
+
 
     #customers tr:nth-child(even) {
         background-color: #f2f2f2;
@@ -173,7 +165,6 @@
     #customers th {
         padding-top: 12px;
         padding-bottom: 12px;
-        text-align: left;
         background-color: #04AA6D;
         color: black;
     }
@@ -214,8 +205,8 @@
 
             <div class="entreprise">
                 <p><i class="title">Ecole</i></p>
-                <p>IFU:<strong>0202380068074</strong></p>
-                <p>Ecole:<strong> complexe scolaire "le petit poucet" </strong></p>
+                <p>IFU:<strong>{{ $ifuEcoleFacture }}</strong></p>
+                <p>Ecole:<strong> {{ $NOMETAB }} </strong></p>
             </div>
 
 
@@ -248,63 +239,31 @@
                         {{-- <th scope="col">Prix unitaire</th> --}}
                         {{-- <th scope="col">Quantite</th> --}}
                         <th scope="col">Montant HT</th>
-                        <th scope="col">tva</th>
-                        <th scope="col">Mois</th>
+                        {{-- <th scope="col">tva</th>
+                        <th scope="col">Mois</th> --}}
                     </tr>
                 </thead>
                 <tbody>
 
-                    @php
-                        $totalHT = 0;
-                        $totalTTC = 0;
-                    @endphp
-
-                    @foreach ($facturedetaille['items'] as $item)
-                    @php
-                    // Définition du taux de TVA initial
-                    $tauxTVA = 0;
-                
-                    // Vérification de la valeur de taxGroup
-                    if ($item['taxGroup'] == 'B') {
-                        // Si taxGroup est 'B', appliquer le taux de TVA 18%
-                        $tauxTVA = 0.18;
-                    } elseif ($item['taxGroup'] == 'A') {
-                        // Si taxGroup est 'A', appliquer le taux de TVA 1%
-                        $tauxTVA = 0.01;
-                    }
-                
-                    // Calcul du montant de TVA
-                    $tva = $item['price'] * $tauxTVA;
-                
-                    // Calcul du montant TTC pour chaque article en ajoutant la TVA
-                    $totalTTCItem = $item['price'] + $tva;
-                
-                    // Ajout du montant TTC de l'article au total TTC
-                    $totalTTC += $totalTTCItem;
-                
-                    // Ajout du montant HT de l'article au total HT
-                    $totalHT += $item['price'];
-                @endphp
                         <tr>
                             <td>
-                                {{ $item['name'] }}
+                                {{ $nameItemFacture }}
                             </td>
 
 
                             <td>
-                                {{ $item['price'] }}
+                                {{ $prixTotalItemFacture }}
                             </td>
 
-                            <td>
+                            {{-- <td>
                                 {{ $tva }}
-                            </td>
+                            </td> --}}
 
-                            <td>
+                            {{-- <td>
                                 {{ $toutmoiscontrat }}
-                            </td>
+                            </td> --}}
 
                         </tr>
-                    @endforeach
                 </tbody>
             </table>
 
@@ -314,7 +273,7 @@
             <table id="customers">
                 <thead>
                     <tr>
-                        <th scope="col">Groupe tax</th>
+                        {{-- <th scope="col">Groupe tax</th> --}}
                         <th scope="col">Montant total HT</th>
                         <th scope="col">Net a Payer</th>
 
@@ -323,16 +282,14 @@
                 <tbody>
 
                     <tr>
+
+
                         <td>
-                            B-TAX
+                            {{ $prixTotalItemFacture }}
                         </td>
 
                         <td>
-                            {{ $totalHT }}
-                        </td>
-
-                        <td>
-                            {{ $totalTTC }}
+                            {{ $prixTotalItemFacture }}
                         </td>
 
 
@@ -342,7 +299,7 @@
 
         </div>
         <p class="textmontant">Arretée, la presente facture a la somme de <span
-                class="prix">{{ $totalTTC }}</span> FCFA .</p>
+                class="prix">{{ $prixTotalItemFacture }}</span> FCFA .</p>
 
         {{-- <h2>Operator: {{ $facturedetaille['operator']['name'] }}</h2> --}}
 
