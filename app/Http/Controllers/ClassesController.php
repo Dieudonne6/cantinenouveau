@@ -2006,10 +2006,7 @@ public function etat() {
                                 //     return back()->with('status','Contrat enregistré avec succès');
                                 // }
                      
-    // debut facture normalisee pour tous les paiements de l'annee 2023_2024
-
-
-
+  
 
         // fin facture normalisee pour tous les paiements de l'annee 2023_2024                     
                             

@@ -6,7 +6,7 @@
   /* Suppression du padding et margin pour le tableau */
 table.dataTable {
     margin: 0 !important;
-    padding: 0 !important;
+    padding: 0;
     border-collapse: collapse !important;
 }
 
@@ -14,16 +14,12 @@ table.dataTable {
 table.dataTable th,
 table.dataTable td {
     margin: 0 !important;
-    padding: 10px 0 5px 5px !important;
+    padding: 10px;
     border-collapse: collapse !important;
+    font-size: 13px;
 }
 
 #myTable td:nth-child(n+2) {
-    width: 100px;
-    word-wrap: break-word;
-    white-space: normal;
-}
-#myTable th:nth-child(n+2) {
     width: 100px;
     word-wrap: break-word;
     white-space: normal;
@@ -71,7 +67,7 @@ table.dataTable td {
             <table id="myTable" class="table table-bordered" >
               <thead>
                 <tr>
-                  <th>N</th>
+                  <th>N </th>
                   <th>Elève</th>
                   <th>Classe</th>
                   @foreach ($moisContrat as $mois)
@@ -142,54 +138,110 @@ table.dataTable td {
   </div>
 </body>
 @endsection
-
-
 <script>
+function imprimePage() {
+    let table = $('#myTable').DataTable();
+    let currentPage = table.page();  
+    table.destroy();// Sauvegarder la page actuelle
 
-  function imprimePage() {
-      // Désactiver la pagination
-      let table = $('#myTable').DataTable();
-      let currentPage = table.page();  // Sauvegarder la page actuelle
-      table.page.len(-1).draw();  // Afficher toutes les lignes
-  
-      // Attendre un court instant pour être sûr que le tableau est complètement rendu
-      setTimeout(function() {
-          // Masque les colonnes avec la classe hide-on-print
-          var tableElement = document.getElementById('myTable');
-          tableElement.classList.remove('dataTable');
-  
-          // var columns = tableElement.querySelectorAll('.hide-on-print');
-          // columns.forEach(function(column) {
-          //     column.style.display = 'none';
-          // });
-  
-          var page = window.open('', '_blank');
-          page.document.write('<html><head><title>EDC_annee_{{ $annee }}_{{ $anneesuivant }}_classe_{{ $classe }}</title>');
-          // page.document.write('<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" >');
-          page.document.write('<style>@media print { .dt-end { display: none !important; } }</style>');
-          page.document.write('<style>@media print { td { font-size: 13px; } } }</style>');
+    setTimeout(function() {
+        // Créer un élément invisible pour l'impression
+        let printDiv = document.createElement('div');
+        printDiv.innerHTML = '<h1 style="font-size: 20px; text-transform: uppercase; text-align: center;">Etat des droits constatés - année académique {{ $annee }}{{ $anneesuivant }} | classe {{ $classe }}</h1>' +
+                             document.getElementById('contenu').innerHTML;
 
-          page.document.write('<style>@media print { .dt-start { display: none !important; } .table td:nth-child(n+2) {width: 500px !important; word-wrap: break-word !important;white-space: normal !important; } table {margin: 0 !important; padding: 0 !important; border-collapse: collapse !important;} table th,table td {margin: 0 !important;padding: 10px 0 5px 5px !important;border-collapse: collapse !important;} }</style>');
-          page.document.write('<style> table th,table td {margin: 0 !important; padding: 10px 0 5px 5px !important; border-collapse: collapse !important;} table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #ddd;} tbody tr:nth-child(even) { background-color: #f1f3f5; } tbody tr:nth-child(odd) { background-color: #ffffff; } </style>');
-          page.document.write('</head><body>');
-          page.document.write('<div>' + document.getElementById('contenu').innerHTML + '</div>');
-          page.document.write('</body></html>');
-          page.document.close();
-          page.onload = function() {
-              page.print();
-              page.close();
-  
-              // Restaurer la pagination après l'impression
-              table.page.len(10).draw();  // Remettre la taille de la page comme avant (par exemple : 10)
-              table.page(currentPage).draw(false);  // Retour à la page actuelle
-  
-              // Restaure les colonnes après l'impression
-              columns.forEach(function(column) {
-                  column.style.display = '';
-              });
-          };
-      }, 200);
-  }
-  
-  
-  </script>
+        // Appliquer des styles pour l'impression
+        let style = document.createElement('style');
+        style.innerHTML = `@page { size: landscape; }
+            @media print {
+                body * { visibility: hidden; }
+                #printDiv, #printDiv * { visibility: visible; }
+                #printDiv { position: absolute; top: 0; left: 0; width: 100%; }
+                .dt-end { display: none !important; }
+                .dt-start { display: none !important; }
+                .table td:nth-child(n+2) {
+                 margin: 0 !important;
+                    padding: 10px 0 5px 5px !important;
+                    width: 500px !important;
+                    word-wrap: break-word !important;
+                    white-space: normal !important;
+                }
+                 table th {
+                 font-weight: bold;
+                font-size: 13px !important;
+
+                 }
+                table th, table td {
+                    font-size: 9px !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border-collapse: collapse !important;
+                }
+                    table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            th, td {
+            margin: 0 !important;
+                    padding: 0 !important;
+                border: 1px solid #ddd;
+            }
+            tbody tr:nth-child(even) {
+                background-color: #f1f3f5;
+            }
+            tbody tr:nth-child(odd) {
+                background-color: #ffffff;
+            }
+            }
+        `;
+        document.head.appendChild(style);
+        document.body.appendChild(printDiv);
+        printDiv.setAttribute("id", "printDiv");
+
+        window.print();
+
+        $('#myTable').DataTable({
+            "pageLength": 10,  // Remettre la pagination à 10 par défaut (ou la valeur souhaitée)
+        });
+
+        // Nettoyer après l'impression
+        document.body.removeChild(printDiv);
+        document.head.removeChild(style);
+    }, 200);
+}
+   
+</script>
+{{-- 
+<script>
+function imprimePage() {
+    let table = $('#myTable').DataTable();
+    let currentPage = table.page();  
+    table.page.len(-1).draw();  
+    setTimeout(function() {
+        let printWindow = window.open('', '', 'height=800,width=600');
+        printWindow.document.write('<html><head><title>Impression</title>');
+          printWindow.document.write('<style>@page { size: landscape; }</style>');
+
+        printWindow.document.write('<style>@media print { .dt-end { display: none !important; } }</style>');
+        printWindow.document.write('<style>@media print { td { font-size: 13px; } }</style>');
+        printWindow.document.write('<style>@media print { .dt-start { display: none !important; } .table td:nth-child(n+2) {width: 500px !important; word-wrap: break-word !important; white-space: normal !important;} table {margin: 0 !important; padding: 0 !important; border-collapse: collapse !important;} table th, table td {margin: 0 !important; padding: 10px 0 5px 5px !important; border-collapse: collapse !important;} }</style>');
+        printWindow.document.write('<style>table th, table td {margin: 0 !important; padding: 10px 0 5px 5px !important; border-collapse: collapse !important;} table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #ddd;} tbody tr:nth-child(even) { background-color: #f1f3f5; } tbody tr:nth-child(odd) { background-color: #ffffff; } </style>');
+        
+        printWindow.document.write('</head><body>');
+          printWindow.document.write('<h1 style="font-size: 20px; text-transform: uppercase; text-align: center;">Etat des droits constates - annee academique {{ $annee }} - {{ $anneesuivant }} | classe ({{ $classe }})</h1>');
+
+        printWindow.document.write('<div>' + document.getElementById('contenu').innerHTML + '</div>');
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+
+        printWindow.onload = function() {
+            printWindow.print();
+            printWindow.close();
+
+            table.page.len(10).draw();  
+            table.page(currentPage).draw(false); 
+        };
+    }, 200);
+}
+
+  </script> --}}
