@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\Eleve;
 use App\Models\Classes;
 use App\Models\Contrat;
@@ -354,7 +355,7 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
                 do {
                      // Génère un nombre aléatoire entre 10000000 et 99999999
                     $valeurDynamiqueNumerique = mt_rand(10000000, 99999999);
-                } while (DB::table('paiementglobalcontrat')->where('reference_paiementcontrat', $valeurDynamiqueNumerique)->exists());
+                } while (DB::table('paiementcontrat')->where('reference_paiementcontrat', $valeurDynamiqueNumerique)->exists());
                 
 
 
@@ -408,11 +409,11 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
     $classeeleve = Eleve::where('MATRICULE', $matriculeeleve)->value('CODECLAS');
     $nomcompleteleve = $nomeleve .' '. $prenomeleve;
 
-    $parametrefacture = Paramsfacture::first();
+    $parametrefacture = Params2::first();
     $ifuentreprise = $parametrefacture->ifu;
     $tokenentreprise = $parametrefacture->token;
     $taxe = $parametrefacture->taxe;
-    $type = $parametrefacture->type;
+    $type = $parametrefacture->typefacture;
 
     $parametreetab = Params2::first();
     // $nometab = $parametreetab->NOMETAB;
@@ -595,6 +596,8 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
 
         $nim = $decodedResponseConfirmation['nim'];
 
+        $dateTime = $decodedResponseConfirmation['dateTime'];
+
         // dd($decodedResponseConfirmation);
 
         // Générer le code QR
@@ -622,31 +625,31 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
 
 
                 // ENREGISTREMENT DANS LA TABLE PAIEMENTGLOBALCONTRAT
-               $paiementglobalcontrat =  new Paiementglobalcontrat();
+            //    $paiementglobalcontrat =  new Paiementglobalcontrat();
                     
-               $paiementglobalcontrat->soldeavant_paiementcontrat = $montanttotal;
-               $paiementglobalcontrat->montant_paiementcontrat = $montanttotal;
-               $paiementglobalcontrat->soldeapres_paiementcontrat = 0;
-               $paiementglobalcontrat->id_contrat = $idcontratEleve;
-               $paiementglobalcontrat->id_usercontrat = $id_usercontrat;
-               $paiementglobalcontrat->date_paiementcontrat = $datepaiementcontrat;
-               //     $paiementglobalcontrat->id_usercontrat = null;
-               $paiementglobalcontrat->anne_paiementcontrat = $anneeActuelle;
-               $paiementglobalcontrat->reference_paiementcontrat = $valeurDynamiqueNumerique;
-               $paiementglobalcontrat->statut_paiementcontrat = 1;
-               //     $paiementglobalcontrat->datesuppr_paiementcontrat = null;
-               //    $paiementglobalcontrat->idsuppr_usercontrat = null;
-               //    $paiementglobalcontrat->motifsuppr_paiementcontrat = null;
-               $paiementglobalcontrat->mois_paiementcontrat = $moisConcatenes;
+            //    $paiementglobalcontrat->soldeavant_paiementcontrat = $montanttotal;
+            //    $paiementglobalcontrat->montant_paiementcontrat = $montanttotal;
+            //    $paiementglobalcontrat->soldeapres_paiementcontrat = 0;
+            //    $paiementglobalcontrat->id_contrat = $idcontratEleve;
+            //    $paiementglobalcontrat->id_usercontrat = $id_usercontrat;
+            //    $paiementglobalcontrat->date_paiementcontrat = $datepaiementcontrat;
+            //    //     $paiementglobalcontrat->id_usercontrat = null;
+            //    $paiementglobalcontrat->anne_paiementcontrat = $anneeActuelle;
+            //    $paiementglobalcontrat->reference_paiementcontrat = $valeurDynamiqueNumerique;
+            //    $paiementglobalcontrat->statut_paiementcontrat = 1;
+            //    //     $paiementglobalcontrat->datesuppr_paiementcontrat = null;
+            //    //    $paiementglobalcontrat->idsuppr_usercontrat = null;
+            //    //    $paiementglobalcontrat->motifsuppr_paiementcontrat = null;
+            //    $paiementglobalcontrat->mois_paiementcontrat = $moisConcatenes;
 
-               $paiementglobalcontrat->save();
+            //    $paiementglobalcontrat->save();
 
 
 
                // Récupérer l'id_paiementcontrat de la table paiementglobalcontrat qui correspond a l'id du contrat
-                $idPaiementContrat = Paiementglobalcontrat::where('id_contrat', $idcontratEleve)
-                ->orderBy('id_paiementcontrat', 'desc')
-                ->value('id_paiementcontrat');
+                // $idPaiementContrat = Paiementglobalcontrat::where('id_contrat', $idcontratEleve)
+                // ->orderBy('id_paiementcontrat', 'desc')
+                // ->value('id_paiementcontrat');
                 // dd($idPaiementContrat);                
 
                 // ENREGISTREMENT DANS LA TABLE PAIEMENTCONTRAT
@@ -655,6 +658,7 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
 
                 // Parcourir les mois cochés et insérer chaque id de mois dans la table Inscriptioncontrat
                 foreach ($moisCoches as $id_moiscontrat) {
+
                     Paiementcontrat::create([
                         // 'id_paiementcontrat ' => $valeurDynamiqueidpaiemnetcontrat, 
                         'soldeavant_paiementcontrat' => $montantmoiscontrat,
@@ -670,49 +674,60 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
                         // 'datesuppr_paiementcontrat' => $anneeActuelle,
                         // 'idsuppr_usercontrat' => $anneeActuelle,
                         // 'motifsuppr_paiementcontrat' => $anneeActuelle,
-                        'id_paiementglobalcontrat' => $idPaiementContrat,
+                        // 'id_paiementglobalcontrat' => 90,
+                        'montanttotal' => $montanttotal,
+
                     ]);
                 }
+
 
 
     
         // $commandeId =  \App\Models\Commandes::find(id);
         // $commande = \App\Models\Commandes::find($commandid);
         // dd($codemecef);
+
+                // gestion du code qr sous forme d'image
+
+                $fileNameqrcode = $nomcompleteleve . time() . '.png';
+                $result = Builder::create()
+                    ->writer(new PngWriter())
+                    ->data($qrCodeString)
+                    ->size(100)
+                    // ->margin(10)
+                    ->build();
+        
+                    $qrcodecontent = $result->getString();
+        
+                    // $qrcode = new Qrcode();
+                    // $qrcode->id = $fileNameqrcode;
+                    // $qrcode->nom = $fileNameqrcode;
+                    // $qrcode->qrcode = $qrcodecontent;
+        
+        
+                    // $qrcode->save();
     
         $facturenormalise = new Facturenormalise();
             $facturenormalise->id = $reffacture;
             $facturenormalise->codemecef = $codemecef;
+            $facturenormalise->counters = $counters;
+            $facturenormalise->nim = $nim;
+            $facturenormalise->dateHeure = $dateTime;
+            $facturenormalise->ifuEcole = $ifuentreprise;
             $facturenormalise->MATRICULE = $matriculeeleve;
             $facturenormalise->idcontrat = $idcontratEleve;
-            $facturenormalise->id_paiementglobalcontrat = $idPaiementContrat;
+            $facturenormalise->moispayes = $toutmoiscontrat;
             $facturenormalise->classe = $classeeleve;
             $facturenormalise->nom = $nomcompleteleve;
             $facturenormalise->montant_total = $montanttotal;
+            $facturenormalise->qrcode = $qrcodecontent;
+            $facturenormalise->statut = 1;
         
         $facturenormalise->save();
 
 
 
-        // gestion du code qr sous forme d'image
 
-        $fileNameqrcode = $nomcompleteleve . time() . '.png';
-        $result = Builder::create()
-            ->writer(new PngWriter())
-            ->data($qrCodeString)
-            ->size(100)
-            // ->margin(10)
-            ->build();
-
-            $qrcodecontent = $result->getString();
-
-            $qrcode = new Qrcode();
-            $qrcode->id = $fileNameqrcode;
-            $qrcode->nom = $fileNameqrcode;
-            $qrcode->qrcode = $qrcodecontent;
-
-
-            $qrcode->save();
     
         //$filePath = public_path('qrcodes/' . $fileNameqrcode);
     
@@ -723,15 +738,15 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
     
         //$result->saveToFile($filePath);
 
-        $paramse = Paramsfacture::first(); 
+        $paramse = Params2::first(); 
 
-        $logoUrl = $paramse ? $paramse->logo: null; 
+        $logoUrl = $paramse ? $paramse->logoimage: null; 
     
     
-            $id = $fileNameqrcode;
-            $qrcodesin = Qrcode::find($id);
+            // $id = $fileNameqrcode;
+            // $qrcodesin = Qrcode::find($id);
     
-            $qrcodecontent = $qrcodesin->qrcode;
+            // $qrcodecontent = $qrcodesin->qrcode;
     
         Session::put('factureconfirm', $decodedResponseConfirmation);
         Session::put('fileNameqrcode', $fileNameqrcode);
@@ -777,11 +792,530 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
 
     }
     
-        }
+}
 
 
 
         
+
+
+        // debut facture normalisee pour tous les paiements de l'annee 2023_2024
+        public function genererfacture() {
+            // $paiements = DB::table('paiementcontrat')->where('montant_paiementcontrat', '>', 0)->get();
+    
+            $paiements = DB::table('paiementcontrat')
+            ->select('id_contrat', 'mois_paiementcontrat', 'montant_paiementcontrat', 'date_paiementcontrat')
+            ->where('montant_paiementcontrat', '>', 0)
+            ->get()
+            ->groupBy('id_contrat')
+            ->map(function ($rows) {
+                return [
+                    'id_contrat' => $rows->first()->id_contrat,
+                    'mois' => $rows->pluck('mois_paiementcontrat')->toArray(),
+                    'montant_total' => $rows->sum('montant_paiementcontrat'),
+                    // 'date_paiementcontrat' => $rows['date_paiementcontrat'],
+                    'details' => $rows->map(function ($row) {
+                        return [
+                            'mois' => $row->mois_paiementcontrat,
+                            'montant_paye' => $row->montant_paiementcontrat,
+                            'date_paiementcontrat' => $row->date_paiementcontrat,
+                        ];
+                    })->toArray(),
+                ];
+            });
+    
+    
+    
+    
+            foreach ($paiements as $paiement) {
+    
+                // dd($paiement['montant_total']);
+    
+                try {
+                    set_time_limit(300); // Augmente le temps d'exécution à 300 secondes (5 minutes)
+                    // Appeler la fonction de création de facture normalisée
+                    $facture = $this->savepaiementcontrat2($paiement);
+    
+                    // // Enregistrer la facture dans la base de données
+                    // DB::table('factures')->insert([
+                    //     'id_paiement' => $paiement->id,
+                    //     'facture_data' => json_encode($facture),
+                    //     'created_at' => now(),
+                    //     'updated_at' => now(),
+                    // ]);
+    
+                    Log::info("Facture générée avec succès pour le paiement ID: " );
+    
+                } catch (\Exception $e) {
+                    // Gérer les erreurs de génération de facture
+                    Log::error("Erreur lors de la génération de la facture pour le paiement ID: " );
+                }
+            }
+    
+         return response()->json(['message' => 'Factures générées avec succès.']);
+        }
+        
+    
+    
+    
+        private function savepaiementcontrat2($paiement){
+            $idcontratEleve = $paiement['id_contrat'];
+            // $moiscont =  DB::table('paiementcontrat')->where('id_contrat', $idcontratEleve)->pluck('mois_paiementcontrat');
+            // dd($moiscont);
+    
+            $moisCoches = $paiement['mois'];
+            
+    
+            // $nombreElements = $moiscont->count();
+            $montantmoiscontrat = $paiement['montant_total'];
+            
+            $montanttotal = $paiement['montant_total'];
+            $datepaiementcontrat = date('Y-m-d H:i:s');
+            $id_usercontrat = 1;
+            // dd($datepaiementcontrat);
+            // dd($id_usercontrat);
+            $anneeActuelle = date('Y');
+    
+            // generer une valeur aleatoire comprise entre 10000000 et 99999999 et verifier si elle existe deja dans la table.
+            // Si la valeur est déjà présente, exists() renverra true, et la boucle continuera à s'exécuter pour générer une nouvelle valeur.
+            // Si la valeur n'est pas présente (c'est-à-dire qu'elle est unique), la condition exists() renverra false, et la boucle s'arrêtera.
+    
+            // do {
+            //      // Génère un nombre aléatoire entre 10000000 et 99999999
+            //     $valeurDynamiqueNumerique = mt_rand(10000000, 99999999);
+            // } while (DB::table('paiementcontrat')->where('reference_paiementcontrat', $valeurDynamiqueNumerique)->exists());
+            
+    
+    
+            // recuperer les nom des mois cochee
+    
+            // Array des noms des mois
+            $nomsMoisCoches = [];
+            if (is_array($moisCoches)) {
+                // Parcourir les ID des mois cochés et obtenir leur nom correspondant
+                foreach ($moisCoches as $id_moiscontrat) {
+                    // Ici, vous pouvez récupérer le nom du mois à partir de votre modèle Mois
+                    $mois = Moiscontrat::where('id_moiscontrat', $id_moiscontrat)->first();
+    
+                    // Vérifiez si le mois existe
+                    if ($mois) {
+                        // Ajouter le nom du mois à l'array
+                        $nomsMoisCoches[] = $mois->nom_moiscontrat;
+                    }
+                }
+    
+            }
+            // Convertir le tableau en une chaîne de caractères
+            $moisConcatenes = implode(',', $nomsMoisCoches);
+    
+            // dd($moisConcatenes);
+            // Récupérer la somme des montants de paiement précédents
+            // $soldeavant_paiementcontrat = DB::table('paiementglobalcontrat')
+            // ->where('id_contrat', $idcontratEleve)
+            // ->sum('montant_paiementcontrat');
+    
+            // // dd($soldeavant_paiementcontrat);
+            // // Calculer le solde après le paiement en ajoutant le montant du paiement actuel à la somme des montants précédents
+            // $soldeapres_paiementcontrat = $soldeavant_paiementcontrat + $montanttotal;
+            // // dd($soldeapres_paiementcontrat);
+    
+    
+    
+    
+            
+    
+    
+    
+                // echo('paiement effectuer avec succes');
+    
+    
+    
+                        // GESTION DE LA FACTURE NORMALISE
+    
+                    $matriculeeleve = Contrat::where('id_contrat', $idcontratEleve)->value('eleve_contrat');
+                    $nomeleve = Eleve::where('MATRICULE', $matriculeeleve)->value('NOM');
+                    $prenomeleve = Eleve::where('MATRICULE', $matriculeeleve)->value('PRENOM');
+                    $classeeleve = Eleve::where('MATRICULE', $matriculeeleve)->value('CODECLAS');
+                    $nomcompleteleve = $nomeleve .' '. $prenomeleve;
+    
+                    $parametrefacture = Params2::first();
+                    $ifuentreprise = $parametrefacture->ifu;
+                    $tokenentreprise = $parametrefacture->token;
+                    $taxe = $parametrefacture->taxe;
+                    $type = $parametrefacture->typefacture;
+    
+                    $parametreetab = Params2::first();
+                    // $nometab = $parametreetab->NOMETAB;
+                    // $villeetab = $parametreetab->VILLE;
+    
+    
+    
+    
+                // dd($classeeleve);
+    
+                // $infocontrateleve = Paiementglobalcontrat::where('id_contrat', $idcontratEleve)
+                // ->orderBy('id_paiementcontrat', 'desc')->first();
+    
+                // $toutmoiscontrat = $infocontrateleve->mois_paiementcontrat;
+                // $moisavecvirg = implode(',', $nomsMoisCoches);
+                // $toutmoiscontrat = $moisavecvirg;
+    
+    
+                // dd($toutmoiscontrat);
+    
+    
+                // $invoiceItems = 
+                //      [
+                //         [
+                //                 // 'date' => $infocontrateleve->date_paiementcontrat,
+                //                 // 'montantpaiement' => intval($infocontrateleve->montant_paiementcontrat), // Convertir le prix en entier
+                //                 // 'mois' => $infocontrateleve->mois_paiementcontrat,
+                //                 // 'eleve' => $nomcompleteleve,
+                //                 // 'classe' => $classeeleve,
+                //                 // 'taxGroup' => 'B', // La taxe reste la même, adaptez si nécessaire
+    
+                //                 'name' => 'contrat de cantine',
+                //                 // 'price' => intval($infocontrateleve->montant_paiementcontrat),
+                //                 'price' => intval($montanttotal), 
+                //                 'quantity' => 1,
+                //                 'taxGroup' => $taxe, // La taxe reste la même, adaptez si nécessaire
+                //         ]
+                //             ];
+                    
+                    
+                        
+                //         $invoiceRequestDto = [
+                //             "ifu" => $ifuentreprise, // ici on doit rendre la valeur de l'ifu dynamique
+                //             "type" => $type,
+                //             "items" => $invoiceItems,
+                //             "operator" => [
+                //                 // "name" => $nomecole
+                //                 "name" => "test"
+                //             ]
+                //         ];
+    
+                //         // dd($invoiceRequestDto);
+    
+                //         $jsonData = json_encode($invoiceRequestDto, JSON_UNESCAPED_UNICODE);
+    
+                        // Préparez les données JSON pour l'API
+                            $jsonData = json_encode([
+                                "ifu" => $ifuentreprise, // ici on doit rendre la valeur de l'ifu dynamique
+                                            "type" => $type,
+                                "items" => [
+                                    [
+                                        'name' => 'Cantine de :'.$moisConcatenes,
+                                        // 'price' => intval($infocontrateleve->montant_paiementcontrat),
+                                        'price' => intval($montanttotal), 
+                                        'quantity' => 1,
+                                        'taxGroup' => $taxe,
+                                    ]
+                                ],
+                                "operator" => [
+                                    "name" => "test"
+                                ]
+                            ]);
+                        // $jsonDataliste = json_encode($jsonData, JSON_FORCE_OBJECT);
+    
+    
+                        //  dd($jsonData);
+    
+                        // Définissez l'URL de l'API de facturation
+                        $apiUrl = 'https://developper.impots.bj/sygmef-emcf/api/invoice';
+    
+                        // Définissez le jeton d'authentification
+                        $token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjAyMDIzODU5MTExMzh8VFMwMTAxMTQ3MiIsInJvbGUiOiJUYXhwYXllciIsIm5iZiI6MTcyNDI1NzQyMywiZXhwIjoxNzM3NDE0MDAwLCJpYXQiOjE3MjQyNTc0MjMsImlzcyI6ImltcG90cy5iaiIsImF1ZCI6ImltcG90cy5iaiJ9.sRcSeEbIuQNSgFebRRaxW4zPLCqlF6PQXc90e2xfHCs';
+                        // $token = $tokenentreprise;
+    
+                        // Effectuez la requête POST à l'API
+                        // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                        $ch = curl_init($apiUrl);
+                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                        curl_setopt($ch, CURLOPT_POST, true);
+                        curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+                        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                            'Content-Type: application/json',
+                            'Authorization: Bearer ' . $token
+                        ));
+                        curl_setopt($ch, CURLOPT_CAINFO, storage_path('certificates/cacert.pem'));
+    
+                    // Exécutez la requête cURL et récupérez la réponse
+            $response = curl_exec($ch);
+            // dd($response);
+    
+            // Vérifiez les erreurs de cURL
+            if (curl_errno($ch)) {
+                // echo 'Erreur cURL : ' . curl_error($ch);
+                return back()->with('erreur','Erreur curl , mauvaise connexion a l\'API');
+            }
+    
+            // Fermez la session cURL
+            curl_close($ch);
+    
+            // Affichez la réponse de l'API
+            $decodedResponse = json_decode($response, true);
+            //  dd($decodedResponse);
+    
+            // Vérifiez si l'UID est présent dans la réponse
+            if (isset($decodedResponse['uid'])) {
+                // L'UID de la demande
+                $uid = $decodedResponse['uid'];
+                // $taxb = 0.18;
+    
+                // Affichez l'UID
+                // echo "L'UID de la demande est : $uid";
+    
+                // ACTION pour la confirmation
+                $actionConfirmation = 'confirm';
+    
+                // Définissez l'URL de l'API de confirmation de facture
+                $confirmationUrl = 'https://developper.impots.bj/sygmef-emcf/api/invoice/'.$uid.'/'.$actionConfirmation;
+    
+                // Configuration de la requête cURL pour la confirmation
+                $chConfirmation = curl_init($confirmationUrl);
+                curl_setopt($chConfirmation, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($chConfirmation, CURLOPT_CUSTOMREQUEST, 'PUT');
+                curl_setopt($chConfirmation, CURLOPT_HTTPHEADER, [
+                    'Authorization: Bearer ' . $token,
+                    'Content-Length: 0'
+                ]);
+                curl_setopt($chConfirmation, CURLOPT_CAINFO, storage_path('certificates/cacert.pem'));
+    
+                // Exécutez la requête cURL pour la confirmation
+                $responseConfirmation = curl_exec($chConfirmation);
+    
+                // Vérifiez les erreurs de cURL pour la confirmation
+                if (curl_errno($chConfirmation)) {
+                    // echo 'Erreur cURL pour la confirmation : ' . curl_error($chConfirmation);/
+                    return redirect('classes')->with('erreur','Erreur curl pour la confirmation');
+    
+                }
+    
+                // Fermez la session cURL pour la confirmation
+                curl_close($chConfirmation);
+    
+            // Convertissez la réponse JSON en tableau associatif PHP
+            $decodedResponseConfirmation = json_decode($responseConfirmation, true);
+    
+            $facturedetaille = json_decode($jsonData, true);
+            // dd($facturedetaille);
+    
+            // $reffacture = uniqid('f_');
+            // dd($decodedResponseConfirmation);
+            // dd($facturedetaille);
+    
+            // Vérifiez si la conversion a réussi
+            if ($decodedResponseConfirmation === null) {
+                // La conversion a échoué
+                // echo 'Erreur lors de la conversion JSON : ' . json_last_error_msg();
+                return back()->with('erreur','Erreur lors de la convertion json');
+    
+            } else {
+    
+                // 'codemecef',
+                // 'commande_id',
+                // 'user_id',
+                // 'nom_utilisateur',
+                // 'montant_total',
+                // 'details',
+    
+                $codemecef = $decodedResponseConfirmation['codeMECeFDGI'];
+    
+                $counters = $decodedResponseConfirmation['counters'];
+    
+                $nim = $decodedResponseConfirmation['nim'];
+    
+                $dateTime = $decodedResponseConfirmation['dateTime'];
+    
+                // dd($decodedResponseConfirmation);
+    
+                // Générer le code QR
+                $qrCodeString = $decodedResponseConfirmation['qrCode'];
+    
+                $reffacture = $nim.'_'.$counters;
+    
+    
+    
+    
+    
+                        // Effectuer lrs enregistrement dans les tables inscriptioncontrat, paiementglobalcontrat et paiementcontrat ici pour etre sur que c'est apres que tout soit bien passe que les enregistrement dans ces tables sont effectue
+                
+                        // ENREGISTREMENT DANS LA TABLE INSCRIPTIONCONTRAT
+                        // // Parcourir les mois cochés et insérer chaque id de mois dans la table Inscriptioncontrat
+                        // foreach ($moisCoches as $id_moiscontrat) {
+                        //     Inscriptioncontrat::create([
+                        //         'id_contrat' => $idcontratEleve, 
+                        //         'id_moiscontrat' => $id_moiscontrat,
+                        //         'anne_inscrption' => $anneeActuelle
+                        //     ]);
+                        // }
+    
+    
+    
+    
+                        // ENREGISTREMENT DANS LA TABLE PAIEMENTGLOBALCONTRAT
+                    //    $paiementglobalcontrat =  new Paiementglobalcontrat();
+                            
+                    //    $paiementglobalcontrat->soldeavant_paiementcontrat = $montanttotal;
+                    //    $paiementglobalcontrat->montant_paiementcontrat = $montanttotal;
+                    //    $paiementglobalcontrat->soldeapres_paiementcontrat = 0;
+                    //    $paiementglobalcontrat->id_contrat = $idcontratEleve;
+                    //    $paiementglobalcontrat->id_usercontrat = $id_usercontrat;
+                    //    $paiementglobalcontrat->date_paiementcontrat = $datepaiementcontrat;
+                    //    //     $paiementglobalcontrat->id_usercontrat = null;
+                    //    $paiementglobalcontrat->anne_paiementcontrat = $anneeActuelle;
+                    //    $paiementglobalcontrat->reference_paiementcontrat = $valeurDynamiqueNumerique;
+                    //    $paiementglobalcontrat->statut_paiementcontrat = 1;
+                    //    //     $paiementglobalcontrat->datesuppr_paiementcontrat = null;
+                    //    //    $paiementglobalcontrat->idsuppr_usercontrat = null;
+                    //    //    $paiementglobalcontrat->motifsuppr_paiementcontrat = null;
+                    //    $paiementglobalcontrat->mois_paiementcontrat = $moisConcatenes;
+    
+                    //    $paiementglobalcontrat->save();
+    
+    
+    
+                    // Récupérer l'id_paiementcontrat de la table paiementglobalcontrat qui correspond a l'id du contrat
+                        // $idPaiementContrat = Paiementglobalcontrat::where('id_contrat', $idcontratEleve)
+                        // ->orderBy('id_paiementcontrat', 'desc')
+                        // ->value('id_paiementcontrat');
+                        // dd($idPaiementContrat);                
+    
+                        // ENREGISTREMENT DANS LA TABLE PAIEMENTCONTRAT
+    
+                        // dd($soldeavant_paiementcontrat);
+    
+                        // Parcourir les mois cochés et insérer chaque id de mois dans la table Inscriptioncontrat
+                        // foreach ($moisCoches as $id_moiscontrat) {
+    
+                        //     Paiementcontrat::create([
+                        //         // 'id_paiementcontrat ' => $valeurDynamiqueidpaiemnetcontrat, 
+                        //         'soldeavant_paiementcontrat' => $montantmoiscontrat,
+                        //         'montant_paiementcontrat' => $montantmoiscontrat,
+                        //         'soldeapres_paiementcontrat' => 0,
+                        //         'id_contrat' => $idcontratEleve,
+                        //         'date_paiementcontrat' => $datepaiementcontrat,
+                        //         'id_usercontrat' => $id_usercontrat,
+                        //         'mois_paiementcontrat' => $id_moiscontrat,
+                        //         'anne_paiementcontrat' => $anneeActuelle,
+                        //         'reference_paiementcontrat' => $valeurDynamiqueNumerique,
+                        //         'statut_paiementcontrat' => 1,
+                        //         // 'datesuppr_paiementcontrat' => $anneeActuelle,
+                        //         // 'idsuppr_usercontrat' => $anneeActuelle,
+                        //         // 'motifsuppr_paiementcontrat' => $anneeActuelle,
+                        //         // 'id_paiementglobalcontrat' => 90,
+                        //         'montanttotal' => $montanttotal,
+    
+                        //     ]);
+                        // }
+    
+    
+    
+    
+                // $commandeId =  \App\Models\Commandes::find(id);
+                // $commande = \App\Models\Commandes::find($commandid);
+                // dd($codemecef);
+    
+            // gestion du code qr sous forme d'image
+    
+            // $fileNameqrcode = $nomcompleteleve . time() . '.png';
+            $result = Builder::create()
+                ->writer(new PngWriter())
+                ->data($qrCodeString)
+                ->size(100)
+                // ->margin(10)
+                ->build();
+    
+                $qrcodecontent = $result->getString();
+    
+                // $qrcode = new Qrcode();
+                // $qrcode->id = $fileNameqrcode;
+                // $qrcode->nom = $fileNameqrcode;
+                // $qrcode->qrcode = $qrcodecontent;
+    
+    
+                // $qrcode->save();
+            $facturenormalise = new Facturenormalise();
+            $facturenormalise->id = $reffacture;
+            $facturenormalise->codemecef = $codemecef;
+            $facturenormalise->counters = $counters;
+            $facturenormalise->nim = $nim;
+            $facturenormalise->dateHeure = $dateTime;
+            $facturenormalise->ifuEcole = $ifuentreprise;
+            $facturenormalise->MATRICULE = $matriculeeleve;
+            $facturenormalise->idcontrat = $idcontratEleve;
+            $facturenormalise->moispayes = $moisConcatenes;
+            $facturenormalise->classe = $classeeleve;
+            $facturenormalise->nom = $nomcompleteleve;
+            $facturenormalise->montant_total = $montanttotal;
+            $facturenormalise->datepaiementcontrat = $datepaiementcontrat;
+            $facturenormalise->qrcode = $qrcodecontent;
+            $facturenormalise->statut = 1;
+        
+            $facturenormalise->save();
+    
+    
+    
+    
+    
+            //$filePath = public_path('qrcodes/' . $fileNameqrcode);
+    
+            // Assurez-vous que le répertoire qrcodes existe, sinon créez-le
+            //if (!file_exists(public_path('qrcodes'))) {
+            //    mkdir(public_path('qrcodes'), 0755, true);
+            //}
+    
+            //$result->saveToFile($filePath);
+    
+            // $paramse = Params2::first(); 
+    
+            // $logoUrl = $paramse ? $paramse->logoimage: null; 
+    
+    
+             }
+    
+            }
+    
+    
+    
+    }
+
+
+public function factures() {
+    $paramse = Params2::first(); 
+
+    $logoUrl = $paramse ? $paramse->logoimage: null; 
+
+    $NOMETAB = $paramse->NOMETAB;
+    $factures = DB::table('facturenormalises')->get();
+
+    // dd($facturesParEleve);
+
+    // $facturesParEleve = DB::table('facturenormalises')
+    // ->orderBy('MATRICULE')
+    // ->get()
+    // ->groupBy('MATRICULE');
+    // dd($facturesParEleve);
+
+    return view('pages.Etats.fact', compact('factures', 'logoUrl', 'NOMETAB'));
+
+}
+
+public function show($id)
+{
+    $paramse = Params2::first(); 
+    // dd($id);
+    $logoUrl = $paramse ? $paramse->logoimage: null;
+    $NOMETAB = $paramse->NOMETAB;
+ 
+    // Récupérer toutes les factures pour un élève spécifique
+    $facture = DB::table('facturenormalises')->where('idcontrat', $id)->first();
+    // dd($factures->id);
+
+    // Passer les données à la vue
+    return view('pages.Etats.show', compact('facture', 'logoUrl', 'NOMETAB'));
+}
+        // fin facture normalisee pour tous les paiements de l'annee 2023_2024
 
 
 

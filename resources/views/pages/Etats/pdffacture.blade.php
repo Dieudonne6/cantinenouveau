@@ -383,6 +383,7 @@
 
             </div>
         </div>
+    </body>
 
         {{-- <a class="telecharger btn btn-success" href="{{ url('telechargerfacture') }}">Imprimer</a> --}}
         {{-- <button onclick="window.print()">Imprimer</button> --}}
@@ -392,38 +393,5 @@
         {{-- <h2> Merci pour votre confiance votre facture a ete generer et vous serras envoyer lors dee la livraison de votre commande</h2> --}}
         {{-- {{ dd($factureconfirm) }} --}}
         {{-- 
-    <h2>qr code {{ $factureconfirm['qrCode'] }} </h2>
-    <h2>code mecef {{ $factureconfirm['codeMECeFDGI'] }} </h2>
 
-    <h2>IFU: {{ $facturedetaille['ifu'] }}</h2>
-    <h2>Type: {{ $facturedetaille['type'] }}</h2>
-    
-    <h3>Items:</h3>
-    <ul>
-        @foreach ($facturedetaille['items'] as $item)
-            <li>
-                <strong>Name:</strong> {{ $item['name'] }},
-                <strong>Price:</strong> {{ $item['price'] }},
-                <strong>Quantity:</strong> {{ $item['quantity'] }},
-                <strong>Tax Group:</strong> {{ $item['taxGroup'] }}
-            </li>
-        @endforeach
-    </ul>
-    
-    <h2>Operator: {{ $facturedetaille['operator']['name'] }}</h2> --}}
-
-        {{-- 
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-    <script src="{{asset('assets/css/bootstrap.min.js')}}"></script> --}}
-        {{-- <script>
-            // Obtenez la chaîne du QR code depuis le serveur
-            var qrCodeStrings = "{{ $qrCodeString }}";
-
-            // Générez le QR code et affichez-le dans le conteneur avec l'ID "qrcode"
-            var qrcode = new QRCode(document.getElementById("qrcode"), {
-                text: qrCodeStrings,
-                width: 100,
-                height: 100
-            });
-        </script> --}}
     @endsection
