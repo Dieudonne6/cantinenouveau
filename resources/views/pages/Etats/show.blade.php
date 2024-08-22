@@ -219,7 +219,7 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td >Frais de cantine pour <span>{{ $facture->moispayes }}</span></td>
+                        <td > {{ $facture->designation }} </td>
                         <td >{{ $facture->montant_total }}</td>
                     </tr>
                 </tbody>

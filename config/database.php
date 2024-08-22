@@ -68,7 +68,7 @@ return [
             'port' => env('DB2_PORT', '3306'),
             'database' => env('DB2_DATABASE', 'scoracine'),
             'username' => env('DB2_USERNAME', 'root'),
-            'password' => env('DB2_PASSWORD', 'root2021'),
+            'password' => env('DB2_PASSWORD', ''),
             'unix_socket' => env('DB2_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
