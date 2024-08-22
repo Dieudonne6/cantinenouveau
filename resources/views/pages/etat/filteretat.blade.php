@@ -167,12 +167,12 @@ function imprimePage() {
                     white-space: normal !important;
                 }
                  table th {
-                 font-weight: bold;
-                font-size: 13px !important;
+                 font-weight: bold !important;
 
                  }
+                                    
                 table th, table td {
-                    font-size: 9px !important;
+                    font-size: 10px !important;
                     margin: 0 !important;
                     padding: 0 !important;
                     border-collapse: collapse !important;

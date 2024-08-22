@@ -1,25 +1,14 @@
 @extends('layouts.master')
 @section('content')
 <style>
-  /* Styles spécifiques pour l'impression sur papier A4 */
-  /* @media print and (size: A4) {
-  table {
-  font-size: 5pt; 
-  }
-  th, td {
-  padding: 3px; 
-  }
-  } */
-  
-  /* Styles spécifiques pour l'impression sur papier A3 */
-  @media print and (size: A3) {
-    table {
-      font-size: 6pt; /* Ajuste la taille de la police pour A3 */
-    }
-    th, td {
-      padding: 4px; /* Ajuste le padding pour A3 */
-    }
-  }
+table.dataTable th,
+table.dataTable td {
+    margin: 0 !important;
+    padding: 10px 0 5px 5px;
+    border-collapse: collapse !important;
+    font-size: 16px;
+}
+
 </style>
 
 
@@ -92,19 +81,17 @@
         
         <div id="contenu">
           
-          <div>
-            <h5 class="card-title" style="text-align: center;">Liste des paiements de la periode du {{$dateFormateedebut}} au {{$dateFormateefin}} </h5>
-          </div><br>
+         
           <div class="table-responsive">
-            <table id="myTable" class="table table-striped table-sm">
+            <table id="myTable" class="table table-bordered">
               <thead>
                 <tr>
-                  <th style="width: 15%;">Classe</th>
-                  <th style="width: 20%;">Eleve</th>
-                  <th style="width: 15%;">Montant</th>
-                  <th style="width: 15%;">Mois payé(s)</th>
-                  <th style="width: 15%;">Date</th>
-                  <th style="width: 10%;">Reference</th>
+                  <th>Classe</th>
+                  <th>Eleve</th>
+                  <th>Montant</th>
+                  <th>Mois payé(s)</th>
+                  <th>Date</th>
+                  <th>Reference</th>
                   {{-- <th class="hide-on-print" style="width: 10%;">Action a effectuee</th> --}}
                 </tr>
               </thead>
@@ -118,9 +105,9 @@
                   <td>
                     {{
                       \Carbon\Carbon::hasFormat($resultatsIndividuel['date_paiement'], 'Y-m-d H:i:s') 
-                      ? \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $resultatsIndividuel['date_paiement'])->format('d/m/Y H:i:s') 
+                      ? \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $resultatsIndividuel['date_paiement'])->format('d/m/Y') 
                       : (\Carbon\Carbon::hasFormat($resultatsIndividuel['date_paiement'], 'd/m/Y H:i:s') 
-                      ? \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', $resultatsIndividuel['date_paiement'])->format('d/m/Y H:i:s') 
+                      ? \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', $resultatsIndividuel['date_paiement'])->format('d/m/Y') 
                       : 'Format de date non supporté')
                     }}
                   </td>
@@ -173,18 +160,87 @@
 @endsection
 
 
-
 <script>
+  function imprimerPage() {
+      let table = $('#myTable').DataTable();
+      let currentPage = table.page();  
+      table.destroy();// Sauvegarder la page actuelle
+  
+      setTimeout(function() {
+          // Créer un élément invisible pour l'impression
+          let printDiv = document.createElement('div');
+          printDiv.innerHTML = '<h1 style="font-size: 20px; text-align: center;">Liste des paiements de la periode du {{$dateFormateedebut}} au {{$dateFormateefin}} </h1>' +
+                               document.getElementById('contenu').innerHTML;
+  
+          // Appliquer des styles pour l'impression
+          let style = document.createElement('style');
+          style.innerHTML = `@page { size: landscape; }
+              @media print {
+                  body * { visibility: hidden; }
+                  #printDiv, #printDiv * { visibility: visible; }
+                  #printDiv { position: absolute; top: 0; left: 0; width: 100%; }
+                  .dt-end { display: none !important; }
+                  .dt-start { display: none !important; }
+                  .table td:nth-child(n+2) {
+                   margin: 0 !important;
+                      padding: 10px 0 5px 5px !important;
+                      width: 500px !important;
+                      word-wrap: break-word !important;
+                      white-space: normal !important;
+                  }
+                   table th {
+                   font-weight: bold !important;
+                  font-size: 12px !important;
+  
+                   }
+                  table th, table td {
+                      font-size: 10px;
+                      margin: 0 !important;
+                      padding: 0 !important;
+                      border-collapse: collapse !important;
+                  }
+                      table {
+                  width: 100%;
+                  border-collapse: collapse;
+              }
+              th, td {
+              margin: 0 !important;
+                      padding: 0 !important;
+                  border: 1px solid #ddd;
+              }
+              tbody tr:nth-child(even) {
+                  background-color: #f1f3f5;
+              }
+              tbody tr:nth-child(odd) {
+                  background-color: #ffffff;
+              }
+              }
+          `;
+          document.head.appendChild(style);
+          document.body.appendChild(printDiv);
+          printDiv.setAttribute("id", "printDiv");
+  
+          window.print();
+  
+          $('#myTable').DataTable({
+              "pageLength": 10,  // Remettre la pagination à 10 par défaut (ou la valeur souhaitée)
+          });
+  
+          // Nettoyer après l'impression
+          document.body.removeChild(printDiv);
+          document.head.removeChild(style);
+      }, 200);
+  }
+     
+  </script>
+
+{{-- <script>
   
   function imprimerPage() {
-    // Désactiver la pagination
     let table = $('#myTable').DataTable();
-    let currentPage = table.page();  // Sauvegarder la page actuelle
-    table.page.len(-1).draw();  // Afficher toutes les lignes
-    
-    // Attendre un court instant pour être sûr que le tableau est complètement rendu
-    setTimeout(function() {
-      // Masque les colonnes avec la classe hide-on-print
+    let currentPage = table.page();
+    table.page.len(-1).draw();
+        setTimeout(function() {
       var tableElement = document.getElementById('myTable');
       tableElement.classList.remove('dataTable');
       
@@ -217,7 +273,7 @@
         }, 200);
       }
   </script>
-    
+     --}}
     
     <!-- Assurez-vous d'inclure jQuery avant d'utiliser les méthodes AJAX -->
     
