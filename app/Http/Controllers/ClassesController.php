@@ -1141,7 +1141,7 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
                 // Générer le code QR
                 $qrCodeString = $decodedResponseConfirmation['qrCode'];
     
-                $reffacture = $nim.'_'.$counters;
+                $reffacture = $uid;
     
                 // dd($reffacture);
 
