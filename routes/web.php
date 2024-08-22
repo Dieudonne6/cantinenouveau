@@ -7,6 +7,7 @@ use App\Http\Controllers\ClassesController;
 use App\Http\Controllers\ConnexionDBController;
 use App\Http\Controllers\EleveController;
 use App\Http\Controllers\EtatController;
+use App\Http\Controllers\DuplicataController;
 
 /*
 |--------------------------------------------------------------------------
@@ -111,6 +112,12 @@ Route::post('logout', [PagesController::class, 'logout'])->name('logout');
 
 Route::get('/duplicatafacture', [PagesController::class, 'duplicatafacture']);
 Route::get('/dowloadduplfac/{id}', [PagesController::class, 'dowloadduplfac']);
+Route::get('/duplicatafacture', [DuplicataController::class, 'showForm'])->name('duplicata.showForm');
+Route::post('/filterduplicata', [DuplicataController::class, 'filterduplicata'])->name('filterduplicata');
+
+
+
+
 
 Route::get('/paiementeleve', [PagesController::class, 'paiementeleve']);
 
