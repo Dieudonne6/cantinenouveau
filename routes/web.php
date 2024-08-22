@@ -117,3 +117,4 @@ Route::get('/paiementeleve', [PagesController::class, 'paiementeleve']);
 
 Route::get('/duplicatainscription/{elevyo}',[ClassesController::class,'duplicatainscription']);
 Route::get('/majpaiementeleve', [PagesController::class, 'majpaiementeleve']);
+Route::get('/generer-factures', [ClassesController::class, 'genererfacture']);

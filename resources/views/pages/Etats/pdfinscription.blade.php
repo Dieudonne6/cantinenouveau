@@ -253,7 +253,7 @@
 
                 
                         <tr>
-                            <td>
+                            <td style="background-color: #04AA6D !important;">
                                 Inscription Cantine 
                             </td>
   
