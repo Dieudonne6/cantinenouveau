@@ -3,25 +3,31 @@
 @extends('layouts.master')
 @section('content')
 <style>
-  /* Styles spécifiques pour l'impression sur papier A4 */
-  @media print and (size: A4) {
-      table {
-          font-size: 5pt; /* Ajuste la taille de la police pour A4 */
-      }
-      th, td {
-          padding: 3px; /* Ajuste le padding pour A4 */
-      }
-  }
+  /* Suppression du padding et margin pour le tableau */
+table.dataTable {
+    margin: 0 !important;
+    padding: 0 !important;
+    border-collapse: collapse !important;
+}
 
-  /* Styles spécifiques pour l'impression sur papier A3 */
-  @media print and (size: A3) {
-      table {
-          font-size: 6pt; /* Ajuste la taille de la police pour A3 */
-      }
-      th, td {
-          padding: 4px; /* Ajuste le padding pour A3 */
-      }
-  }
+/* Suppression du padding et margin pour les cellules */
+table.dataTable th,
+table.dataTable td {
+    margin: 0 !important;
+    padding: 10px 0 5px 5px !important;
+    border-collapse: collapse !important;
+}
+
+#myTable td:nth-child(n+2) {
+    width: 100px;
+    word-wrap: break-word;
+    white-space: normal;
+}
+#myTable th:nth-child(n+2) {
+    width: 100px;
+    word-wrap: break-word;
+    white-space: normal;
+}
 </style>
 
 <body>
@@ -52,16 +58,14 @@
             <div class="col-lg-2">
               <button type="submit" class="btn btn-primary">Afficher</button>
             </div>
-            <div class="col-lg-2 offset-2">
-              <button onclick="imprimePage()" class="btn btn-primary">Imprimer</button>
-            </div>
+          
           </div>
-        </form> --}}
-        
+        </form>  --}}
+        <div class="col-lg-2">
+          <button onclick="imprimePage()" class="btn btn-primary">Imprimer</button>
+        </div>
         <div id="contenu">
-          <div>
-            <h4 class="card-title" style="text-align: center; font-weight:bold;">Etats des droits constatés ANNEE-ACADEMIQUE: {{ $annee }} - {{ $anneesuivant }} | CLASSE: {{ $classe }}</h4>
-          </div><br>
+          
           <div class="table-responsive pt-3">
             {{-- <table id="myTable" class="table table-striped table-sm" > --}}
             <table id="myTable" class="table table-bordered" >
@@ -82,7 +86,7 @@
                 @foreach ($eleves as $index => $eleve)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td style="width: 10px">{{ $eleve->NOM }} {{ $eleve->PRENOM }}</td>
+                    <td class="space-nom">{{ $eleve->NOM }} {{ $eleve->PRENOM }}</td>
                     <td>{{ $eleve->CODECLAS }}</td>
                     
                     @php
@@ -161,10 +165,12 @@
   
           var page = window.open('', '_blank');
           page.document.write('<html><head><title>EDC_annee_{{ $annee }}_{{ $anneesuivant }}_classe_{{ $classe }}</title>');
-          page.document.write('<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" >');
+          // page.document.write('<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" >');
           page.document.write('<style>@media print { .dt-end { display: none !important; } }</style>');
-          page.document.write('<style>@media print { .dt-start { display: none !important; } }</style>');
-          page.document.write('<style>table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #ddd; padding: 4px; } tbody tr:nth-child(even) { background-color: #f1f3f5; } tbody tr:nth-child(odd) { background-color: #ffffff; } </style>');
+          page.document.write('<style>@media print { td { font-size: 13px; } } }</style>');
+
+          page.document.write('<style>@media print { .dt-start { display: none !important; } .table td:nth-child(n+2) {width: 500px !important; word-wrap: break-word !important;white-space: normal !important; } table {margin: 0 !important; padding: 0 !important; border-collapse: collapse !important;} table th,table td {margin: 0 !important;padding: 10px 0 5px 5px !important;border-collapse: collapse !important;} }</style>');
+          page.document.write('<style> table th,table td {margin: 0 !important; padding: 10px 0 5px 5px !important; border-collapse: collapse !important;} table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #ddd;} tbody tr:nth-child(even) { background-color: #f1f3f5; } tbody tr:nth-child(odd) { background-color: #ffffff; } </style>');
           page.document.write('</head><body>');
           page.document.write('<div>' + document.getElementById('contenu').innerHTML + '</div>');
           page.document.write('</body></html>');

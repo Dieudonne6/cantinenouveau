@@ -37,7 +37,7 @@ use Endroid\QrCode\Writer\PngWriter;
 use DateTime;
 use Carbon\Carbon;
 
-
+use Illuminate\Support\Facades\Log;
 
 
 // use Endroid\QrCode\Response\QrCodeResponse;
@@ -1786,17 +1786,6 @@ public function etat() {
             }
                 
 
-
-     
-            public function etatpaiement(){
-                if(Session::has('account')){
-                // $paiementsAvecEleves = Session::get('paiementsAvecEleves', collect()); // Déclaration avec une collection vide par défaut
-
-                return view ('pages.etatpaiement');
-                } 
-                return redirect('/');
-            }
-
             public function traitementetatpaiement(Request $request){
 
 
@@ -1804,7 +1793,7 @@ public function etat() {
                 $fin = $request->input('fin');
             
                 // Récupérer les paiements entre les dates spécifiées
-                $paiements = Paiementglobalcontrat::whereBetween('date_paiementcontrat', [$debut, $fin])->where('statut_paiementcontrat', '=', 1)->get();
+                $paiements = Paiementcontrat::whereBetween('date_paiementcontrat', [$debut, $fin])->where('statut_paiementcontrat', '=', 1)->get();
             
                 // Collection pour stocker les informations de paiement avec les noms d'élève
                 $paiementsAvecEleves = collect([]);
@@ -1812,6 +1801,9 @@ public function etat() {
                 // dd($paiements);
                 // Itérer sur chaque paiement
                 foreach ($paiements as $paiement) {
+                    if ($paiement->mois_paiementcontrat == 13 && $paiement->montant_paiementcontrat == 0) {
+                        continue; // Saute cet enregistrement
+                    }
                     // Récupérer l'id_contrat de ce paiement
                     $idContrat = $paiement->id_contrat;
             
@@ -1823,21 +1815,33 @@ public function etat() {
                         $iduser = $contrat->id_usercontrat;
 
                         // dd($iduser);
-
-
-
-                        
                         // Récupérer le nom de l'élève à partir de la table Eleve
                         $eleve = Eleve::where('MATRICULE', $matriculeEleve)->first();
-                        $users = User::where('id_usercontrat', '=', $iduser)->first();
+                        $users = User::where('id', '=', $iduser)->first();
                         // dd($users);
 
                         if ($eleve) {
+                            $moisContrat = Moiscontrat::where('id_moiscontrat', $paiement->mois_paiementcontrat)->first();
 
+                            // Chercher si cet élève a déjà des paiements enregistrés pour cette date et cette référence
+                            $existingPaiementIndex = $paiementsAvecEleves->search(function ($item) use ($eleve, $paiement) {
+                                return $item['nomcomplet_eleve'] === $eleve->NOM . ' ' . $eleve->PRENOM &&
+                                       $item['date_paiement'] === $paiement->date_paiementcontrat;
+                            });
+            
+                            if ($existingPaiementIndex !== false) {
+ // Si un paiement existe déjà pour cet élève à cette date et cette référence, on met à jour les mois et la somme des montants
+ $updatedPaiement = $paiementsAvecEleves->get($existingPaiementIndex);
+ $updatedPaiement['mois'] .= ', ' . ($moisContrat ? $moisContrat->nom_moiscontrat : 'Mois inconnu');
+ $updatedPaiement['montant'] += $paiement->montant_paiementcontrat;
+
+ // Remplacer l'ancien élément avec l'élément mis à jour
+ $paiementsAvecEleves->put($existingPaiementIndex, $updatedPaiement);
+                            } else {
+            
                             // Ajouter les informations de paiement avec le nom de l'élève à la collection
                             $paiementsAvecEleves->push([
                                 // dd($user->login),
-
                                 // 'user' => $users->login,
                                 'id_contrat' => $idContrat,
                                 'nomcomplet_eleve' => $eleve->NOM .' '. $eleve->PRENOM,
@@ -1845,11 +1849,12 @@ public function etat() {
                                 'id_paiementcontrat' => $paiement->id_paiementcontrat,
                                 'date_paiement' => $paiement->date_paiementcontrat,
                                 'montant' => $paiement->montant_paiementcontrat,
-                                'mois' => $paiement->mois_paiementcontrat,
+                                'mois' => $moisContrat ? $moisContrat->nom_moiscontrat : 'Mois inconnu',
                                 'reference' => $paiement->reference_paiementcontrat,
                                 // Ajoutez d'autres informations de paiement si nécessaire
                             ]);
                         }
+                    }
                     }
                 }
             
@@ -1877,7 +1882,6 @@ public function etat() {
 
 
             }
-
 
 
             public function etatpaiement1 (){
@@ -2001,8 +2005,391 @@ public function etat() {
                                 //     return back()->with('status','Contrat enregistré avec succès');
                                 // }
                      
-                                
-                                
-                                
+    // debut facture normalisee pour tous les paiements de l'annee 2023_2024
+    public function genererfacture() {
+        // $paiements = DB::table('paiementcontrat')->where('montant_paiementcontrat', '>', 0)->get();
+
+        $paiements = DB::table('paiementcontrat')
+        ->select('id_contrat', 'mois_paiementcontrat', 'montant_paiementcontrat', 'date_paiementcontrat')
+        ->where('montant_paiementcontrat', '>', 0)
+        ->get()
+        ->groupBy('id_contrat')
+        ->map(function ($rows) {
+            return [
+                'id_contrat' => $rows->first()->id_contrat,
+                'mois' => $rows->pluck('mois_paiementcontrat')->toArray(),
+                'montant_total' => $rows->sum('montant_paiementcontrat'),
+                // 'date_paiementcontrat' => $rows['date_paiementcontrat'],
+                'details' => $rows->map(function ($row) {
+                    return [
+                        'mois' => $row->mois_paiementcontrat,
+                        'montant_paye' => $row->montant_paiementcontrat,
+                        'date_paiementcontrat' => $row->date_paiementcontrat,
+                    ];
+                })->toArray(),
+            ];
+        });
+
+
+
+
+        foreach ($paiements as $paiement) {
+
+            // dd($paiement['montant_total']);
+
+            try {
+                set_time_limit(300); // Augmente le temps d'exécution à 300 secondes (5 minutes)
+                // Appeler la fonction de création de facture normalisée
+                $facture = $this->savepaiementcontrat2($paiement);
+
+                // // Enregistrer la facture dans la base de données
+                // DB::table('factures')->insert([
+                //     'id_paiement' => $paiement->id,
+                //     'facture_data' => json_encode($facture),
+                //     'created_at' => now(),
+                //     'updated_at' => now(),
+                // ]);
+
+                Log::info("Facture générée avec succès pour le paiement ID: " );
+
+            } catch (\Exception $e) {
+                // Gérer les erreurs de génération de facture
+                Log::error("Erreur lors de la génération de la facture pour le paiement ID: " );
+            }
+        }
+
+     return response()->json(['message' => 'Factures générées avec succès.']);
+    }
+    
+
+
+
+    private function savepaiementcontrat2($paiement){
+        $idcontratEleve = $paiement['id_contrat'];
+        // $moiscont =  DB::table('paiementcontrat')->where('id_contrat', $idcontratEleve)->pluck('mois_paiementcontrat');
+        // dd($moiscont);
+
+        $moisCoches = $paiement['mois'];
+        
+
+        // $nombreElements = $moiscont->count();
+        $montantmoiscontrat = $paiement['montant_total'];
+        
+        $montanttotal = $paiement['montant_total'];
+        $datepaiementcontrat = date('Y-m-d H:i:s');
+        $id_usercontrat = 1;
+        // dd($datepaiementcontrat);
+        // dd($id_usercontrat);
+        $anneeActuelle = date('Y');
+
+       
+        
+
+
+        // recuperer les nom des mois cochee
+
+        // Array des noms des mois
+        $nomsMoisCoches = [];
+        if (is_array($moisCoches)) {
+            // Parcourir les ID des mois cochés et obtenir leur nom correspondant
+            foreach ($moisCoches as $id_moiscontrat) {
+                // Ici, vous pouvez récupérer le nom du mois à partir de votre modèle Mois
+                $mois = Moiscontrat::where('id_moiscontrat', $id_moiscontrat)->first();
+
+                // Vérifiez si le mois existe
+                if ($mois) {
+                    // Ajouter le nom du mois à l'array
+                    $nomsMoisCoches[] = $mois->nom_moiscontrat;
+                }
+            }
+
+        }
+        // Convertir le tableau en une chaîne de caractères
+        $moisConcatenes = implode(',', $nomsMoisCoches);
+
+
+                    // GESTION DE LA FACTURE NORMALISE
+
+                $matriculeeleve = Contrat::where('id_contrat', $idcontratEleve)->value('eleve_contrat');
+                $nomeleve = Eleve::where('MATRICULE', $matriculeeleve)->value('NOM');
+                $prenomeleve = Eleve::where('MATRICULE', $matriculeeleve)->value('PRENOM');
+                $classeeleve = Eleve::where('MATRICULE', $matriculeeleve)->value('CODECLAS');
+                $nomcompleteleve = $nomeleve .' '. $prenomeleve;
+
+                $parametrefacture = Params2::first();
+                $ifuentreprise = $parametrefacture->ifu;
+                $tokenentreprise = $parametrefacture->token;
+                $taxe = $parametrefacture->taxe;
+                $type = $parametrefacture->typefacture;
+                // dd($ifuentreprise);
+                $parametreetab = Params2::first();
+                // $nometab = $parametreetab->NOMETAB;
+                // $villeetab = $parametreetab->VILLE;
+
+
+
+
+                // -------------------------------
+                    //  RECUPERATION DE LA FACTURE
+                // -------------------------------
+
+                    // Préparez les données JSON pour l'API
+                        $jsonData = json_encode([
+                            "ifu" => $ifuentreprise, // ici on doit rendre la valeur de l'ifu dynamique
+                            // "aib" => "A",
+                            "type" => $type,
+                            "items" => [
+                                [
+                                    'name' => 'Frais cantine pour :'.$moisConcatenes,
+                                    // 'price' => intval($infocontrateleve->montant_paiementcontrat),
+                                    'price' => intval($montanttotal), 
+                                    'quantity' => 1,
+                                    'taxGroup' => $taxe,
+                                ]
+                            ],
+                            "client" => [
+                                // "ifu" => "string",
+                                "name"=>  $nomcompleteleve,
+                                // "contact" => "string",
+                                // "address"=> "string"
+                            ],
+                            "operator" => [
+                                "name" => "test"
+                            ],
+                            "payment" => [
+                                [
+                                "name" => "ESPECES",
+                                //   "amount": 0
+                                ]
+                              ],
+                        ]);
+                    // $jsonDataliste = json_encode($jsonData, JSON_FORCE_OBJECT);
+
+
+                    //  dd($jsonData);
+
+                    // Définissez l'URL de l'API de facturation
+                    $apiUrl = 'https://developper.impots.bj/sygmef-emcf/api/invoice';
+
+                    // Définissez le jeton d'authentification
+                    $token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjAyMDIzODU5MTExMzh8VFMwMTAxMTQ3MiIsInJvbGUiOiJUYXhwYXllciIsIm5iZiI6MTcyNDI1NzQyMywiZXhwIjoxNzM3NDE0MDAwLCJpYXQiOjE3MjQyNTc0MjMsImlzcyI6ImltcG90cy5iaiIsImF1ZCI6ImltcG90cy5iaiJ9.sRcSeEbIuQNSgFebRRaxW4zPLCqlF6PQXc90e2xfHCs';
+                    // $token = $tokenentreprise;
+
+                    // Effectuez la requête POST à l'API
+                    // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                    $ch = curl_init($apiUrl);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_POST, true);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                        'Content-Type: application/json',
+                        'Authorization: Bearer ' . $token
+                    ));
+                    curl_setopt($ch, CURLOPT_CAINFO, storage_path('certificates/cacert.pem'));
+
+                // Exécutez la requête cURL et récupérez la réponse
+        $response = curl_exec($ch);
+        // dd($response);
+
+        // Vérifiez les erreurs de cURL
+        if (curl_errno($ch)) {
+            // echo 'Erreur cURL : ' . curl_error($ch);
+            return back()->with('erreur','Erreur curl , mauvaise connexion a l\'API');
+        }
+
+        // {
+        //     "ifu": "string",
+        //     "aib": "A",
+        //     "type": "FV",
+        //     "items": [
+        //       {
+        //         "code": "string",
+        //         "name": "string",
+        //         "price": 0,
+        //         "quantity": 0,
+        //         "taxGroup": "A",
+        //         "taxSpecific": 0,
+        //         "originalPrice": 0,
+        //         "priceModification": "string"
+        //       }
+        //     ],
+        //     "client": {
+        //       "ifu": "string",
+        //       "name": "string",
+        //       "contact": "string",
+        //       "address": "string"
+        //     },
+        //     "operator": {
+        //       "id": "string",
+        //       "name": "string"
+        //     },
+        //     "payment": [
+        //       {
+        //         "name": "ESPECES",
+        //         "amount": 0
+        //       }
+        //     ],
+        //     "reference": "string",
+        //     "innat": "NA",
+        //     "usconf": true
+        //   }
+
+        // Fermez la session cURL
+        curl_close($ch);
+
+        // Affichez la réponse de l'API
+        $decodedResponse = json_decode($response, true);
+        //  dd($decodedResponse);
+
+        // Vérifiez si l'UID est présent dans la réponse
+        if (isset($decodedResponse['uid'])) {
+            // L'UID de la demande
+            $uid = $decodedResponse['uid'];
+            // $taxb = 0.18;
+
+            // Affichez l'UID
+            // echo "L'UID de la demande est : $uid";
+
+           
+
+
+            // -------------------------------
+                //  RECUPERATION DE LA FACTURE PAR SON UID
+            // -------------------------------
+
+            // Définissez l'URL de l'API de confirmation de facture
+            $recuperationUrl = 'https://developper.impots.bj/sygmef-emcf/api/invoice/'.$uid;
+
+            // Configuration de la requête cURL pour la confirmation
+            $chRecuperation = curl_init($recuperationUrl);
+            curl_setopt($chRecuperation, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($chRecuperation, CURLOPT_CUSTOMREQUEST, 'GET');
+            curl_setopt($chRecuperation, CURLOPT_HTTPHEADER, [
+                'Authorization: Bearer ' . $token,
+                'Content-Length: 0'
+            ]);
+            curl_setopt($chRecuperation, CURLOPT_CAINFO, storage_path('certificates/cacert.pem'));
+
+            // Exécutez la requête cURL pour la confirmation
+            $responseRecuperation = curl_exec($chRecuperation);
+            // dd($responseConfirmation);
+            // Vérifiez les erreurs de cURL pour la confirmation
+
+
+            // Fermez la session cURL pour la confirmation
+            curl_close($chRecuperation);
+
+        // Convertissez la réponse JSON en tableau associatif PHP
+        $decodedDonneFacture = json_decode($responseRecuperation, true);
+
+        // $facturedetaille = json_decode($jsonData, true);
+        $ifuEcoleFacture = $decodedDonneFacture['ifu'];
+        // dd($ifuEcoleFacture);
+        $itemFacture = $decodedDonneFacture['items'];
+        $doneeDetailleItemFacture = $itemFacture['0'];
+        $nameItemFacture = $doneeDetailleItemFacture['name'];
+        $prixTotalItemFacture = $doneeDetailleItemFacture['price'];
+        $quantityItemFacture = $doneeDetailleItemFacture['quantity'];
+        $taxGroupItemFacture = $doneeDetailleItemFacture['taxGroup'];
+        // $idd = $responseRecuperation.ifu;
+        $nameClient = $decodedDonneFacture['client']['name'];
+        // dd($decodedDonneFacture);
+
+
+
+            // -------------------------------
+                //  CONFIRMATION DE LA FACTURE 
+            // -------------------------------
+
+             // ACTION pour la confirmation
+             $actionConfirmation = 'confirm';
+
+            // Définissez l'URL de l'API de confirmation de facture
+            $confirmationUrl = 'https://developper.impots.bj/sygmef-emcf/api/invoice/'.$uid.'/'.$actionConfirmation;
+        
+            // Configuration de la requête cURL pour la confirmation
+            $chConfirmation = curl_init($confirmationUrl);
+            curl_setopt($chConfirmation, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($chConfirmation, CURLOPT_CUSTOMREQUEST, 'PUT');
+            curl_setopt($chConfirmation, CURLOPT_HTTPHEADER, [
+                'Authorization: Bearer ' . $token,
+                'Content-Length: 0'
+            ]);
+            curl_setopt($chConfirmation, CURLOPT_CAINFO, storage_path('certificates/cacert.pem'));
+        
+            // Exécutez la requête cURL pour la confirmation
+            $responseConfirmation = curl_exec($chConfirmation);
+        
+        
+            // Fermez la session cURL pour la confirmation
+            curl_close($chConfirmation);
+        
+        // Convertissez la réponse JSON en tableau associatif PHP
+        $decodedResponseConfirmation = json_decode($responseConfirmation, true);
+        // dd($decodedResponseConfirmation);
+
+
+            $codemecef = $decodedResponseConfirmation['codeMECeFDGI'];
+
+            $counters = $decodedResponseConfirmation['counters'];
+
+            $nim = $decodedResponseConfirmation['nim'];
+
+            $dateTime = $decodedResponseConfirmation['dateTime'];
+
+
+            // Générer le code QR
+            $qrCodeString = $decodedResponseConfirmation['qrCode'];
+
+            $reffacture = $nim.'_'.$counters;
+
+            // dd($reffacture);
+
+        // gestion du code qr sous forme d'image
+
+        // $fileNameqrcode = $nomcompleteleve . time() . '.png';
+        $result = Builder::create()
+            ->writer(new PngWriter())
+            ->data($qrCodeString)
+            ->size(100)
+            // ->margin(10)
+            ->build();
+
+            $qrcodecontent = $result->getString();
+
+            // dd($qrcodecontent);
+
+        // ENREGISTREMENT DE LA FACTURE
+        $facturenormalise = new Facturenormalise();
+        $facturenormalise->id = $reffacture;
+        $facturenormalise->codemecef = $codemecef;
+        $facturenormalise->counters = $counters;
+        $facturenormalise->nim = $nim;
+        $facturenormalise->dateHeure = $dateTime;
+        $facturenormalise->ifuEcole = $ifuEcoleFacture;
+        $facturenormalise->MATRICULE = $matriculeeleve;
+        $facturenormalise->idcontrat = $idcontratEleve;
+        $facturenormalise->moispayes = $moisConcatenes;
+        $facturenormalise->classe = $classeeleve;
+        $facturenormalise->nom = $nameClient;
+        $facturenormalise->designation = $nameItemFacture;
+        $facturenormalise->montant_total = $prixTotalItemFacture;
+        $facturenormalise->datepaiementcontrat = $datepaiementcontrat;
+        $facturenormalise->qrcode = $qrcodecontent;
+        $facturenormalise->statut = 1;
+    
+        $facturenormalise->save();
+
+
+         }
+
+
+
+
+}
+
+
+
+        // fin facture normalisee pour tous les paiements de l'annee 2023_2024                     
                             
 }

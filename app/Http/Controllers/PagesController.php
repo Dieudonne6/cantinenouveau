@@ -178,10 +178,10 @@ class PagesController extends Controller
                 if (Hash::check($request->password_usercontrat, $account->motdepasse)) {
 
                 Session::put('account', $account);
-                $id_usercontrat = $account->id_usercontrat;
+                $id_usercontrat = $account->id;
                 $image = $account->image;
 
-                $nom_user = $account->nomuser;
+                $nom_user = $account->login;
                 Session::put('image', $image);
 
                 $prenom_user = $account->prenomuser;
@@ -251,7 +251,7 @@ class PagesController extends Controller
         // $request->validate([
         //     'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         // ]);
-        $login->nomgroupe = 1;
+        $login->nomgroupe = $request->input('nomgroupe');
         $login->login = $request->input('login');
         $login->nomuser = $request->input('nom');
         $login->prenomuser = $request->input('prenom');
@@ -259,8 +259,13 @@ class PagesController extends Controller
         $imageconten = file_get_contents($imagenam->getRealPath());
         $login->image = $imageconten;
         $login->motdepasse = $password_crypte;
-        $login->administrateur = 1;
-        $login->user_actif = 1;
+        $login->frequence_mp = 0;
+        $login->saisir_mp = 0;
+        $login->date_desactivation = "2000-01-01";
+        $login->date_change_mp = "2000-01-01";
+        $login->administrateur = $request->input('administrateur');
+        $login->user_actif = $request->input('user_actif');
+        // dd($login);
         $login->save();
         return redirect()->back()->with('status','Enregistrer avec succes');
 
