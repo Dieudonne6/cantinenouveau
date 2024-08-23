@@ -31,7 +31,7 @@
                                                 name="eleve_id">
                                                 <option value="">Sélectionnez un élève</option>
                                                 @foreach ($eleves as $eleve)
-                                                    <option value="{{ $eleve->idcontrat }}">{{ $eleve->nom }}</option>
+                                                    <option value="{{ $eleve->MATRICULE }}">{{ $eleve->NOM }}{{ $eleve->PRENOM }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -52,27 +52,19 @@
                                                 Afficher
                                             </button>
                                         </div>
-
-                                        <!-- Bouton pour ouvrir le modal d'impression -->
-                                        <div class="col-3">
-                                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#exampleModal">
-                                                Imprimer la relance
-                                            </button>
-                                        </div>
                                     </div>
                                 </form>
 
                                 <!-- Tableau pour afficher les factures -->
                                  @if (isset($factures) && $factures->count() > 0)
                                 <div class="table-responsive pt-3">
-                                    <div id="facture-table">
+                                    <div id="mytable">
                                         <table class="table table-bordered">
                                             <thead>
                                                 <tr>
                                                     <th>N° de facture</th>
                                                     <th>Date de facture</th>
-                                                    <th>Référence</th>
+                                                    <th>Montant Total</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -99,11 +91,11 @@
 
                                  @if (isset($contrats) && $contrats->count() > 0)
                                 <div class="table-responsive pt-3">
-                                    <div id="facture-table">
+                                    <div id="mytable">
                                         <table class="table table-bordered">
                                             <thead>
                                                 <tr>
-                                                    <th>N° de facture</th>
+                                                    <th>N° matricule</th>
                                                     <th>Date de facture</th>
                                                     <th>Montant Total</th>
                                                     <th>Action</th>
@@ -116,9 +108,10 @@
                                                         <td>{{ $contrat->datecreation_contrat }}</td>
                                                         <td>{{ $contrat->cout_contrat }}</td> 
                                                         <td>
-                                                            <button type="button" class="btn btn-primary">
+                                                            <a href="ton-lien-ici" class="btn btn-primary">
                                                                 Imprimer
-                                                            </button>
+                                                            </a>
+
                                                         </td>
                                                         @endforeach
                                                     </tr>
@@ -160,7 +153,7 @@
                         });
                     }
 
-                    var tableElement = document.getElementById('facture-table');
+                    var tableElement = document.getElementById('mytable');
                     tableElement.innerHTML = ''; // Effacer le contenu actuel du tableau
 
                     if (filteredFactures.length > 0) {
