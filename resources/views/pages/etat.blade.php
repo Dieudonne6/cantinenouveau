@@ -1,6 +1,10 @@
 @extends('layouts.master')
 @section('content')
-
+<style>
+  .select2-container {
+    width: 100% !important;
+  }
+</style>
 <div class="card">
   <div class="card-body">
     
@@ -149,7 +153,7 @@
                   <form action="{{url('/filteretat')}}" method="POST">
                     {{csrf_field()}}
                     <div class="row">
-                      <div class="col-3">
+                      <div class="form-group col-3 w-100">
                         <select class="js-example-basic-multiple w-100" name="annee">
                           <option value="">Sélectionnez une année</option>
                           @foreach ($annee as $annees)
@@ -158,7 +162,7 @@
                         </select>
                       </div>
                       
-                      <div class="col-3">
+                      <div class="form-group col-3 w-100">
                         <select class="js-example-basic-multiple w-100" name="classe">
                           <option value="">Sélectionnez une classe</option>
                           <option value="TOUTES">Toutes les classes</option>
@@ -190,11 +194,12 @@
                             aria-label="Close"></button>
                           </div>
                           <div class="modal-body">
-                            <input type="date" class="form-control" name="daterelance">
+                            <input type="date" class="form-control" name="daterelance" required>
                           </div>
                           <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
                             <button type="submit" class="btn btn-primary">Imprimer</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+
                           </div>
                         </div>
                       </div>

@@ -1,14 +1,18 @@
 @extends('layouts.master')
 @section('content')
 <style>
-table.dataTable th,
-table.dataTable td {
+  table.dataTable th,
+  table.dataTable td {
     margin: 0 !important;
-    padding: 10px 0 5px 5px;
+    padding: 10px 0 10px 10px !important;
     border-collapse: collapse !important;
-    font-size: 16px;
-}
-
+    font-size: 14px;
+  }
+  @media print {
+    .table-bordered th, .table-bordered td {
+      border: 1px solid #000 !important;
+    }
+  }
 </style>
 
 
@@ -44,9 +48,8 @@ table.dataTable td {
     </form> --}}
     <div class="card">
       <div class="card-body">
-        
-        
-        <div class="col">
+        <h5> Liste des paiements de la periode du {{$dateFormateedebut}} au {{$dateFormateefin}}</h5>
+        <div class="col mb-2">
           <label for="debut" style="visibility: hidden">Du</label>
           <button onclick="imprimerPage()" type="button" class="btn btn-primary" style="display: block">
             Imprimer Etat
@@ -81,7 +84,7 @@ table.dataTable td {
         
         <div id="contenu">
           
-         
+          
           <div class="table-responsive">
             <table id="myTable" class="table table-bordered">
               <thead>
@@ -162,19 +165,21 @@ table.dataTable td {
 
 <script>
   function imprimerPage() {
-      let table = $('#myTable').DataTable();
-      let currentPage = table.page();  
-      table.destroy();// Sauvegarder la page actuelle
-  
-      setTimeout(function() {
-          // Créer un élément invisible pour l'impression
-          let printDiv = document.createElement('div');
-          printDiv.innerHTML = '<h1 style="font-size: 20px; text-align: center;">Liste des paiements de la periode du {{$dateFormateedebut}} au {{$dateFormateefin}} </h1>' +
-                               document.getElementById('contenu').innerHTML;
-  
-          // Appliquer des styles pour l'impression
-          let style = document.createElement('style');
-          style.innerHTML = `@page { size: landscape; }
+    let table = $('#myTable').DataTable();
+    let currentPage = table.page();  
+    table.destroy();// Sauvegarder la page actuelle
+    let originalTitle = document.title;
+    document.title = `Liste des paiements de la periode du {{$dateFormateedebut}} au {{$dateFormateefin}}`;
+    
+    setTimeout(function() {
+      // Créer un élément invisible pour l'impression
+      let printDiv = document.createElement('div');
+      printDiv.innerHTML = '<h1 style="font-size: 20px; text-align: center;">Liste des paiements de la periode du {{$dateFormateedebut}} au {{$dateFormateefin}} </h1>' +
+      document.getElementById('contenu').innerHTML;
+      
+      // Appliquer des styles pour l'impression
+      let style = document.createElement('style');
+      style.innerHTML = `@page { size: landscape; }
               @media print {
                   body * { visibility: hidden; }
                   #printDiv, #printDiv * { visibility: visible; }
@@ -203,11 +208,7 @@ table.dataTable td {
                   width: 100%;
                   border-collapse: collapse;
               }
-              th, td {
-              margin: 0 !important;
-                      padding: 0 !important;
-                  border: 1px solid #ddd;
-              }
+              
               tbody tr:nth-child(even) {
                   background-color: #f1f3f5;
               }
@@ -216,64 +217,64 @@ table.dataTable td {
               }
               }
           `;
-          document.head.appendChild(style);
-          document.body.appendChild(printDiv);
-          printDiv.setAttribute("id", "printDiv");
-  
-          window.print();
-  
-          $('#myTable').DataTable({
-              "pageLength": 10,  // Remettre la pagination à 10 par défaut (ou la valeur souhaitée)
-          });
-  
-          // Nettoyer après l'impression
-          document.body.removeChild(printDiv);
-          document.head.removeChild(style);
-      }, 200);
+      document.head.appendChild(style);
+      document.body.appendChild(printDiv);
+      printDiv.setAttribute("id", "printDiv");
+      
+      window.print();
+      
+      $('#myTable').DataTable({
+        "pageLength": 10,  // Remettre la pagination à 10 par défaut (ou la valeur souhaitée)
+      });
+      
+      // Nettoyer après l'impression
+      document.body.removeChild(printDiv);
+      document.head.removeChild(style);
+    }, 200);
   }
-     
-  </script>
+  
+</script>
 
 {{-- <script>
   
   function imprimerPage() {
-    let table = $('#myTable').DataTable();
-    let currentPage = table.page();
-    table.page.len(-1).draw();
-        setTimeout(function() {
-      var tableElement = document.getElementById('myTable');
-      tableElement.classList.remove('dataTable');
-      
-      var columns = tableElement.querySelectorAll('.hide-on-print');
+  let table = $('#myTable').DataTable();
+  let currentPage = table.page();
+  table.page.len(-1).draw();
+  setTimeout(function() {
+  var tableElement = document.getElementById('myTable');
+  tableElement.classList.remove('dataTable');
+  
+  var columns = tableElement.querySelectorAll('.hide-on-print');
+  columns.forEach(function(column) {
+  column.style.display = 'none';
+  });
+  
+  var page = window.open('', '_blank');
+  page.document.write('<html><head><title>Paiement du {{$dateFormateedebut}} au {{$dateFormateefin}}</title>');
+    page.document.write('<link rel="stylesheet" href="https://cdn.datatables.net/2.0.7/css/dataTables.dataTables.css" />');
+    page.document.write('<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" >');
+    page.document.write('<style>@media print { .dt-end { display: none !important; } }</style>');
+    page.document.write('<style>@media print { .dt-start { display: none !important; } }</style>');
+    page.document.write('<style>table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #ddd; padding: 8px; } .cell-classe { background-color: #f8f9fa; } .cell-eleve { background-color: #e9ecef; } .cell-montant { background-color: #dee2e6; } .cell-mois { background-color: #ced4da; } .cell-date { background-color: #adb5bd; } .cell-reference { background-color: #6c757d; } .cell-action { background-color: #343a40; color: #fff; } tbody tr:nth-child(even) { background-color: #f1f3f5; } tbody tr:nth-child(odd) { background-color: #ffffff; } </style>');
+    page.document.write('</head><body>');
+      page.document.write('<div>' + document.getElementById('contenu').innerHTML + '</div>');
+      page.document.write('</body></html>');
+      page.document.close();
+      page.onload = function() {
+      page.print();
+      page.close();
+      table.page.len(10).draw();  
+      table.page(currentPage).draw(false);            
       columns.forEach(function(column) {
-        column.style.display = 'none';
+      column.style.display = '';
       });
-      
-        var page = window.open('', '_blank');
-        page.document.write('<html><head><title>Paiement du {{$dateFormateedebut}} au {{$dateFormateefin}}</title>');
-        page.document.write('<link rel="stylesheet" href="https://cdn.datatables.net/2.0.7/css/dataTables.dataTables.css" />');
-        page.document.write('<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" >');
-        page.document.write('<style>@media print { .dt-end { display: none !important; } }</style>');
-        page.document.write('<style>@media print { .dt-start { display: none !important; } }</style>');
-        page.document.write('<style>table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #ddd; padding: 8px; } .cell-classe { background-color: #f8f9fa; } .cell-eleve { background-color: #e9ecef; } .cell-montant { background-color: #dee2e6; } .cell-mois { background-color: #ced4da; } .cell-date { background-color: #adb5bd; } .cell-reference { background-color: #6c757d; } .cell-action { background-color: #343a40; color: #fff; } tbody tr:nth-child(even) { background-color: #f1f3f5; } tbody tr:nth-child(odd) { background-color: #ffffff; } </style>');
-        page.document.write('</head><body>');
-          page.document.write('<div>' + document.getElementById('contenu').innerHTML + '</div>');
-          page.document.write('</body></html>');
-          page.document.close();
-          page.onload = function() {
-            page.print();
-            page.close();
-            table.page.len(10).draw();  
-            table.page(currentPage).draw(false);            
-            columns.forEach(function(column) {
-              column.style.display = '';
-            });
-            location.reload(); 
-          };
-        }, 200);
+      location.reload(); 
+      };
+      }, 200);
       }
-  </script>
-     --}}
+    </script>
+    --}}
     
     <!-- Assurez-vous d'inclure jQuery avant d'utiliser les méthodes AJAX -->
     
