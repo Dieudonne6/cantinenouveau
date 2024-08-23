@@ -3,25 +3,39 @@
 @extends('layouts.master')
 @section('content')
 <style>
-  /* Styles spécifiques pour l'impression sur papier A4 */
-  @media print and (size: A4) {
-      table {
-          font-size: 5pt; /* Ajuste la taille de la police pour A4 */
-      }
-      th, td {
-          padding: 3px; /* Ajuste le padding pour A4 */
-      }
+  /* Suppression du padding et margin pour le tableau */
+  table.dataTable {
+    margin: 0 !important;
+    padding: 0;
+    border-collapse: collapse !important;
   }
-
-  /* Styles spécifiques pour l'impression sur papier A3 */
-  @media print and (size: A3) {
-      table {
-          font-size: 6pt; /* Ajuste la taille de la police pour A3 */
-      }
-      th, td {
-          padding: 4px; /* Ajuste le padding pour A3 */
-      }
+  
+  /* Suppression du padding et margin pour les cellules */
+  table.dataTable th,
+  table.dataTable td {
+    margin: 0 !important;
+    padding: 10px;
+    border-collapse: collapse !important;
+    font-size: 13px;
   }
+  
+  #myTable td:nth-child(n+2) {
+    width: 100px;
+    word-wrap: break-word;
+    white-space: normal;
+  }
+  /* Masquer la ligne des totaux par défaut */
+  .totals-row {
+    display: none;
+  }
+  
+  /* Afficher la ligne des totaux uniquement lors de l'impression */
+  @media print {
+    .totals-row {
+      display: table-row;
+    }
+  }
+  
 </style>
 
 <body>
@@ -52,37 +66,35 @@
             <div class="col-lg-2">
               <button type="submit" class="btn btn-primary">Afficher</button>
             </div>
-            <div class="col-lg-2 offset-2">
-              <button onclick="imprimePage()" class="btn btn-primary">Imprimer</button>
-            </div>
+            
           </div>
-        </form> --}}
-        
+        </form>  --}}
+        <div class="col-lg-2">
+          <button onclick="imprimePage()" class="btn btn-primary">Imprimer</button>
+        </div>
         <div id="contenu">
-          <div>
-            <h4 class="card-title" style="text-align: center; font-weight:bold;">Etats des droits constatés ANNEE-ACADEMIQUE: {{ $annee }} - {{ $anneesuivant }} | CLASSE: {{ $classe }}</h4>
-          </div><br>
+          
           <div class="table-responsive pt-3">
             {{-- <table id="myTable" class="table table-striped table-sm" > --}}
-            <table id="myTable" class="table table-bordered" >
-              <thead>
-                <tr>
-                  <th>N</th>
-                  <th>Elève</th>
-                  <th>Classe</th>
-                  @foreach ($moisContrat as $mois)
-                  @if ($mois->nom_moiscontrat != 'Juillet' && $mois->nom_moiscontrat != 'Aout')
-                  <th>{{ $mois->nom_moiscontrat }}</th>
-                  @endif
-                  @endforeach         
-                  <th>Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                @foreach ($eleves as $index => $eleve)
-                <tr>
+              <table id="myTable" class="table table-bordered" >
+                <thead>
+                  <tr>
+                    <th>N </th>
+                    <th>Elève</th>
+                    <th>Classe</th>
+                    @foreach ($moisContrat as $mois)
+                    @if ($mois->nom_moiscontrat != 'Juillet' && $mois->nom_moiscontrat != 'Aout')
+                    <th>{{ $mois->nom_moiscontrat }}</th>
+                    @endif
+                    @endforeach         
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @foreach ($eleves as $index => $eleve)
+                  <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td style="width: 10px">{{ $eleve->NOM }} {{ $eleve->PRENOM }}</td>
+                    <td class="space-nom">{{ $eleve->NOM }} {{ $eleve->PRENOM }}</td>
                     <td>{{ $eleve->CODECLAS }}</td>
                     
                     @php
@@ -96,94 +108,154 @@
                     $paiementTrouve = false;
                     @endphp
                     <td>
-                        @foreach ($eleve->contrats as $contrat)
-                        @foreach ($contrat->paiements as $paiement)
-                        @if ($paiement->mois_paiementcontrat == $mois->id_moiscontrat)
-                        {{ \Carbon\Carbon::parse($paiement->date_paiementcontrat)->format('d/m/Y') }}</br></br>
-                        {{ $paiement->montant_paiementcontrat }}
-                        @php
-                        $montantTotalMois += $paiement->montant_paiementcontrat;
-                        $paiementTrouve = true;
-                        @endphp
-                        @endif
-                        @endforeach
-                        @endforeach
-                        @if (!$paiementTrouve)
-                        @if ($mois->id_moiscontrat != 13)
-                        Pas inscrit
-                        @else
-                        0
-                        @endif
-                        @php
-                        $totalMois[$mois->id_moiscontrat] += $montantTotalMois;
-                        @endphp
-                        @else
-                        @php
-                        $totalMois[$mois->id_moiscontrat] += $montantTotalMois;
-                        @endphp
-                        @endif
-                        
+                      @foreach ($eleve->contrats as $contrat)
+                      @foreach ($contrat->paiements as $paiement)
+                      @if ($paiement->mois_paiementcontrat == $mois->id_moiscontrat)
+                      {{ \Carbon\Carbon::parse($paiement->date_paiementcontrat)->format('d/m/Y') }}</br></br>
+                      {{ $paiement->montant_paiementcontrat }}
+                      @php
+                      $montantTotalMois += $paiement->montant_paiementcontrat;
+                      $paiementTrouve = true;
+                      @endphp
+                      @endif
+                      @endforeach
+                      @endforeach
+                      @if (!$paiementTrouve)
+                      @if ($mois->id_moiscontrat != 13)
+                      Pas inscrit
+                      @else
+                      0
+                      @endif
+                      @php
+                      $totalMois[$mois->id_moiscontrat] += $montantTotalMois;
+                      @endphp
+                      @else
+                      @php
+                      $totalMois[$mois->id_moiscontrat] += $montantTotalMois;
+                      @endphp
+                      @endif
+                      
                     </td>
                     @endif
                     @endforeach
                     <td>{{ array_sum($totalMois) }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-            </table>
+                  </tr>
+                  @endforeach
+                </tbody>
+                
+              </table>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</body>
-@endsection
-
-
-<script>
-
-  function imprimePage() {
-      // Désactiver la pagination
+  </body>
+  @endsection
+  <script>
+    function imprimePage() {
       let table = $('#myTable').DataTable();
-      let currentPage = table.page();  // Sauvegarder la page actuelle
-      table.page.len(-1).draw();  // Afficher toutes les lignes
-  
-      // Attendre un court instant pour être sûr que le tableau est complètement rendu
+      let currentPage = table.page();  
+      table.destroy();// Sauvegarder la page actuelle
+      
       setTimeout(function() {
-          // Masque les colonnes avec la classe hide-on-print
-          var tableElement = document.getElementById('myTable');
-          tableElement.classList.remove('dataTable');
+        // Créer un élément invisible pour l'impression
+        let printDiv = document.createElement('div');
+        printDiv.innerHTML = '<h1 style="font-size: 20px; text-transform: uppercase; text-align: center;">Etat des droits constatés - année académique {{ $annee }}{{ $anneesuivant }} | classe {{ $classe }}</h1>' +
+        document.getElementById('contenu').innerHTML;
+        
+        // Appliquer des styles pour l'impression
+        let style = document.createElement('style');
+        style.innerHTML = `@page { size: landscape; }
+              @media print {
+                  body * { visibility: hidden; }
+                  #printDiv, #printDiv * { visibility: visible; }
+                  #printDiv { position: absolute; top: 0; left: 0; width: 100%; }
+                  .dt-end { display: none !important; }
+                  .dt-start { display: none !important; }
+                  .table td:nth-child(n+2) {
+                   margin: 0 !important;
+                      padding: 5px 0 5px 5px !important;
+                      width: 500px !important;
+                      word-wrap: break-word !important;
+                      white-space: normal !important;
+                  }
+                   table th {
+                   font-weight: bold !important;
   
-          // var columns = tableElement.querySelectorAll('.hide-on-print');
-          // columns.forEach(function(column) {
-          //     column.style.display = 'none';
-          // });
-  
-          var page = window.open('', '_blank');
-          page.document.write('<html><head><title>EDC_annee_{{ $annee }}_{{ $anneesuivant }}_classe_{{ $classe }}</title>');
-          page.document.write('<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" >');
-          page.document.write('<style>@media print { .dt-end { display: none !important; } }</style>');
-          page.document.write('<style>@media print { .dt-start { display: none !important; } }</style>');
-          page.document.write('<style>table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #ddd; padding: 4px; } tbody tr:nth-child(even) { background-color: #f1f3f5; } tbody tr:nth-child(odd) { background-color: #ffffff; } </style>');
-          page.document.write('</head><body>');
-          page.document.write('<div>' + document.getElementById('contenu').innerHTML + '</div>');
-          page.document.write('</body></html>');
-          page.document.close();
-          page.onload = function() {
-              page.print();
-              page.close();
-  
-              // Restaurer la pagination après l'impression
-              table.page.len(10).draw();  // Remettre la taille de la page comme avant (par exemple : 10)
-              table.page(currentPage).draw(false);  // Retour à la page actuelle
-  
-              // Restaure les colonnes après l'impression
-              columns.forEach(function(column) {
-                  column.style.display = '';
-              });
-          };
+                   }
+                                      
+                  table th, table td {
+                      font-size: 9px !important;
+                      margin: 0 !important;
+                      padding: 0 !important;
+                      border-collapse: collapse !important;
+                  }
+                      table {
+                  width: 100%;
+                  border-collapse: collapse;
+              }
+              th, td {
+              margin: 0 !important;
+                      padding: 0 !important;
+                  border: 1px solid #ddd;
+              }
+              tbody tr:nth-child(even) {
+                  background-color: #f1f3f5;
+              }
+              tbody tr:nth-child(odd) {
+                  background-color: #ffffff;
+              }
+              }
+          `;
+        document.head.appendChild(style);
+        document.body.appendChild(printDiv);
+        printDiv.setAttribute("id", "printDiv");
+        
+        window.print();
+        
+        $('#myTable').DataTable({
+          "pageLength": 10,  // Remettre la pagination à 10 par défaut (ou la valeur souhaitée)
+        });
+        
+        // Nettoyer après l'impression
+        document.body.removeChild(printDiv);
+        document.head.removeChild(style);
       }, 200);
-  }
-  
-  
+    }
+    
   </script>
+  {{-- 
+  <script>
+    function imprimePage() {
+    let table = $('#myTable').DataTable();
+    let currentPage = table.page();  
+    table.page.len(-1).draw();  
+    setTimeout(function() {
+    let printWindow = window.open('', '', 'height=800,width=600');
+    printWindow.document.write('<html><head><title>Impression</title>');
+      printWindow.document.write('<style>@page { size: landscape; }</style>');
+      
+      printWindow.document.write('<style>@media print { .dt-end { display: none !important; } }</style>');
+      printWindow.document.write('<style>@media print { td { font-size: 13px; } }</style>');
+      printWindow.document.write('<style>@media print { .dt-start { display: none !important; } .table td:nth-child(n+2) {width: 500px !important; word-wrap: break-word !important; white-space: normal !important;} table {margin: 0 !important; padding: 0 !important; border-collapse: collapse !important;} table th, table td {margin: 0 !important; padding: 10px 0 5px 5px !important; border-collapse: collapse !important;} }</style>');
+      printWindow.document.write('<style>table th, table td {margin: 0 !important; padding: 10px 0 5px 5px !important; border-collapse: collapse !important;} table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #ddd;} tbody tr:nth-child(even) { background-color: #f1f3f5; } tbody tr:nth-child(odd) { background-color: #ffffff; } </style>');
+      
+      printWindow.document.write('</head><body>');
+        printWindow.document.write('<h1 style="font-size: 20px; text-transform: uppercase; text-align: center;">Etat des droits constates - annee academique {{ $annee }} - {{ $anneesuivant }} | classe ({{ $classe }})</h1>');
+        
+        printWindow.document.write('<div>' + document.getElementById('contenu').innerHTML + '</div>');
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+        
+        printWindow.onload = function() {
+        printWindow.print();
+        printWindow.close();
+        
+        table.page.len(10).draw();  
+        table.page(currentPage).draw(false); 
+        };
+        }, 200);
+        }
+        
+      </script> --}}
+      

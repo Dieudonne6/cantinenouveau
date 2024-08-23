@@ -151,6 +151,7 @@
         word-break: break-all; /* Casse les mots plus longs que la taille de la colonne */
     }
 
+
     #customers tr:nth-child(even) {
         background-color: #f2f2f2;
     }
@@ -218,8 +219,8 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Frais de cantine pour <span>{{ $facture->moispayes }}</span></td>
-                        <td>{{ $facture->montant_total }}</td>
+                        <td > {{ $facture->designation }} </td>
+                        <td >{{ $facture->montant_total }}</td>
                     </tr>
                 </tbody>
             </table>

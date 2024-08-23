@@ -50,6 +50,10 @@
                                   <form action="{{ url('/enregistreruser') }}" method="POST" enctype="multipart/form-data">
                                     @csrf
                                     <div class="form-group">
+                                      <label for="exampleInputUsername1">Nom groupe</label>
+                                      <input type="text" class="form-control" name="nomgroupe" id="exampleInputUsername1" placeholder="Nom groupe">
+                                    </div>
+                                    <div class="form-group">
                                       <label for="exampleInputUsername1">Nom d'utilisateur</label>
                                       <input type="text" class="form-control" name="login" id="exampleInputUsername1" placeholder="Nom d'utilisateur">
                                     </div>
@@ -64,6 +68,20 @@
                                     <div class="form-group">
                                       <label for="exampleInputConfirmPassword1">Mot de passe</label>
                                       <input type="password" class="form-control" name="password" id="exampleInputConfirmPassword1" placeholder="Mot de passe">
+                                    </div>
+                                    <div class="form-group">
+                                      <label for="exampleInputConfirmPassword1">Utilisateur actif</label>
+                                      <select name="user_actif" class="form-select">
+                                        <option value="0">0</option>
+                                        <option value="1">1</option>
+                                      </select>
+                                    </div>
+                                    <div class="form-group">
+                                      <label for="exampleInputConfirmPassword1">Administrateur</label>
+                                      <select name="administrateur" class="form-select">
+                                        <option value="0">0</option>
+                                        <option value="1">1</option>
+                                      </select>
                                     </div>
                                    <div class="form-group">
                                       <label for="exampleInputConfirmPassword1">Photos</label>
