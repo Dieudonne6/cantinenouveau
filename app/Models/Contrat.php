@@ -34,4 +34,9 @@ class Contrat extends Model
         // Ajoutez statut_contrat à la liste des colonnes remplissables
         'statut_contrat',
     ];
+
+    public function contrats()
+    {
+    return $this->hasMany(Contrat::class, 'eleve_id');
+}
 }

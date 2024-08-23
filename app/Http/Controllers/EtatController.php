@@ -41,7 +41,8 @@ class EtatController extends Controller
         if ($request->has('annee')) {
             $query->whereHas('contrats', function($q) use ($request) {
                 $q->whereHas('paiements', function($q) use ($request) {
-                    $q->where('anne_paiementcontrat', $request->annee);
+                    $q->where('anne_paiementcontrat', $request->annee)
+                      ->where('statut_paiementcontrat', 1);
                 });
             });
         }
@@ -58,7 +59,9 @@ class EtatController extends Controller
         $eleves = $query->with(['contrats' => function($query) use ($request) {
             $query->with(['paiements' => function($query) use ($request) {
                 if ($request->has('annee')) {
-                    $query->where('anne_paiementcontrat', $request->annee);
+                    $query->where('anne_paiementcontrat', $request->annee)
+                    ->where('statut_paiementcontrat', 1);
+
                 }
             }]);
         }])->get();
