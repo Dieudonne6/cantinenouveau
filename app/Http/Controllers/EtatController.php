@@ -48,7 +48,7 @@ class EtatController extends Controller
         }
         
         // Filtrer par classe
-        if ($request->has('classe')) {
+        if ($request->has('classe') && $request->classe !== 'TOUTES') {
             $query->where('CODECLAS', $request->classe);
         }
         
@@ -61,7 +61,6 @@ class EtatController extends Controller
                 if ($request->has('annee')) {
                     $query->where('anne_paiementcontrat', $request->annee)
                     ->where('statut_paiementcontrat', 1);
-
                 }
             }]);
         }])->get();
