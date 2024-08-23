@@ -130,3 +130,5 @@ Route::get('/generer-factures', [ClassesController::class, 'genererfacture']);
 
 Route::get('/factures', [ClassesController::class, 'factures']);
 Route::get('/factures/{id}', [ClassesController::class, 'show'])->name('factures.show');
+Route::get('/listefacture', [ClassesController::class, 'listefacture']);
+Route::get('/avoirfacture/{codemecef}', [ClassesController::class, 'avoirfacture']);
