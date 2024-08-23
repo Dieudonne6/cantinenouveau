@@ -10,7 +10,7 @@
                         <div class="nav nav-tabs" id="nav-tab1" role="tablist">
                             <button class="nav-link active" id="nav-etatdroitconstate-tab" data-bs-toggle="tab"
                                 data-bs-target="#nav-etatdroitconstate" type="button" role="tab"
-                                aria-controls="nav-etatdroitconstate" aria-selected="true">Etat Droit Constaté</button>
+                                aria-controls="nav-etatdroitconstate" aria-selected="true">Duplicata Facture</button>
                         </div>
                     </nav>
                     <br><br>
@@ -81,7 +81,7 @@
                           @foreach ($factures as $facture)
                               
                           <tr>
-                                                        <td>{{ $facture->nim }}</td>
+                                                        <td>{{ $facture->nim }}/{{ $facture->counters }}</td>
                                                         <td>{{ $facture->dateHeure }}</td>
                                                         <td>{{ $facture->montant_total }}</td> 
                                                         <td>
