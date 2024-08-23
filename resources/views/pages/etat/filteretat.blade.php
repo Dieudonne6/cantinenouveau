@@ -18,7 +18,9 @@
     border-collapse: collapse !important;
     font-size: 13px;
   }
-  
+  .table-bordered th, .table-bordered td {
+    border: 1px solid #000 !important;
+  }
   #myTable td:nth-child(n+2) {
     width: 100px;
     word-wrap: break-word;
@@ -33,6 +35,9 @@
   @media print {
     .totals-row {
       display: table-row;
+    }
+    .classe-start {
+      display: none;
     }
   }
   
@@ -76,74 +81,79 @@
           
           <div class="table-responsive pt-3">
             {{-- <table id="myTable" class="table table-striped table-sm" > --}}
-              <table id="myTable" class="table table-bordered" >
+              <table id="myTable" class="table table-bordered">
                 <thead>
-                  <tr>
-                    <th>N </th>
-                    <th>Elève</th>
-                    <th>Classe</th>
-                    @foreach ($moisContrat as $mois)
-                    @if ($mois->nom_moiscontrat != 'Juillet' && $mois->nom_moiscontrat != 'Aout')
-                    <th>{{ $mois->nom_moiscontrat }}</th>
-                    @endif
-                    @endforeach         
-                    <th>Total</th>
-                  </tr>
+                    <tr>
+                        <th>N</th>
+                        <th>Élève</th>
+                        <th class="classe-start">Classe</th>
+                        @foreach ($moisContrat as $mois)
+                            @if ($mois->nom_moiscontrat != 'Juillet' && $mois->nom_moiscontrat != 'Aout')
+                                <th>{{ $mois->nom_moiscontrat }}</th>
+                            @endif
+                        @endforeach
+                        <th>Total</th>
+                    </tr>
                 </thead>
                 <tbody>
-                  @foreach ($eleves as $index => $eleve)
-                  <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td class="space-nom">{{ $eleve->NOM }} {{ $eleve->PRENOM }}</td>
-                    <td>{{ $eleve->CODECLAS }}</td>
-                    
                     @php
-                    $totalMois = [];
+                        // Initialiser les totaux des colonnes
+                        $totalsParMois = [];
+                        foreach ($moisContrat as $mois) {
+                            if ($mois->nom_moiscontrat != 'Juillet' && $mois->nom_moiscontrat != 'Aout') {
+                                $totalsParMois[$mois->id_moiscontrat] = 0;
+                            }
+                        }
                     @endphp
-                    @foreach ($moisContrat as $mois)
-                    @if ($mois->nom_moiscontrat != 'Juillet' && $mois->nom_moiscontrat != 'Aout')
-                    @php
-                    $totalMois[$mois->id_moiscontrat] = 0;
-                    $montantTotalMois = 0;
-                    $paiementTrouve = false;
-                    @endphp
-                    <td>
-                      @foreach ($eleve->contrats as $contrat)
-                      @foreach ($contrat->paiements as $paiement)
-                      @if ($paiement->mois_paiementcontrat == $mois->id_moiscontrat)
-                      {{ \Carbon\Carbon::parse($paiement->date_paiementcontrat)->format('d/m/Y') }}</br></br>
-                      {{ $paiement->montant_paiementcontrat }}
-                      @php
-                      $montantTotalMois += $paiement->montant_paiementcontrat;
-                      $paiementTrouve = true;
-                      @endphp
-                      @endif
-                      @endforeach
-                      @endforeach
-                      @if (!$paiementTrouve)
-                      @if ($mois->id_moiscontrat != 13)
-                      Pas inscrit
-                      @else
-                      0
-                      @endif
-                      @php
-                      $totalMois[$mois->id_moiscontrat] += $montantTotalMois;
-                      @endphp
-                      @else
-                      @php
-                      $totalMois[$mois->id_moiscontrat] += $montantTotalMois;
-                      @endphp
-                      @endif
-                      
-                    </td>
-                    @endif
+            
+                    @foreach ($eleves as $index => $eleve)
+                        <tr>
+                            <td>{{ $index + 1 }}</td>
+                            <td class="space-nom">{{ $eleve->NOM }} {{ $eleve->PRENOM }}</td>
+                            <td class="classe-start">{{ $eleve->CODECLAS }}</td>
+                            @php
+                                $totalMoisEleve = 0; // Initialiser le total pour cet élève
+                            @endphp
+                            @foreach ($moisContrat as $mois)
+                                @if ($mois->nom_moiscontrat != 'Juillet' && $mois->nom_moiscontrat != 'Aout')
+                                    @php
+                                        $montantTotalMois = 0;
+                                        $paiementTrouve = false;
+                                    @endphp
+                                    <td>
+                                        @foreach ($eleve->contrats as $contrat)
+                                            @foreach ($contrat->paiements as $paiement)
+                                                @if ($paiement->mois_paiementcontrat == $mois->id_moiscontrat)
+                                                    {{ \Carbon\Carbon::parse($paiement->date_paiementcontrat)->format('d/m/Y') }}</br></br>
+                                                    {{ $paiement->montant_paiementcontrat }}
+                                                    @php
+                                                        $montantTotalMois += $paiement->montant_paiementcontrat;
+                                                        $paiementTrouve = true;
+                                                    @endphp
+                                                @endif
+                                            @endforeach
+                                        @endforeach
+                                        @if (!$paiementTrouve)
+                                            @if ($mois->id_moiscontrat != 13)
+                                                Pas inscrit
+                                            @else
+                                                0
+                                            @endif
+                                        @endif
+                                        @php
+                                            $totalsParMois[$mois->id_moiscontrat] += $montantTotalMois; // Ajouter au total de la colonne
+                                            $totalMoisEleve += $montantTotalMois; // Ajouter au total de l'élève
+                                        @endphp
+                                    </td>
+                                @endif
+                            @endforeach
+                            <td>{{ $totalMoisEleve }}</td>
+                        </tr>
                     @endforeach
-                    <td>{{ array_sum($totalMois) }}</td>
-                  </tr>
-                  @endforeach
                 </tbody>
-                
-              </table>
+
+            </table>
+            
             </div>
           </div>
         </div>
@@ -153,77 +163,92 @@
   @endsection
   <script>
     function imprimePage() {
-      let table = $('#myTable').DataTable();
-      let currentPage = table.page();  
-      table.destroy();// Sauvegarder la page actuelle
-      
-      setTimeout(function() {
-        // Créer un élément invisible pour l'impression
-        let printDiv = document.createElement('div');
-        printDiv.innerHTML = '<h1 style="font-size: 20px; text-transform: uppercase; text-align: center;">Etat des droits constatés - année académique {{ $annee }}{{ $anneesuivant }} | classe {{ $classe }}</h1>' +
-        document.getElementById('contenu').innerHTML;
+        let table = $('#myTable').DataTable();
+        let currentPage = table.page();  
+        table.destroy(); // Sauvegarder la page actuelle
         
-        // Appliquer des styles pour l'impression
-        let style = document.createElement('style');
-        style.innerHTML = `@page { size: landscape; }
-              @media print {
-                  body * { visibility: hidden; }
-                  #printDiv, #printDiv * { visibility: visible; }
-                  #printDiv { position: absolute; top: 0; left: 0; width: 100%; }
-                  .dt-end { display: none !important; }
-                  .dt-start { display: none !important; }
-                  .table td:nth-child(n+2) {
-                   margin: 0 !important;
-                      padding: 5px 0 5px 5px !important;
-                      width: 500px !important;
-                      word-wrap: break-word !important;
-                      white-space: normal !important;
-                  }
-                   table th {
-                   font-weight: bold !important;
-  
-                   }
-                                      
-                  table th, table td {
-                      font-size: 9px !important;
-                      margin: 0 !important;
-                      padding: 0 !important;
-                      border-collapse: collapse !important;
-                  }
-                      table {
-                  width: 100%;
-                  border-collapse: collapse;
-              }
-              th, td {
-              margin: 0 !important;
-                      padding: 0 !important;
-                  border: 1px solid #ddd;
-              }
-              tbody tr:nth-child(even) {
-                  background-color: #f1f3f5;
-              }
-              tbody tr:nth-child(odd) {
-                  background-color: #ffffff;
-              }
-              }
-          `;
-        document.head.appendChild(style);
-        document.body.appendChild(printDiv);
-        printDiv.setAttribute("id", "printDiv");
-        
-        window.print();
-        
-        $('#myTable').DataTable({
-          "pageLength": 10,  // Remettre la pagination à 10 par défaut (ou la valeur souhaitée)
-        });
-        
-        // Nettoyer après l'impression
-        document.body.removeChild(printDiv);
-        document.head.removeChild(style);
-      }, 200);
-    }
+        setTimeout(function() {
+            // Créer un élément invisible pour l'impression
+            let printDiv = document.createElement('div');
+            printDiv.innerHTML = '<h1 style="font-size: 20px; text-transform: uppercase; text-align: center;">Etat des droits constatés - année académique {{ $annee }}{{ $anneesuivant }} | classe {{ $classe }}</h1>' +
+            document.getElementById('contenu').innerHTML;
+            
+            // Ajouter les totaux au tableau pour l'impression
+            let tableFoot = document.createElement('tfoot');
+            let totalRow = '<tr>';
+            totalRow += '<th colspan="2">Total</th>';
+            
+            @foreach ($moisContrat as $mois)
+                @if ($mois->nom_moiscontrat != 'Juillet' && $mois->nom_moiscontrat != 'Aout')
+                    totalRow += '<th>{{ $totalsParMois[$mois->id_moiscontrat] }}</th>';
+                @endif
+            @endforeach
+            
+            totalRow += '<th>{{ array_sum($totalsParMois) }}</th>';
+            totalRow += '</tr>';
+            
+            tableFoot.innerHTML = totalRow;
+            printDiv.querySelector('#myTable').appendChild(tableFoot);
     
-  </script>
+            // Appliquer des styles pour l'impression
+            let style = document.createElement('style');
+            style.innerHTML = `@page { size: landscape; }
+                @media print {
+                    body * { visibility: hidden; }
+                    #printDiv, #printDiv * { visibility: visible; }
+                    #printDiv { position: absolute; top: 0; left: 0; width: 100%; }
+                    .dt-end { display: none !important; }
+                    .dt-start { display: none !important; }
+                    .table td:nth-child(n+2) {
+                        margin: 0 !important;
+                        padding: 5px 0 5px 5px !important;
+                        width: 500px !important;
+                        word-wrap: break-word !important;
+                        white-space: normal !important;
+                    }
+                    table th {
+                        font-weight: bold !important;
+                    }
+                    table th, table td {
+                        font-size: 9.5px !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        border-collapse: collapse !important;
+                    
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+                    th, td {
+                        margin: 0 !important;
+                        padding: 0 !important;
+                    }
+                    th:nth-child(even) {
+                        background-color: #f1f3f5;
+                    }
+                    th:nth-child(odd) {
+                        background-color: red;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            document.body.appendChild(printDiv);
+            printDiv.setAttribute("id", "printDiv");
+            
+            window.print();
+            
+            $('#myTable').DataTable({
+                "pageLength": 10,  // Remettre la pagination à 10 par défaut (ou la valeur souhaitée)
+            });
+            
+            // Nettoyer après l'impression
+            document.body.removeChild(printDiv);
+            document.head.removeChild(style);
+        }, 200);
+    }
+    </script>
+    
   {{-- 
   <script>
     function imprimePage() {
