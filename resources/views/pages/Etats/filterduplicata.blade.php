@@ -22,7 +22,7 @@
                             <div class="col-lg-12 grid-margin">
 
                                 <!-- Formulaire de filtrage -->
-                                <form method="POST" action="{{ route('filterduplicata')  }}">
+                                <form method="POST" action="{{ route('filterduplicata') }}">
                                     @csrf
                                     <div class="row">
                                         <!-- Sélection de l'élève -->
@@ -31,7 +31,8 @@
                                                 name="eleve_id">
                                                 <option value="">Sélectionnez un élève</option>
                                                 @foreach ($eleves as $eleve)
-                                                    <option value="{{ $eleve->idcontrat }}">{{ $eleve->nom }}</option>
+                                                    <option value="{{ $eleve->MATRICULE }}">
+                                                        {{ $eleve->NOM }}{{ $eleve->PRENOM }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -52,81 +53,76 @@
                                                 Afficher
                                             </button>
                                         </div>
-
-                                        <!-- Bouton pour ouvrir le modal d'impression -->
-                                        <div class="col-3">
-                                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#exampleModal">
-                                                Imprimer la relance
-                                            </button>
-                                        </div>
                                     </div>
                                 </form>
 
                                 <!-- Tableau pour afficher les factures -->
-                                 @if (isset($factures) && $factures->count() > 0)
-                                <div class="table-responsive pt-3">
-                                    <div id="facture-table">
-                                        <table class="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>N° de facture</th>
-                                                    <th>Date de facture</th>
-                                                    <th>Référence</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                    
-                          @foreach ($factures as $facture)
-                              
-                          <tr>
-                                                        <td>{{ $facture->nim }}/{{ $facture->counters }}</td>
-                                                        <td>{{ $facture->dateHeure }}</td>
-                                                        <td>{{ $facture->montant_total }}</td> 
-                                                        <td>
-                                                            <button type="button" class="btn btn-primary">
-                                                                Imprimer
-                                                            </button>
-                                                        </td>
+                                @if (isset($factures) && $factures->count() > 0)
+                                    <div class="table-responsive pt-3">
+                                        <div id="mytable">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>N° de facture</th>
+                                                        <th>Date de facture</th>
+                                                        <th>Montant Total</th>
+                                                        <th>Action</th>
                                                     </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
+                                                </thead>
+                                                <tbody>
+
+                                                    @foreach ($factures as $facture)
+                                                        <tr>
+                                                            <td>{{ $facture->nim }}/{{ $facture->counters }}</td>
+                                                            <td>{{ $facture->dateHeure }}</td>
+                                                            <td>{{ $facture->montant_total }}</td>
+                                                            <td>
+                                                                <a href="{{ url('pdfduplicatapaie/'.$facture->idcontrat) }}"
+                                                                    class="btn btn-primary">
+                                                                    Imprimer
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
-                                </div>
                                 @endif
 
-                                 @if (isset($contrats) && $contrats->count() > 0)
-                                <div class="table-responsive pt-3">
-                                    <div id="facture-table">
-                                        <table class="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>N° de facture</th>
-                                                    <th>Date de facture</th>
-                                                    <th>Montant Total</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
+                                @if (isset($contrats) && $contrats->count() > 0)
+                                    <div class="table-responsive pt-3">
+                                        <div id="mytable">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>N° de facture</th>
+                                                        <th>Date de facture</th>
+                                                        <th>Montant Total</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
                                                     <tr>
                                                         @foreach ($contrats as $contrat)
-                                                        <td>{{ $contrat->eleve_contrat }}</td>
-                                                        <td>{{ $contrat->datecreation_contrat }}</td>
-                                                        <td>{{ $contrat->cout_contrat }}</td> 
-                                                        <td>
-                                                            <button type="button" class="btn btn-primary">
-                                                                Imprimer
-                                                            </button>
-                                                        </td>
+                                                            <td>{{ $contrat->eleve_contrat }}</td>
+                                                            <td>{{ $contrat->datecreation_contrat }}</td>
+                                                            <td>{{ $contrat->cout_contrat }}</td>
+                                                            <td>
+                                                                <a href="{{ url('pdfduplicatacontrat/'.$contrat->id_contrat) }}"
+                                                                    class="btn btn-primary">
+                                                                    Imprimer
+                                                                </a>
+
+
+                                                            </td>
                                                         @endforeach
                                                     </tr>
-                                                
-                                            </tbody>
-                                        </table>
+
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
-                                </div>
                                 @endif
 
 
@@ -160,7 +156,7 @@
                         });
                     }
 
-                    var tableElement = document.getElementById('facture-table');
+                    var tableElement = document.getElementById('mytable');
                     tableElement.innerHTML = ''; // Effacer le contenu actuel du tableau
 
                     if (filteredFactures.length > 0) {

@@ -16,6 +16,7 @@ use App\Models\Params2;
 
 use App\Models\Classes;
 use Barryvdh\DomPDF\Facade as PDF;
+\Carbon\Carbon::setLocale('fr');
 
 use App\Models\Moiscontrat;
 use Illuminate\Support\Facades\DB;
@@ -96,13 +97,13 @@ public function relance(Request $request)
     $dateselectionne = $request->input('daterelance');
 
     $date = Carbon::parse($dateselectionne);
-    $dateFormatee = $date->format('d/m/Y');
+    $dateFormatee = $date->format('l j F Y');
 
     $selectedDate = Carbon::createFromFormat('Y-m-d', $dateselectionne);
     // dd($dateselectionne);
 
     // Liste des mois en français dans l'ordre scolaire (septembre à août)
-    $months = ["Septembre", "Octobre", "Novembre", "Decembre", "Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin", "Juillet", "Aout"];
+    $months = ["Septembre", "Octobre", "Novembre", "Decembre", "Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin"];
     
     // Convertir la date sélectionnée en mois et année
     $selectedMonthName = $selectedDate->format('F'); // Mois en anglais
@@ -191,11 +192,11 @@ public function relance(Request $request)
             'total_du' => $total
         ];
     }
-    $paramse = Paramsfacture::first(); 
+    $paramse = Params2::first(); 
 
-    $logoUrl = $paramse ? $paramse->logo: null; 
+    $logoUrl = $paramse ? $paramse->logoimage: null; 
     // return view('pages.etat.relance')->with('results', $results)->with('paramse', $paramse);
-    return view('pages.etat.relance', compact('results', 'logoUrl', 'databaseName'));
+    return view('pages.etat.relance', compact('results', 'logoUrl', 'databaseName', 'params'));
 
 
 

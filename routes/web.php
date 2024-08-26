@@ -114,6 +114,9 @@ Route::get('/duplicatafacture', [PagesController::class, 'duplicatafacture']);
 Route::get('/dowloadduplfac/{id}', [PagesController::class, 'dowloadduplfac']);
 Route::get('/duplicatafacture', [DuplicataController::class, 'showForm'])->name('duplicata.showForm');
 Route::post('/filterduplicata', [DuplicataController::class, 'filterduplicata'])->name('filterduplicata');
+Route::get('/pdfduplicatacontrat/{idcontrat}', [DuplicataController::class, 'pdfduplicatacontrat']);
+Route::get('/pdfduplicatapaie/{idfacture}', [DuplicataController::class, 'pdfduplicatapaie']);
+Route::get('/duplicatainscription2/{idcontrat}',[DuplicataController::class,'duplicatainscription2']);
 
 
 
@@ -132,5 +135,3 @@ Route::get('/factures', [ClassesController::class, 'factures']);
 Route::get('/factures/{id}', [ClassesController::class, 'show'])->name('factures.show');
 Route::get('/listefacture', [ClassesController::class, 'listefacture']);
 Route::get('/avoirfacture/{codemecef}', [ClassesController::class, 'avoirfacture']);
-
-

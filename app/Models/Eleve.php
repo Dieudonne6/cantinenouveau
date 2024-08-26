@@ -13,4 +13,10 @@ class Eleve extends Model
     {
         return $this->hasMany(Contrat::class,'eleve_contrat', 'MATRICULE');
     }
+    protected static function booted()
+    {
+        static::addGlobalScope('order', function ($builder) {
+            $builder->orderBy('NOM', 'asc');
+        });
+    }
 }
