@@ -22,7 +22,7 @@
                             <div class="col-lg-12 grid-margin">
 
                                 <!-- Formulaire de filtrage -->
-                                <form method="POST" action="{{ route('filterduplicata')  }}">
+                                <form method="POST" action="{{ route('filterduplicata') }}">
                                     @csrf
                                     <div class="row">
                                         <!-- Sélection de l'élève -->
@@ -31,7 +31,8 @@
                                                 name="eleve_id">
                                                 <option value="">Sélectionnez un élève</option>
                                                 @foreach ($eleves as $eleve)
-                                                    <option value="{{ $eleve->MATRICULE }}">{{ $eleve->NOM }}{{ $eleve->PRENOM }}</option>
+                                                    <option value="{{ $eleve->MATRICULE }}">
+                                                        {{ $eleve->NOM }} {{ $eleve->PRENOM }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -56,123 +57,75 @@
                                 </form>
 
                                 <!-- Tableau pour afficher les factures -->
-                                 @if (isset($factures) && $factures->count() > 0)
-                                <div class="table-responsive pt-3">
-                                    <div id="mytable">
-                                        <table class="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>N° de facture</th>
-                                                    <th>Date de facture</th>
-                                                    <th>Montant Total</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                    
-                          @foreach ($factures as $facture)
-                              
-                          <tr>
-                                                        <td>{{ $facture->nim }}/{{ $facture->counters }}</td>
-                                                        <td>{{ $facture->dateHeure }}</td>
-                                                        <td>{{ $facture->montant_total }}</td> 
-                                                        <td>
-                                                            <button type="button" class="btn btn-primary">
-                                                                Imprimer
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                                @endif
-
-                                 @if (isset($contrats) && $contrats->count() > 0)
-                                <div class="table-responsive pt-3">
-                                    <div id="mytable">
-                                        <table class="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>N° matricule</th>
-                                                    <th>Date de facture</th>
-                                                    <th>Montant Total</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
+                                @if (isset($factures) && $factures->count() > 0)
+                                    <div class="table-responsive pt-3">
+                                        <div id="mytable">
+                                            <table class="table table-bordered">
+                                                <thead>
                                                     <tr>
-                                                        @foreach ($contrats as $contrat)
-                                                        <td>{{ $contrat->eleve_contrat }}</td>
-                                                        <td>{{ $contrat->datecreation_contrat }}</td>
-                                                        <td>{{ $contrat->cout_contrat }}</td> 
-                                                        <td>
-                                                            <a href="ton-lien-ici" class="btn btn-primary">
-                                                                Imprimer
-                                                            </a>
-
-                                                        </td>
-                                                        @endforeach
+                                                        <th>N° de facture</th>
+                                                        <th>Date de facture</th>
+                                                        <th>Montant Total</th>
+                                                        <th>Action</th>
                                                     </tr>
-                                                
-                                            </tbody>
-                                        </table>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ($factures as $facture)
+                                                        <tr>
+                                                            <td>{{ $facture->nim }}/{{ $facture->counters }}</td>
+                                                            <td>{{ $facture->dateHeure }}</td>
+                                                            <td>{{ $facture->montant_total }}</td>
+                                                            <td>
+                                                                <a href="{{ url('pdfduplicatapaie/'.$facture->idcontrat) }}"
+                                                                    class="btn btn-primary">
+                                                                    Imprimer
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
-                                </div>
                                 @endif
 
-
+                                @if (isset($contrats) && $contrats->count() > 0)
+                                    <div class="table-responsive pt-3">
+                                        <div id="mytable">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>N° de facture</th>
+                                                        <th>Date de facture</th>
+                                                        <th>Montant Total</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ($contrats as $contrat)
+                                                        <tr>
+                                                            <td>{{ $contrat->eleve_contrat }}</td>
+                                                            <td>{{ $contrat->datecreation_contrat }}</td>
+                                                            <td>{{ $contrat->cout_contrat }}</td>
+                                                            <td>
+                                                                <a href="{{ url('pdfduplicatacontrat/'.$contrat->id_contrat) }}"
+                                                                    class="btn btn-primary">
+                                                                    Imprimer
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                @endif
 
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- JavaScript pour filtrer les données -->
-            {{-- <script>
-                document.getElementById('afficher-btn').addEventListener('click', function(e) {
-                    e.preventDefault(); // Empêcher la soumission du formulaire pour gérer le filtrage en JavaScript
-                    var eleveId = document.getElementById('eleve-select').value;
-                    var factureType = document.getElementById('facture-type-select').value;
-
-                    var facturesPaiement = @json($facturesPaiement);
-                    var facturesInscription = @json($facturesInscription);
-
-                    var tableContent = '';
-                    var filteredFactures = [];
-
-                    if (factureType === 'facturenormalises') {
-                        filteredFactures = facturesPaiement.filter(function(facture) {
-                            return facture.eleve_id == eleveId;
-                        });
-                    } else if (factureType === 'contrat') {
-                        filteredFactures = facturesInscription.filter(function(facture) {
-                            return facture.eleve_id == eleveId;
-                        });
-                    }
-
-                    var tableElement = document.getElementById('mytable');
-                    tableElement.innerHTML = ''; // Effacer le contenu actuel du tableau
-
-                    if (filteredFactures.length > 0) {
-                        tableContent +=
-                            '<table class="table table-bordered"><thead><tr><th>N° de facture</th><th>Date de facture</th><th>Référence</th><th>Action</th></tr></thead><tbody>';
-                        filteredFactures.forEach(function(facture) {
-                            tableContent += '<tr><td>' + facture.id + '</td><td>' + facture.dateHeure +
-                                '</td><td>' +
-                                facture.montant_total +
-                                '</td><td><button type="button" class="btn btn-primary">Imprimer</button></td></tr>';
-                        });
-                        tableContent += '</tbody></table>';
-                    } else {
-                        tableContent = '<p>Aucune facture trouvée.</p>';
-                    }
-
-                    tableElement.innerHTML = tableContent;
-                });
-            </script> --}}
         </div>
     </div>
 @endsection

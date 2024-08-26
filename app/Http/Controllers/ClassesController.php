@@ -345,7 +345,7 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
                 $id_usercontrat = Session::get('id_usercontrat');
                 // $id_usercontrat = $request->input('id_usercontrat');
 
-                // dd($id_usercontrat);
+                // dd($montanttotal);
                 $anneeActuelle = date('Y');
 
                 // generer une valeur aleatoire comprise entre 10000000 et 99999999 et verifier si elle existe deja dans la table.
@@ -583,10 +583,10 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
 
         // Convertissez la réponse JSON en tableau associatif PHP
         $decodedDonneFacture = json_decode($responseRecuperation, true);
+        // dd($decodedDonneFacture);
 
         $facturedetaille = json_decode($jsonData, true);
         $ifuEcoleFacture = $decodedDonneFacture['ifu'];
-        // dd($ifuEcoleFacture);
         $itemFacture = $decodedDonneFacture['items'];
         $doneeDetailleItemFacture = $itemFacture['0'];
         $nameItemFacture = $doneeDetailleItemFacture['name'];
@@ -595,7 +595,7 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
         $taxGroupItemFacture = $doneeDetailleItemFacture['taxGroup'];
         // $idd = $responseRecuperation.ifu;
         $nameClient = $decodedDonneFacture['client']['name'];
-        // dd($decodedDonneFacture);
+        // dd($prixTotalItemFacture);
 
     
                 // -------------------------------
@@ -770,6 +770,8 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
         Session::put('qrCodeString', $qrCodeString);
         Session::put('qrcodecontent', $qrcodecontent);
         Session::put('NOMETAB', $NOMETAB);
+        Session::put('nim', $nim);
+        Session::put('datepaiementcontrat', $datepaiementcontrat);
         // Session::put('nometab', $nometab);
         // Session::put('villeetab', $villeetab);
 
@@ -793,6 +795,8 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
             'logoUrl' => $logoUrl,
             'qrcodecontent' => $qrcodecontent,
             'NOMETAB' => $NOMETAB,
+            'nim' => $nim,
+            'datepaiementcontrat' => $datepaiementcontrat,
             // 'villeetab' => $villeetab,
             // 'qrCodeImage' => $qrCodeImage,
     
@@ -1508,6 +1512,8 @@ public function show($id)
         $fileNameqrcode = Session::get('fileNameqrcode');
         $qrcodecontent = Session::get('qrcodecontent');
         $fileNameqrcode = Session::get('fileNameqrcode');
+        $nim = Session::get('nim');
+        $datepaiementcontrat = Session::get('datepaiementcontrat');
 
         $paramse = Params2::first(); 
 
@@ -1580,6 +1586,8 @@ public function show($id)
             'NOMETAB' => $NOMETAB,
             'fileNameqrcode' => $fileNameqrcode,
             'qrcodecontent' => $qrcodecontent,
+            'nim' => $nim,
+            'datepaiementcontrat' => $datepaiementcontrat,
 
             // 'nometab' => $nometab,
             // 'villeetab' => $villeetab,
