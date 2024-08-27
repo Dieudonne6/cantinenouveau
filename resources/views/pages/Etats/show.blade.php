@@ -432,7 +432,7 @@
                         <tr>
                             <td >{{ $facture->designation }} </td>
                             <td >{{ $facture->montant_total }}</td>
-                            <td>{{ $facture->montant_total }}</td>
+                            <td>{{ $facture->montant_total }} <strong>[-A]</strong></td>
                         </tr>
                     </tbody>
                 </table>

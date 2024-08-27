@@ -442,7 +442,7 @@
                         <tr>
                             <td >{{ $nameItemFacture }} </td>
                             <td >{{ $prixTotalItemFacture }}</td>
-                            <td>{{ $prixTotalItemFacture }}</td>
+                            <td>{{ $prixTotalItemFacture }} <strong>[-A]</strong></td>
                         </tr>
                     </tbody>
                 </table>

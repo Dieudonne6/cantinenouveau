@@ -352,11 +352,39 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
                 // Si la valeur est déjà présente, exists() renverra true, et la boucle continuera à s'exécuter pour générer une nouvelle valeur.
                 // Si la valeur n'est pas présente (c'est-à-dire qu'elle est unique), la condition exists() renverra false, et la boucle s'arrêtera.
 
-                do {
-                     // Génère un nombre aléatoire entre 10000000 et 99999999
-                    $valeurDynamiqueNumerique = mt_rand(10000000, 99999999);
-                } while (DB::table('paiementcontrat')->where('reference_paiementcontrat', $valeurDynamiqueNumerique)->exists());
+                // do {
+                //      // Génère un nombre aléatoire entre 10000000 et 99999999
+                //     $valeurDynamiqueNumerique = mt_rand(10000000, 99999999);
+                // } while (DB::table('paiementcontrat')->where('reference_paiementcontrat', $valeurDynamiqueNumerique)->exists());
                 
+                // recuperer le debut de l'anne scolaire en cours et forme l'annee scolaire en cours
+
+                $infoParamContrat = Paramcontrat::first();
+                $debutAnneeEnCours = $infoParamContrat->anneencours_paramcontrat;
+                $anneeSuivante = $debutAnneeEnCours + 1;
+                $anneeScolaireEnCours = $debutAnneeEnCours.'-'.$anneeSuivante;
+                // dd($annneScolaireEnCours);
+
+                // Trouver la dernière référence pour l'année scolaire en cours
+                $derniereReference = DB::table('paiementcontrat')
+                ->where('reference_paiementcontrat', 'like', '%/'.$anneeScolaireEnCours)
+                ->orderBy('id_paiementcontrat', 'desc')
+                ->value('reference_paiementcontrat');
+
+                // Extraire et incrémenter la partie numérique
+                if ($derniereReference) {
+                $numeroActuel = (int) explode('/', $derniereReference)[0];
+                $nouveauNumero = $numeroActuel + 1;
+                } else {
+                $nouveauNumero = 1; // Commencer à 1 si aucune référence n'existe pour cette année
+                }
+
+                // Générer la nouvelle référence
+                $nouvelleReference = str_pad($nouveauNumero, 7, '0', STR_PAD_LEFT) . '/' . $anneeScolaireEnCours;
+
+                // dd($nouvelleReference);
+
+
 
 
                 // recuperer les nom des mois cochee
@@ -697,7 +725,7 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
                         'id_usercontrat' => $id_usercontrat,
                         'mois_paiementcontrat' => $id_moiscontrat,
                         'anne_paiementcontrat' => $anneeActuelle,
-                        'reference_paiementcontrat' => $valeurDynamiqueNumerique,
+                        'reference_paiementcontrat' => $nouvelleReference,
                         'statut_paiementcontrat' => 1,
                         // 'datesuppr_paiementcontrat' => $anneeActuelle,
                         // 'idsuppr_usercontrat' => $anneeActuelle,
