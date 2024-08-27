@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Session;
 use App\Models\Contrat;
 use App\Models\Eleve;
 use App\Models\Params2;
-
+use Illuminate\Support\Facades\Validator;
 
 class DuplicataController extends Controller
 {      
@@ -29,104 +29,89 @@ class DuplicataController extends Controller
     
     public function filterduplicata(Request $request)
     {
+        // Validation des données du formulaire
+        $validator = Validator::make($request->all(), [
+            'eleve_id' => 'required_if:facture_type,!=,',
+            'facture_type' => 'required_if:eleve_id,!=,',
+        ]);
+    
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+    
         $idEleve = $request->input('eleve_id');
         $factureType = $request->input('facture_type');
+    
         $facture = null;
         $contrat = null;
-
+        $message = null;
+    
+        // Vérification et récupération des données en fonction du type de facture
         if ($factureType) {
             if ($factureType === 'facturenormalises') {
                 $facture = Facturenormalise::where('MATRICULE', $idEleve)->get();
-            } else {
+                if ($facture->isEmpty()) {
+                    $message = 'Aucune facture de paiement trouvée pour l\'élève sélectionné.';
+                }
+            } elseif ($factureType === 'contrat') {
                 $contrat = Contrat::where('eleve_contrat', $idEleve)->get();
+                if ($contrat->isEmpty()) {
+                    $message = 'Aucun contrat trouvé pour l\'élève sélectionné.';
+                }
             }
+        } else {
+            $message = 'Veuillez sélectionner un type de facture.';
         }
-
+    
         $eleves = Eleve::all();
         $facturesPaiement = Facturenormalise::all();
         $facturesInscription = Contrat::all();
-
+    
         return view('pages.Etats.filterduplicata', [
             'eleves' => $eleves,
             'facturesPaiement' => $facturesPaiement,
             'facturesInscription' => $facturesInscription,
             'factures' => $facture,
             'contrats' => $contrat,
+            'message' => $message,
         ]);
     }
+    
+    
+    
+    
 
-    public function pdfduplicatacontrat($idcontrat){
-
+    public function pdfduplicatacontrat($idcontrat)
+    {
         $factureIns = Contrat::where('id_contrat', $idcontrat)->first();
-
-        $factureIns->cout_contrat;
-        $factureIns->id_usercontrat;
-        $factureIns->statut_contrat;
-        $factureIns->eleve_contrat;
-        $factureIns->datecreation_contrat;
-
-        // recuperation des information de l'eleve
-
         $infoeleves = Eleve::where('MATRICULE', $factureIns->eleve_contrat)->first();
         $nomcompeleve = $infoeleves->NOM .' '. $infoeleves->PRENOM;
         $classeeleve = $infoeleves->CODECLAS;
         $infoecole = Params2::first();
         $nomecole = $infoecole->NOMETAB;
         $ifuEcole = $infoecole->ifu;
-        // dd($infoEcole);
         $logo = $infoecole->logoimage;
-        // dd($classeeleve);
 
-                Session::put('factureIns', $factureIns);
-
+        Session::put('factureIns', $factureIns);
 
         return view('pages.Etats.pdfduplicatacontrat', compact('nomcompeleve', 'classeeleve', 'nomecole', 'ifuEcole', 'logo', 'factureIns'));
     }
 
-    // public function pdfduplicatapaie($idfacture){
-
-    //     $facturePaie = Facturenormalise::where('idcontrat', $idfacture)->first();
-          
-    //     $facturePaie->nom;
-    //     $facturePaie->montant_total;
-    //     $facturePaie->ifuEcole;
-    //     $facturePaie->classe;
-    //     $facturePaie->designation;
-    //     $facturePaie->codemecef;
-    //     $facturePaie->id;
-    //     $facturePaie->qrcode;
-    //     $facturePaie->nim;
-    //     $facturePaie->datepaiementcontrat;
-    //     $facturePaie->dateHeure;
-    //     $facturePaie->counters;
-    //     // dd($facturePaie);
-
-    //     // recuperation des information de l'ecole
-    //     $infoecole = Params2::first();
-    //     $nomecole = $infoecole->NOMETAB;
-    //     // dd($infoEcole);
-    //     $logo = $infoecole->logoimage;
-    //     // dd($logo);
-
-    //     return view('pages.Etats.pdfduplicatapaie', compact( 'nomecole', 'logo', 'facturePaie'));
-    // }
-
     public function pdfduplicatapaie($idfacture)
-{
-    // Utilisation du query builder pour récupérer les informations de la facture
-    $facturePaie = DB::table('facturenormalises')
-        ->where('idcontrat', $idfacture)
-        ->first();
+    {
+        $facturePaie = DB::table('facturenormalises')
+            ->where('idcontrat', $idfacture)
+            ->first();
 
-    // Récupération des informations de l'école
-    $infoecole = DB::table('params2')->first();
-    $nomecole = $infoecole->NOMETAB;
-    $logo = $infoecole->logoimage;
+        $infoecole = DB::table('params2')->first();
+        $nomecole = $infoecole->NOMETAB;
+        $logo = $infoecole->logoimage;
 
-    return view('pages.Etats.pdfduplicatapaie', compact('nomecole', 'logo', 'facturePaie'));
-}
+        return view('pages.Etats.pdfduplicatapaie', compact('nomecole', 'logo', 'facturePaie'));
+    }
 
-    public function duplicatainscription2() {
+    public function duplicatainscription2()
+    {
         $amount = Session::get('amount');
         $classe = Session::get('classe');
         $logoUrl = Session::get('logoUrl');
@@ -141,36 +126,21 @@ class DuplicataController extends Controller
         ];
 
         $factureIns = Session::get('factureIns');
-
-    //    dd($factureIns);
     
-        // Spécifiez le nom du fichier avec un timestamp pour garantir l'unicité
         $fileName = $elevyo . time() . '.pdf';
-    
-        // Spécifiez le chemin complet vers le sous-dossier pdfs dans public
         $filePaths = public_path('pdfs/' . $fileName);
     
-        // Assurez-vous que le répertoire pdfs existe, sinon créez-le
         if (!file_exists(public_path('pdfs'))) {
             mkdir(public_path('pdfs'), 0755, true);
         }
 
-
-    
-        // Générer et enregistrer le PDF dans le sous-dossier pdfs
-       // $pdf = PDF::loadView('pages.Etats.doubleinscriptionpdf', $data)->save($filePaths);
-    
-
-                        return view('pages.Etats.duplicatainscription2', [
-                            'amount' => $amount,
-                            'classe' => $classe,
-                            'logoUrl' => $logoUrl,
-                            'dateContrat' => $dateContrat,
-                            'elevyo' => $elevyo,
-                            'factureIns' => $factureIns,
-                
-                        ]);  
-        
+        return view('pages.Etats.duplicatainscription2', [
+            'amount' => $amount,
+            'classe' => $classe,
+            'logoUrl' => $logoUrl,
+            'dateContrat' => $dateContrat,
+            'elevyo' => $elevyo,
+            'factureIns' => $factureIns,
+        ]);  
     }
-
 }
