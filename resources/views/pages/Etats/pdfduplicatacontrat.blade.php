@@ -27,7 +27,7 @@
         }
 
         .logoimg {
-            width: 100%;
+            width: 40%;
         }
 
         .info {
@@ -38,6 +38,7 @@
 
         .bas {
             margin-top: 20px;
+            margin-bottom: 20px;
             border: 1px solid #ccc;
             font-size: 15px;
             background: #cccccc34;
@@ -81,8 +82,19 @@
         }
 
         .info1 {
-            margin-top: -2.5rem;
+            margin-top: 0.5rem;
             margin-left: 28.5rem;
+        }
+
+        .tableau {
+            margin-top: 3.5rem;
+            margin-bottom: 2.5rem;
+            /* margin-left: 28.5rem; */
+        }
+
+        .textremerciement {
+            margin-top: -2.5rem;
+            margin-left: 0.5rem;
         }
 
         .prix {
@@ -182,7 +194,7 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td style="background-color: #04AA6D !important;">
+                            <td >
                                 Inscription Cantine
                             </td>
                             <td>{{ $factureIns->cout_contrat }}</td>
@@ -196,7 +208,7 @@
                 <div class="info1">
                     <p>Fait à Cotonou le <strong>{{ $factureIns->datecreation_contrat }}</strong></p>
                 </div>
-                <p class="textremerciement"><i>Merci d'avoir choisi le complexe scolaire petit poucet</i></p>
+                <p class="textremerciement"><i>Merci d'avoir choisi le {{ $nomecole }}</i></p>
             </div>
         </div>
         <br>
