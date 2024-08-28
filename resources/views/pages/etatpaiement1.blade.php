@@ -89,6 +89,7 @@
             <table id="myTable" class="table table-bordered">
               <thead>
                 <tr>
+                  <th>N</th>
                   <th>Classe</th>
                   <th>Eleve</th>
                   <th>Montant</th>
@@ -99,8 +100,9 @@
                 </tr>
               </thead>
               <tbody>
-                @foreach ($paiementsAvecEleves as $resultatsIndividuel)
+                @foreach ($paiementsAvecEleves as $index => $resultatsIndividuel)
                 <tr>
+                  <td>{{ $index + 1 }}</td>
                   <td>{{ $resultatsIndividuel['classe_eleve'] }}</td>
                   <td>{{ $resultatsIndividuel['nomcomplet_eleve'] }}</td>
                   <td>{{ $resultatsIndividuel['montant'] }}</td>

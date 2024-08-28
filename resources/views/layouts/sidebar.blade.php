@@ -6,10 +6,12 @@
         <span class="menu-title">Cantine</span>
         <i class="menu-arrow"></i>
       </a>
+
       <div class="collapse" id="Cantine">
         <ul class="nav flex-column sub-menu">
           <li class="nav-item">
-            <a class="nav-link {{ request()->is('listecontrat') ? 'active' : '' }}" href="{{url('/listecontrat')}}">Liste des Contrats</a>
+           
+            <a class="nav-link {{ request()->is('listecontrat') || request()->is('paiementcontrat') ? 'active' : '' }}" href="{{url('/listecontrat')}}">Liste des Contrats</a>
           </li>
           <li class="nav-item">
             <a class="nav-link {{ request()->is('etat') || request()->is('filteretat') ? 'active' : '' }}" href="{{url('/etat')}}">Etats</a>
