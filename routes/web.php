@@ -30,11 +30,11 @@ Route::get('/nouveaucontrat', [PagesController::class, 'nouveaucontrat']);
 Route::get('/paiement', [PagesController::class, 'paiement']);
 
 Route::get('/classes', [ClassesController::class, 'classe']);
-Route::get('/listecontrat', [ClassesController::class, 'listecontrat']);
+Route::get('/listecontrat', [ClassesController::class, 'listecontrat'])->name('listecontrat');
 Route::get('/connexiondonnees', [PagesController::class, 'connexiondonnees']);
 Route::get('/', [PagesController::class, 'connexion']);
 
-Route::get('/eleve/{CODECLAS}', [ClassesController::class, 'filterEleve']);
+Route::get('/eleve/{CODECLAS}', [ClassesController::class, 'filterEleve'])->name('eleve');
 // Route::get('/eleve/{CODECLAS}', [ClassesController::class, 'getElevesByClasse']);
 
 // Route::get('/eleve/{CODECLAS}', 'EleveController@getElevesByClasse');
@@ -49,7 +49,7 @@ Route::get('/frais', [PagesController::class, 'frais']);
 Route::post('/nouveaufrais', [PagesController::class, 'fraisnouveau']);
 Route::post('/modifierfrais', [PagesController::class, 'modifierfrais']);
 
-Route::get('/paiementcontrat/{CODECLAS}/{MATRICULE}', [ClassesController::class, 'paiementcontrat']);
+Route::get('/paiementcontrat/{CODECLAS}/{MATRICULE}', [ClassesController::class, 'paiementcontrat'])->name('paiementcontrat');
 Route::post('/savepaiementcontrat', [ClassesController::class, 'savepaiementcontrat']);
 Route::get('/telechargerfacture', [ClassesController::class, 'telechargerfacture']);
 
@@ -96,7 +96,7 @@ Route::get('http://localhost:38917/info');
 
 
 Route::get('/etatdroits', [EtatController::class, 'etatdroits']);
-Route::post('/filteretat', [EtatController::class, 'filteretat']);
+Route::post('/filteretat', [EtatController::class, 'filteretat'])->name('filteretat');
 Route::post('/relance', [EtatController::class, 'relance']);
 
 Route::get('/paramsfacture', [PagesController::class, 'paramsfacture']);

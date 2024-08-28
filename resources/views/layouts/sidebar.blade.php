@@ -10,14 +10,22 @@
       <div class="collapse" id="Cantine">
         <ul class="nav flex-column sub-menu">
           <li class="nav-item">
-           
-            <a class="nav-link {{ request()->is('listecontrat') || request()->is('paiementcontrat') ? 'active' : '' }}" href="{{url('/listecontrat')}}">Liste des Contrats</a>
+            @php
+            $routesClass = ['listecontrat', 'paiementcontrat','eleve']; // Liste des noms de routes associées à l'accueil
+            @endphp
+            <a class="nav-link {{ in_array(request()->route()->getName(), $routesClass) ? 'active' : '' }}" href="{{ route('listecontrat') }}">Liste des Contrats</a>
+
           </li>
           <li class="nav-item">
-            <a class="nav-link {{ request()->is('etat') || request()->is('filteretat') ? 'active' : '' }}" href="{{url('/etat')}}">Etats</a>
+            @php
+            $routesEtat = ['etat', 'traitementetatpaiement','filteretat']; // Liste des noms de routes associées à l'accueil
+            @endphp
+            <a class="nav-link {{ in_array(request()->route()->getName(), $routesEtat) ? 'active' : '' }}" href="{{ route('etat') }}">Etats</a>
+
           </li>
           <li class="nav-item">
-            <a class="nav-link {{ request()->is('duplicatafacture') ? 'active' : '' }}" href="{{url('/duplicatafacture')}}">Duplicata facture</a>
+            
+            <a class="nav-link {{ request()->is('duplicatafacture') || request()->is('filterduplicata') ? 'active' : '' }}" href="{{url('/duplicatafacture')}}">Duplicata facture</a>
           </li>
         </ul>
       </div>
