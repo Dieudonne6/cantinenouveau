@@ -93,6 +93,11 @@ class DuplicataController extends Controller
         $logo = $infoecole->logoimage;
 
         Session::put('factureIns', $factureIns);
+        Session::put('nomcompeleve', $nomcompeleve);
+        Session::put('classeeleve', $classeeleve);
+        Session::put('logo', $logo);
+        Session::put('ifuEcole', $ifuEcole);
+        Session::put('nomecole', $nomecole);
 
         return view('pages.Etats.pdfduplicatacontrat', compact('nomcompeleve', 'classeeleve', 'nomecole', 'ifuEcole', 'logo', 'factureIns'));
     }
@@ -126,6 +131,11 @@ class DuplicataController extends Controller
         ];
 
         $factureIns = Session::get('factureIns');
+        $nomcompeleve = Session::get('nomcompeleve');
+        $logo = Session::get('logo');
+        $classeeleve = Session::get('classeeleve');
+        $ifuEcole = Session::get('ifuEcole');
+        $nomecole = Session::get('nomecole');
     
         $fileName = $elevyo . time() . '.pdf';
         $filePaths = public_path('pdfs/' . $fileName);
@@ -141,6 +151,11 @@ class DuplicataController extends Controller
             'dateContrat' => $dateContrat,
             'elevyo' => $elevyo,
             'factureIns' => $factureIns,
+            'nomcompeleve' => $nomcompeleve,
+            'classeeleve' => $classeeleve,
+            'logo' => $logo,
+            'ifuEcole' => $ifuEcole,
+            'nomecole' => $nomecole,
         ]);  
     }
 }
