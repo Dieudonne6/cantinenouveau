@@ -2116,7 +2116,7 @@ public function etat() {
                             // Ajouter les informations de paiement avec le nom de l'élève à la collection
                             $paiementsAvecEleves->push([
                                 // dd($user->login),
-                                // 'user' => $users->login,
+                                'user' => $users->login,
                                 'id_contrat' => $idContrat,
                                 'nomcomplet_eleve' => $eleve->NOM .' '. $eleve->PRENOM,
                                 'classe_eleve' => $eleve->CODECLAS,

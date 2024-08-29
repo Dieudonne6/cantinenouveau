@@ -8,11 +8,35 @@
     border-collapse: collapse !important;
     font-size: 14px;
   }
+  @media screen {
+    tfoot {
+      display: none;
+    }
+  }
   @media print {
     .table-bordered th, .table-bordered td {
       border: 1px solid #000 !important;
     }
+  } 
+  @media print {
+    tfoot {
+      display: table-row-group;
+    }
+    
+    table {
+      page-break-inside: auto;
+    }
+    
+    tr {
+      page-break-inside: avoid;
+      page-break-after: auto;
+    }
+    
+    tfoot {
+      page-break-inside: avoid;
+    }
   }
+
 </style>
 
 
@@ -81,10 +105,7 @@
           <p>lolllllllllllllllllllllll</p>
         </div>
         @endif --}}
-        
         <div id="contenu">
-          
-          
           <div class="table-responsive">
             <table id="myTable" class="table table-bordered">
               <thead>
@@ -96,17 +117,19 @@
                   <th>Mois payé(s)</th>
                   <th>Date</th>
                   <th>Reference</th>
-                  {{-- <th class="hide-on-print" style="width: 10%;">Action a effectuee</th> --}}
+                  <th>Caissier</th>
                 </tr>
               </thead>
               <tbody>
+                @php $totalMontant = 0; @endphp
                 @foreach ($paiementsAvecEleves as $index => $resultatsIndividuel)
                 <tr>
                   <td>{{ $index + 1 }}</td>
                   <td>{{ $resultatsIndividuel['classe_eleve'] }}</td>
                   <td>{{ $resultatsIndividuel['nomcomplet_eleve'] }}</td>
-                  <td>{{ $resultatsIndividuel['montant'] }}</td>
+                  <td class="montant">{{ $resultatsIndividuel['montant'] }}</td>
                   <td>{{ $resultatsIndividuel['mois'] }}</td>
+
                   <td>
                     {{
                       \Carbon\Carbon::hasFormat($resultatsIndividuel['date_paiement'], 'Y-m-d H:i:s') 
@@ -117,20 +140,24 @@
                     }}
                   </td>
                   <td>{{ $resultatsIndividuel['reference'] }}</td>
-                  {{-- <td class="cell-action hide-on-print">
-                    <div class="d-flex justify-content-between">
-                      <a type="button" style="height: 45px" class="btn btn-primary w-50 me-1" href="{{ url('imprimerfiche/' . $resultatsIndividuel['id_paiementcontrat']) }}">Imprimer fiche</a>
-                      <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">Supprimer</button>
-                    </div>
-                  </td> --}}
+                  <td>{{ $resultatsIndividuel['user'] }}</td>
+
                 </tr>
+                @php $totalMontant += $resultatsIndividuel['montant']; @endphp
+
                 @endforeach
               </tbody>
+              <tfoot>
+                <tr>
+                  <th colspan="3">Total</th>
+                  <th id="totalMontant" colspan="4">{{ number_format($totalMontant, 0, '', ' ') }}</th>
+                </tr>
+              </tfoot>
             </table>
           </div>
-          
         </div>
         
+
       </div>
     </div>
   </div>
@@ -167,21 +194,21 @@
 
 <script>
   function imprimerPage() {
-    let table = $('#myTable').DataTable();
-    let currentPage = table.page();  
-    table.destroy();// Sauvegarder la page actuelle
-    let originalTitle = document.title;
-    document.title = `Liste des paiements de la periode du {{$dateFormateedebut}} au {{$dateFormateefin}}`;
-    
-    setTimeout(function() {
-      // Créer un élément invisible pour l'impression
-      let printDiv = document.createElement('div');
-      printDiv.innerHTML = '<h1 style="font-size: 20px; text-align: center;">Liste des paiements de la periode du {{$dateFormateedebut}} au {{$dateFormateefin}} </h1>' +
-      document.getElementById('contenu').innerHTML;
-      
-      // Appliquer des styles pour l'impression
-      let style = document.createElement('style');
-      style.innerHTML = `@page { size: landscape; }
+      let table = $('#myTable').DataTable();
+      let currentPage = table.page();  
+      table.destroy(); // Sauvegarder la page actuelle
+      let originalTitle = document.title;
+      document.title = `Liste des paiements de la periode du {{$dateFormateedebut}} au {{$dateFormateefin}}`;
+  
+      setTimeout(function() {
+          // Créer un élément invisible pour l'impression
+          let printDiv = document.createElement('div');
+          printDiv.innerHTML = '<h1 style="font-size: 20px; text-align: center;">Liste des paiements de la periode du {{$dateFormateedebut}} au {{$dateFormateefin}} </h1>' +
+          document.getElementById('contenu').innerHTML;
+          
+          // Appliquer des styles pour l'impression
+          let style = document.createElement('style');
+          style.innerHTML = `@page { size: landscape; }
               @media print {
                   body * { visibility: hidden; }
                   #printDiv, #printDiv * { visibility: visible; }
@@ -189,54 +216,60 @@
                   .dt-end { display: none !important; }
                   .dt-start { display: none !important; }
                   .table td:nth-child(n+2) {
-                   margin: 0 !important;
+                      margin: 0 !important;
                       padding: 10px 0 5px 5px !important;
                       width: 500px !important;
                       word-wrap: break-word !important;
                       white-space: normal !important;
                   }
-                   table th {
-                   font-weight: bold !important;
-                  font-size: 12px !important;
-  
-                   }
+                  table th {
+                      font-weight: bold !important;
+                      font-size: 12px !important;
+                  }
                   table th, table td {
                       font-size: 10px;
                       margin: 0 !important;
                       padding: 0 !important;
                       border-collapse: collapse !important;
                   }
-                      table {
-                  width: 100%;
-                  border-collapse: collapse;
-              }
-              
-              tbody tr:nth-child(even) {
-                  background-color: #f1f3f5;
-              }
-              tbody tr:nth-child(odd) {
-                  background-color: #ffffff;
-              }
+                  table {
+                      width: 100%;
+                      border-collapse: collapse;
+                      page-break-inside: auto;
+                  }
+                  tr {
+                      page-break-inside: avoid;
+                      page-break-after: auto;
+                  }
+                  tfoot {
+                      display: table-row-group;
+                      page-break-inside: avoid;
+                  }
+                  tbody tr:nth-child(even) {
+                      background-color: #f1f3f5;
+                  }
+                  tbody tr:nth-child(odd) {
+                      background-color: #ffffff;
+                  }
               }
           `;
-      document.head.appendChild(style);
-      document.body.appendChild(printDiv);
-      printDiv.setAttribute("id", "printDiv");
-      
-      window.print();
-      
-      $('#myTable').DataTable({
-        "pageLength": 10,  // Remettre la pagination à 10 par défaut (ou la valeur souhaitée)
-      });
-      
-      // Nettoyer après l'impression
-      document.body.removeChild(printDiv);
-      document.head.removeChild(style);
-    }, 200);
+          document.head.appendChild(style);
+          document.body.appendChild(printDiv);
+          printDiv.setAttribute("id", "printDiv");
+          
+          window.print();
+          
+          $('#myTable').DataTable({
+              "pageLength": 10,  // Remettre la pagination à 10 par défaut (ou la valeur souhaitée)
+          });
+          
+          // Nettoyer après l'impression
+          document.body.removeChild(printDiv);
+          document.head.removeChild(style);
+      }, 200);
   }
+  </script>
   
-</script>
-
 {{-- <script>
   
   function imprimerPage() {
