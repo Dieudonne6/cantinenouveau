@@ -32,12 +32,12 @@
     }
   
     .invoice {
-        width: 100%;
-        /* margin: 20px auto; */
+        width:80%;
+        margin: 20px auto;
         /* border: 1px solid #ccc; */
         background-color: #fffff;
         padding: 0;
-        /* height: 100% */
+        height: 100%
     }
   
     .entete {
@@ -58,12 +58,13 @@
   
     .logoimg {
         width: 25%;
-        margin-top: -1rem;
+        margin-top: -1.8rem;
+        margin-bottom: 1rem;
     }
   
     .info {
         padding: 0.5rem;
-        margin-left: 26rem;
+        margin-left: 28rem;
         margin-top: -20rem;
     }
   
@@ -108,14 +109,14 @@
         background: #aeadad35;
         width: 14rem;
         text-align: center;
-        margin-top: 2rem;
+        margin-top: 4rem;
   
     }
   
   
     .client {
-        margin-top: -8.4rem;
-        margin-left: 28rem;
+        margin-top: -6.4rem;
+        margin-left: 35rem;
         border: 1px solid black;
         width: 14rem;
         text-align: center;
@@ -160,8 +161,8 @@
     }
   
     .info1 {
-        margin-top: -2.5rem;
-        margin-left: 28.5rem;
+        margin-top: -1.5rem;
+        margin-left: 35rem;
     }
   
   
@@ -177,6 +178,11 @@
                             width: 50px; */
     }
   
+    .tableau{
+        margin-top: -2rem;
+        margin-bottom: 5rem;
+    }
+
     #customers {
         font-family: Arial, Helvetica, sans-serif;
         border-collapse: collapse;
@@ -246,12 +252,12 @@
           </div>
       </div>
 
-      <div class="titre" style="margin-bottom: 6rem; background-color: red !important;">
+      <div class="titre" style="margin-bottom: 6rem;!important ">
 
           <div class="entreprise">
               <p><i class="title">Ecole</i></p>
-              <p>IFU:<strong>0202380068074</strong></p>
-              <p>Ecole:<strong> complexe scolaire "le petit poucet" </strong></p>
+              <p>IFU:<strong>{{$ifu}}</strong></p>
+              <p>Ecole:<strong> {{$nometab}}</strong></p>
           </div>
 
 
@@ -288,7 +294,14 @@
                           </td>
 
                           <td>
-                              {{ $dateContrat }}
+                              
+                              {{
+                                \Carbon\Carbon::hasFormat($dateContrat, 'Y-m-d H:i:s') 
+                                ? \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $dateContrat)->format('d/m/Y') 
+                                : (\Carbon\Carbon::hasFormat($dateContrat, 'd/m/Y H:i:s') 
+                                ? \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', $dateContrat)->format('d/m/Y') 
+                                : 'Format de date non supporté')
+                              }}
                           </td>
 
                          
@@ -303,42 +316,30 @@
 
       <div class="bas">
           <div class="logo1">
-              <p><strong> complexe scolaire petit poucet </strong> </p>
+              <p><strong> {{$nometab}} </strong> </p>
               {{-- <p><strong> {{ $nometab }} </strong> </p> --}}
               {{-- <img src="" alt=""> --}}
           </div>
 
           <div class="info1">
-              <p>Fait a cotonou le , <strong>{{ $dateContrat}} </strong></p>
+              <p>Fait a cotonou le , <strong>
+                {{
+                    \Carbon\Carbon::hasFormat($dateContrat, 'Y-m-d H:i:s') 
+                    ? \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $dateContrat)->format('d/m/Y') 
+                    : (\Carbon\Carbon::hasFormat($dateContrat, 'd/m/Y H:i:s') 
+                    ? \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', $dateContrat)->format('d/m/Y') 
+                    : 'Format de date non supporté')
+                  }}
+                 </strong></p>
               {{-- <p>Fait a {{ $villeetab }} le , <strong>{{ $factureconfirm['dateTime'] }} </strong></p> --}}
               {{-- <p>Reference 909090909090   </p> --}}
           </div>
-          <p class="textremerciement"><i>Merci d'avoir choisi le complexe scolaire petiti poucet. </i> </p>
+          <p class="textremerciement"><i>Merci d'avoir choisi {{$nometab}} </i> </p>
           {{-- <p class="textremerciement"><i>Merci d'avoir choisi le {{ $nometab }}. </i> </p> --}}
 
       </div>
   </div>
 
-  <script src="{{asset('assets/vendors/js/vendor.bundle.base.js')}}"></script>
-  <!-- endinject -->
-  <!-- inject:js -->
-  <script src="{{asset('assets/js/off-canvas.js')}}"></script>
-  <script src="{{asset('assets/js/hoverable-collapse.js')}}"></script>
-  <script src="{{asset('assets/js/template.js')}}"></script>
-  <script src="{{asset('assets/js/settings.js')}}"></script>
-  <script src="{{asset('assets/js/todolist.js')}}"></script>
-  <!-- endinject -->
-  <!-- plugin js for this page -->
-  <script src="{{asset('assets/jquery-3.6.0.min.js')}}"></script>
-  <script src="{{asset('assets/bootstrap.bundle.min.js')}}"></script>
-
-  <script src="{{asset('assets/vendors/typeahead.js/typeahead.bundle.min.js')}}"></script>
-  <script src="{{asset('assets/vendors/select2/select2.min.js')}}"></script>
-  <!-- End plugin js for this page -->
-  <!-- Custom js for this page-->
-  <script src="{{asset('assets/js/file-upload.js')}}"></script>
-
-  <script src="{{asset('assets/js/typeahead.js')}}"></script>
   {{-- <script src="{{asset('assets/js/select2.js')}}"></script> --}}
 
 </body>

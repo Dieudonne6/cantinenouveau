@@ -198,7 +198,15 @@
                                 Inscription Cantine
                             </td>
                             <td>{{ $factureIns->cout_contrat }}</td>
-                            <td>{{ $factureIns->datecreation_contrat }}</td>
+                            <td>
+                                {{
+                                    \Carbon\Carbon::hasFormat($factureIns->datecreation_contrat, 'Y-m-d H:i:s') 
+                                    ? \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $factureIns->datecreation_contrat)->format('d/m/Y') 
+                                    : (\Carbon\Carbon::hasFormat($factureIns->datecreation_contrat, 'd/m/Y H:i:s') 
+                                    ? \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', $factureIns->datecreation_contrat)->format('d/m/Y') 
+                                    : 'Format de date non supporté')
+                                  }}
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -206,7 +214,15 @@
 
             <div class="bas">
                 <div class="info1">
-                    <p>Fait à Cotonou le <strong>{{ $factureIns->datecreation_contrat }}</strong></p>
+                    <p>Fait à Cotonou le <strong>
+                        {{
+                            \Carbon\Carbon::hasFormat($factureIns->datecreation_contrat, 'Y-m-d H:i:s') 
+                            ? \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $factureIns->datecreation_contrat)->format('d/m/Y') 
+                            : (\Carbon\Carbon::hasFormat($factureIns->datecreation_contrat, 'd/m/Y H:i:s') 
+                            ? \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', $factureIns->datecreation_contrat)->format('d/m/Y') 
+                            : 'Format de date non supporté')
+                          }}
+                          </strong></p>
                 </div>
                 <p class="textremerciement"><i>Merci d'avoir choisi le {{ $nomecole }}</i></p>
             </div>
