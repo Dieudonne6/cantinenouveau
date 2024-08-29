@@ -48,6 +48,7 @@
 
     .bas {
         margin-top: 20px;
+        margin-bottom: 20px;
         border: 1px solid #ccc;
         font-size: 15px;
         background: #cccccc34;
@@ -143,6 +144,12 @@
         margin-left: 28.5rem;
     }
 
+    .tableau {
+        margin-top: -1.5rem;
+        margin-bottom: 1.5rem;
+        /* margin-left: 28.5rem; */
+    }
+
 
     .prix {
         background: rgb(27, 27, 27);
@@ -222,8 +229,8 @@
 
             <div class="entreprise">
                 <p><i class="title">Ecole</i></p>
-                <p>IFU:<strong>0202380068074</strong></p>
-                <p>Ecole:<strong> complexe scolaire "le petit poucet" </strong></p>
+                <p>IFU:<strong>{{$ifu}}</strong></p>
+                <p>Ecole:<strong> {{$nometab}} </strong></p>
             </div>
 
 
@@ -253,7 +260,7 @@
 
                 
                         <tr>
-                            <td style="background-color: #04AA6D !important;">
+                            <td >
                                 Inscription Cantine 
                             </td>
   
@@ -285,7 +292,7 @@
 
         <div class="bas">
             <div class="logo1">
-                <p><strong>complexe scolaire petiti poucet</strong> </p>
+                <p><strong>{{$nometab}}</strong> </p>
                 {{-- <p><strong>{{ $nometab }}</strong> </p> --}}
                 {{-- <img src="" alt=""> --}}
             </div>
@@ -302,7 +309,7 @@
                 {{-- <p>Fait a {{$villeetab}} le , <strong>{{ $factureconfirm['dateTime'] }} </strong></p> --}}
                 {{-- <p>Reference 909090909090   </p> --}}
             </div>
-            <p class="textremerciement"><i>Merci d'avoir choisi le complexe scolaire petit poucet </i> </p>
+            <p class="textremerciement"><i>Merci d'avoir choisi le {{$nometab}} </i> </p>
             {{-- <p class="textremerciement"><i>Merci d'avoir choisi le {{ $nometab }} </i> </p> --}}
 
         </div>

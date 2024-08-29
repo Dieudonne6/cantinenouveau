@@ -163,7 +163,7 @@
                         <div class="col">
                           <label>Montant</label>
                           <div id="bloodhound">
-                            <input class="typeaheads mater" type="text" readonly name="montant"  id="montant" value="">
+                            <input class="typeaheads mater" type="text" name="montant"  id="montant" value="">
                           </div>
                         </div>
                       </div>

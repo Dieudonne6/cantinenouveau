@@ -1629,6 +1629,10 @@ public function show($id)
         $logoUrl = Session::get('logoUrl');
         $dateContrat = Session::get('dateContrat');
         $elevyo = Session::get('elevyo');
+        $nometab = Session::get('nometab');
+        $ifu = Session::get('ifu');
+
+
         $data = [
             'amount' => $amount,
             'classe' => $classe,
@@ -1651,28 +1655,30 @@ public function show($id)
         }
 
                 // Générer et enregistrer le PDF dans la base de donne
-                $pdfdupinscri = PDF::loadView('pages.Etats.doubleinscriptionpdf', $data);
-                $pdfcontentdupinscri = $pdfdupinscri->output();
+                // $pdfdupinscri = PDF::loadView('pages.Etats.doubleinscriptionpdf', $data);
+                // $pdfcontentdupinscri = $pdfdupinscri->output();
     
         // Générer et enregistrer le PDF dans le sous-dossier pdfs
        // $pdf = PDF::loadView('pages.Etats.doubleinscriptionpdf', $data)->save($filePaths);
     
     
            // Enregistrer le chemin du PDF dans la base de données
-                        $duplicatafacture = new Duplicatafacture();
-                        $duplicatafacture->url = $pdfcontentdupinscri;
-                        $duplicatafacture->nomeleve = $elevyo;
-                        $duplicatafacture->classe = $classe;
-                        $duplicatafacture->reference = 'Facture d\'inscription';
+                        // $duplicatafacture = new Duplicatafacture();
+                        // $duplicatafacture->url = $pdfcontentdupinscri;
+                        // $duplicatafacture->nomeleve = $elevyo;
+                        // $duplicatafacture->classe = $classe;
+                        // $duplicatafacture->reference = 'Facture d\'inscription';
 
-                        $duplicatafacture->datepaiement = $dateContrat;
-                        $duplicatafacture->save();
+                        // $duplicatafacture->datepaiement = $dateContrat;
+                        // $duplicatafacture->save();
                         return view('pages.Etats.duplicatainscription', [
                             'amount' => $amount,
                             'classe' => $classe,
                             'logoUrl' => $logoUrl,
                             'dateContrat' => $dateContrat,
                             'elevyo' => $elevyo,
+                            'nometab' => $nometab,
+                            'ifu' => $ifu,
                 
                         ]);  
         
@@ -1918,9 +1924,11 @@ public function etat() {
                                                ->where('statut_contrat', 0)
                                                ->first();
         
-                                               $paramse = Paramsfacture::first(); 
+                                               $paramse = Params2::first(); 
         
-                                               $logoUrl = $paramse ? $paramse->logo: null; 
+                                               $logoUrl = $paramse ? $paramse->logoimage: null; 
+                                               $nometab = $paramse->NOMETAB; 
+                                               $ifu = $paramse->ifu; 
                     if ($contratExistant) {
                         // Mettre à jour le contrat existant
                         $contratExistant->cout_contrat = $montant;
@@ -1933,13 +1941,17 @@ public function etat() {
                         Session::put('logoUrl', $logoUrl);
                         Session::put('dateContrat', $dateContrat);
                         Session::put('elevyo', $elevyo);
+                        Session::put('nometab', $nometab);
+                        Session::put('ifu', $ifu);
         
                         return view('pages.Etats.pdfinscription')
                         ->with('amount', $montant)
                         ->with('classe', $classes )
                         ->with('logoUrl', $logoUrl )
                         ->with('dateContrat', $dateContrat)
-                        ->with('elevyo', $elevyo);
+                        ->with('elevyo', $elevyo)
+                        ->with('nometab', $nometab)
+                        ->with('ifu', $ifu);
                         
                         return back()->with('status', 'Contrat mis à jour avec succès');
                     } else {
@@ -1961,6 +1973,8 @@ public function etat() {
                         ->with('classe', $classes )
                         ->with('logoUrl', $logoUrl )
                         ->with('dateContrat', $dateContrat)
+                        ->with('nometab', $nometab)
+                        ->with('ifu', $ifu)
                         ->with('elevyo', $elevyo);
                         return redirect()->back()->with('success', 'Élève ajouté avec succès');
                     }

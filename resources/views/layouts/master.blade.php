@@ -120,7 +120,7 @@ display: block;
 .main-panel {
   margin-left: 240px; 
   width: calc(100% - 240px);
-  padding: 20px;
+  padding: 0 20px 20px 20px;
   position: relative;
   /* height: 100%; */
 }
