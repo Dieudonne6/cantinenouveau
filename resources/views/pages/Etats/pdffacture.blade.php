@@ -373,7 +373,15 @@
             <div class="info">
                 <h4><strong>FACTURE DE VENTE</strong></h4>
                 <p><strong>Facture # {{ $reffacture }} </strong></p>
-                <p>Date : {{ $datepaiementcontrat }} </p>
+                <p>Date :
+                    {{
+                        \Carbon\Carbon::hasFormat($datepaiementcontrat, 'Y-m-d H:i:s') 
+                        ? \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $datepaiementcontrat)->format('d/m/Y') 
+                        : (\Carbon\Carbon::hasFormat($datepaiementcontrat, 'd/m/Y H:i:s') 
+                        ? \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', $datepaiementcontrat)->format('d/m/Y') 
+                        : 'Format de date non supporté')
+                      }}
+                </p>
                 <p>Vendeur : SFE en ligne</p>
                 {{-- <p>Réference fact. originale :</p> --}}
             </div>

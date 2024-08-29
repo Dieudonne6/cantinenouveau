@@ -294,7 +294,14 @@
                           </td>
 
                           <td>
-                              {{ $dateContrat }}
+                              
+                              {{
+                                \Carbon\Carbon::hasFormat($dateContrat, 'Y-m-d H:i:s') 
+                                ? \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $dateContrat)->format('d/m/Y') 
+                                : (\Carbon\Carbon::hasFormat($dateContrat, 'd/m/Y H:i:s') 
+                                ? \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', $dateContrat)->format('d/m/Y') 
+                                : 'Format de date non supporté')
+                              }}
                           </td>
 
                          
@@ -315,7 +322,15 @@
           </div>
 
           <div class="info1">
-              <p>Fait a cotonou le , <strong>{{ $dateContrat}} </strong></p>
+              <p>Fait a cotonou le , <strong>
+                {{
+                    \Carbon\Carbon::hasFormat($dateContrat, 'Y-m-d H:i:s') 
+                    ? \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $dateContrat)->format('d/m/Y') 
+                    : (\Carbon\Carbon::hasFormat($dateContrat, 'd/m/Y H:i:s') 
+                    ? \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', $dateContrat)->format('d/m/Y') 
+                    : 'Format de date non supporté')
+                  }}
+                 </strong></p>
               {{-- <p>Fait a {{ $villeetab }} le , <strong>{{ $factureconfirm['dateTime'] }} </strong></p> --}}
               {{-- <p>Reference 909090909090   </p> --}}
           </div>

@@ -79,7 +79,15 @@
                                             @if ($facture->montant_total > 0)
                                                 <tr>
                                                     <td>{{ $facture->nim }}/{{ $facture->counters }}</td>
-                                                    <td>{{ $facture->dateHeure }}</td>
+                                                    <td>
+                                                        {{
+                                                            \Carbon\Carbon::hasFormat($facture->dateHeure, 'Y-m-d H:i:s') 
+                                                            ? \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $facture->dateHeure)->format('d/m/Y') 
+                                                            : (\Carbon\Carbon::hasFormat($facture->dateHeure, 'd/m/Y H:i:s') 
+                                                            ? \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', $facture->dateHeure)->format('d/m/Y') 
+                                                            : 'Format de date non supporté')
+                                                          }}
+                                                    </td>
                                                     <td>{{ $facture->montant_total }}</td>
                                                     <td>
                                                         <a href="{{ url('pdfduplicatapaie/' . $facture->idcontrat) }}"
@@ -118,7 +126,15 @@
                                             @if ($contrat->cout_contrat > 0)
                                                 <tr>
                                                     <td>{{ $contrat->eleve_contrat }}</td>
-                                                    <td>{{ $contrat->datecreation_contrat }}</td>
+                                                    <td>
+                                                        {{
+                                                            \Carbon\Carbon::hasFormat($contrat->datecreation_contrat, 'Y-m-d H:i:s') 
+                                                            ? \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $contrat->datecreation_contrat)->format('d/m/Y ') 
+                                                            : (\Carbon\Carbon::hasFormat($contrat->datecreation_contrat, 'd/m/Y H:i:s') 
+                                                            ? \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', $contrat->datecreation_contrat)->format('d/m/Y ') 
+                                                            : 'Format de date non supporté')
+                                                          }}
+                                                    </td>
                                                     <td>{{ $contrat->cout_contrat }}</td>
                                                     <td>
                                                         <a href="{{ url('pdfduplicatacontrat/' . $contrat->id_contrat) }}"
