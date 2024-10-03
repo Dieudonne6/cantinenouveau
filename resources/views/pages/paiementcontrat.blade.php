@@ -1,8 +1,31 @@
+
 @extends('layouts.master')
 @section('content')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+  .btn-arrow {
+      position: absolute;
+      top: 0px; /* Ajustez la position verticale */
+      left: 0px; /* Positionnez à gauche */
+      background-color: transparent !important;
+      border:1px !important;
+      text-transform: uppercase !important;
+      font-weight: bold !important;
+      cursor: pointer!important;
+      font-size: 17px!important; /* Taille de l'icône */
+      color: #b51818!important; /* Couleur de l'icône */
+  }
+  
+  .btn-arrow:hover {
+      color: #b700ff !important; /* Couleur au survol */
+  }
+  </style>
     <div class="col-lg-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
+       <button class="btn btn-arrow" onclick="window.history.back();">
+            <i class="fas fa-arrow-left"></i> Retour
+        </button>
 
                                   {{-- erreur concernant le paiement --}}
                                   @if($errors->any())

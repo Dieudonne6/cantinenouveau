@@ -1,9 +1,15 @@
+
 @extends('layouts.master')
 @section('content')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 <div class="card">
     <div class="card-body">
 
+      <button class="btn btn-arrow" onclick="window.history.back();">
+           <i class="fas fa-arrow-left"></i> Retour
+       </button>
+       <br></br>
         <nav>
             <div class="nav nav-tabs" id="nav-tab" role="tablist">
               <button class="nav-link active" id="nav-cantine-tab" data-bs-toggle="tab" data-bs-target="#nav-cantine" type="button" role="tab" aria-controls="nav-cantine" aria-selected="true">Cantine</button>
@@ -19,8 +25,8 @@
             <div class="tab-pane fade show active" id="nav-cantine" role="tabpanel" aria-labelledby="nav-cantine-tab">
                 <nav>
                     <div class="nav nav-tabs" id="nav-tab1" role="tablist">
-                      {{-- <button class="nav-link " id="nav-identification-tab" data-bs-toggle="tab" data-bs-target="#nav-identification" type="button" role="tab" aria-controls="nav-identification" aria-selected="true">Identification</button> --}}
-                      <button class="nav-link active" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-frais&année" type="button" role="tab" aria-controls="nav-frais&année" aria-selected="false">Frais & Année</button>
+{{--                       <button class="nav-link" id="nav-identification-tab" data-bs-toggle="tab" data-bs-target="#nav-identification" type="button" role="tab" aria-controls="nav-identification" aria-selected="false">Identification</button>
+ --}}                      <button class="nav-link active" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-frais&année" type="button" role="tab" aria-controls="nav-frais&année" aria-selected="true">Frais & Année</button>
                       <button class="nav-link" id="nav-connexionBD-tab" data-bs-toggle="tab" data-bs-target="#nav-connexionBD" type="button" role="tab" aria-controls="nav-connexionBD" aria-selected="false">ConnexionBD</button>
                       <button class="nav-link" id="nav-facture-tab" data-bs-toggle="tab" data-bs-target="#nav-facture" type="button" role="tab" aria-controls="nav-facture" aria-selected="false">Facture</button>
                     </div>
@@ -398,5 +404,21 @@
     </div>
 </div>
 
+<style>
+  .btn-arrow {
+      position: absolute;
+      top: 0px; /* Ajustez la position verticale */
+      left: 0px; /* Positionnez à gauche */
+      background-color: transparent !important;
+      border:1px !important;
+      cursor: pointer!important;
+      font-size: 15px!important; /* Taille de l'icône */
+      color: #b51818!important; /* Couleur de l'icône */
+  }
+  
+  .btn-arrow:hover {
+      color: #b700ff !important; /* Couleur au survol */
+  }
+  </style>
 
 @endsection
