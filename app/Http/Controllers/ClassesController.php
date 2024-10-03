@@ -672,70 +672,12 @@ public function savepaiementcontrat(PaiementCantineRequest $request) {
 
         $dateTime = $decodedResponseConfirmation['dateTime'];
 
-        // dd($decodedResponseConfirmation);
-
         // Générer le code QR
         $qrCodeString = $decodedResponseConfirmation['qrCode'];
 
         $reffactures = $nim.'-'.$counters;
 
         $reffacture = explode('/', $reffactures)[0];
-
-        // $reffactures = rtrim($reffacture, " FV");
-
-        // dd($reffactures);
-        // $reffacture = $nim.'_'.$counters;
-
-
-
-
-
-                // Effectuer lrs enregistrement dans les tables inscriptioncontrat, paiementglobalcontrat et paiementcontrat ici pour etre sur que c'est apres que tout soit bien passe que les enregistrement dans ces tables sont effectue
-        
-                // ENREGISTREMENT DANS LA TABLE INSCRIPTIONCONTRAT
-                // Parcourir les mois cochés et insérer chaque id de mois dans la table Inscriptioncontrat
-                foreach ($moisCoches as $id_moiscontrat) {
-                    Inscriptioncontrat::create([
-                        'id_contrat' => $idcontratEleve, 
-                        'id_moiscontrat' => $id_moiscontrat,
-                        'anne_inscrption' => $anneeActuelle
-                    ]);
-                }
-
-
-
-
-           
-
-                // ENREGISTREMENT DANS LA TABLE PAIEMENTCONTRAT
-
-                // dd($soldeavant_paiementcontrat);
-
-                // dd($id_usercontrat);
-                // Parcourir les mois cochés et insérer chaque id de mois dans la table Inscriptioncontrat
-                foreach ($moisCoches as $id_moiscontrat) {
-
-                    Paiementcontrat::create([
-                        // 'id_paiementcontrat ' => $valeurDynamiqueidpaiemnetcontrat, 
-                        'soldeavant_paiementcontrat' => $montantmoiscontrat,
-                        'montant_paiementcontrat' => $montantmoiscontrat,
-                        'soldeapres_paiementcontrat' => 0,
-                        'id_contrat' => $idcontratEleve,
-                        'date_paiementcontrat' => $datepaiementcontrat,
-                        'id_usercontrat' => $id_usercontrat,
-                        'mois_paiementcontrat' => $id_moiscontrat,
-                        'anne_paiementcontrat' => $anneeActuelle,
-                        'reference_paiementcontrat' => $nouvelleReference,
-                        'statut_paiementcontrat' => 1,
-                        // 'datesuppr_paiementcontrat' => $anneeActuelle,
-                        // 'idsuppr_usercontrat' => $anneeActuelle,
-                        // 'motifsuppr_paiementcontrat' => $anneeActuelle,
-                        // 'id_paiementglobalcontrat' => 90,
-                        'montanttotal' => $montanttotal,
-
-                    ]);
-                }
-
 
                 // gestion du code qr sous forme d'image
 
