@@ -19,14 +19,21 @@
             <div class="tab-pane fade show active" id="nav-cantine" role="tabpanel" aria-labelledby="nav-cantine-tab">
                 <nav>
                     <div class="nav nav-tabs" id="nav-tab1" role="tablist">
-                      <button class="nav-link active" id="nav-identification-tab" data-bs-toggle="tab" data-bs-target="#nav-identification" type="button" role="tab" aria-controls="nav-identification" aria-selected="true">Identification</button>
-                      <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-frais&année" type="button" role="tab" aria-controls="nav-frais&année" aria-selected="false">Frais & Année</button>
+                      {{-- <button class="nav-link " id="nav-identification-tab" data-bs-toggle="tab" data-bs-target="#nav-identification" type="button" role="tab" aria-controls="nav-identification" aria-selected="true">Identification</button> --}}
+                      <button class="nav-link active" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-frais&année" type="button" role="tab" aria-controls="nav-frais&année" aria-selected="false">Frais & Année</button>
                       <button class="nav-link" id="nav-connexionBD-tab" data-bs-toggle="tab" data-bs-target="#nav-connexionBD" type="button" role="tab" aria-controls="nav-connexionBD" aria-selected="false">ConnexionBD</button>
                       <button class="nav-link" id="nav-facture-tab" data-bs-toggle="tab" data-bs-target="#nav-facture" type="button" role="tab" aria-controls="nav-facture" aria-selected="false">Facture</button>
                     </div>
                   </nav>
                   <div class="tab-content" id="nav-tabContent1">
-                    <div class="tab-pane fade show active" id="nav-identification" role="tabpanel" aria-labelledby="nav-identification-tab">
+
+                    @if(Session::has('status'))
+                    <div id="statusAlert" class="alert alert-succes btn-primary">
+                        {{ Session::get('status')}}
+                    </div>
+                    @endif
+                    
+                    {{-- <div class="tab-pane fade" id="nav-identification" role="tabpanel" aria-labelledby="nav-identification-tab">
                         <div class="row">
                             <div class="col-md-10 mx-auto grid-margin stretch-card">
                               <div class="card">
@@ -37,7 +44,7 @@
                                   </div>
                                   @endif
                                   {{-- erreur concernant un nouveau utilisateur --}}
-                                  @if($errors->any())
+                                  {{-- @if($errors->any())
                                   <div id="statusAlert" class="alert alert-danger">
                                       <ul>
                                           @foreach($errors->all() as $error)
@@ -97,26 +104,10 @@
                               
                             </div>
                           </div>
-                    </div>
+                    </div> --}}
 
-                    <div class="tab-pane fade" id="nav-frais&année" role="tabpanel" aria-labelledby="nav-frais&année-tab">
+                    <div class="tab-pane fade show active" id="nav-frais&année" role="tabpanel" aria-labelledby="nav-frais&année-tab">
                         <div class="content-wrapper">
-                            @if(Session::has('status'))
-                              <div id="statusAlert" class="alert alert-succes btn-primary">
-                              {{ Session::get('status')}}
-                              </div>
-                            @endif
-
-                            {{-- erreur concernant un nouveau utilisateur --}}
-                            {{-- @if($errors->any())
-                            <div id="statusAlert" class="alert alert-danger">
-                                <ul>
-                                    @foreach($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                            @endif --}}
                             @if($param)
                               <form action="{{url('modifierfrais/'.$param->id_paramcontrat)}}" method="POST">
                                 {{csrf_field()}}
@@ -263,12 +254,6 @@
                         <div class="col-md grid-margin stretch-card">
                             <div class="card">
                               <div class="card-body">  
-                                @if(Session::has('status'))
-                                <div  id="statusAlert" class="alert alert-succes btn-primary mb-4">
-                                {{ Session::get('status')}}
-                                </div>
-                                @endif
-
                                 {{-- erreur concernant la connexion a la base de donne --}}
                                 {{-- @if($errors->any())
                                 <div id="statusAlert" class="alert alert-danger">
@@ -337,12 +322,6 @@
                                       </label>
                                     </div>
                                   </div>
-                                  @if(Session::has('status'))
-                                    <div id="statusAlert" class="alert alert-succes btn-primary">
-                                      {{ Session::get('status')}}
-                                    </div>
-                                  @endif
-
                                   {{-- erreur concernant les infos emecef dans facture --}}
                                   {{-- @if($errors->any())
                                   <div id="statusAlert" class="alert alert-danger">
