@@ -1,20 +1,24 @@
 @extends('layouts.master')
 @section('content')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <div class="col-lg-12 grid-margin stretch-card">
   <div class="card">
     <div class="card-body">
-      <h4 class="card-title">Liste des contrats disponible</h4>
-      @if(Session::has('status'))
-      <div id="statusAlert" class="alert alert-succes btn-primary">
-        {{ Session::get('status')}}
-      </div>
-      @endif
-      @if(Session::has('erreur'))
-      <div id="statusAlert" class="alert alert-danger btn-primary">
-        {{ Session::get('erreur')}}
-      </div>
-      @endif
-      
+        <button class="btn btn-arrow" onclick="window.history.back();">
+            <i class="fas fa-arrow-left"></i> Retour
+        </button>
+      <h4 class="card-title" style="text-align: center;">Liste des contrats disponibles</h4>
+        @if(Session::has('status'))
+            <div id="statusAlert" class="alert alert-success btn-primary">
+            {{ Session::get('status')}}
+            </div>
+        @endif
+                @if(Session::has('erreur'))
+            <div id="statusAlert" class="alert alert-danger btn-primary">
+            {{ Session::get('erreur')}}
+            </div>
+        @endif
+
       <div class="form-group row">
         <div class="col-3">
           <select class="js-example-basic-multiple w-100" onchange="window.location.href=this.value">
@@ -317,7 +321,24 @@
                   //     });
                   // });
                 </script>
+              <style>
+                .btn-arrow {
+                    position: absolute;
+                    top: 0px; /* Ajustez la position verticale */
+                    left: 0px; /* Positionnez à gauche */
+                    background-color: transparent !important;
+                    border:1px !important;
+                    text-transform: uppercase !important;
+                    font-weight: bold !important;
+                    cursor: pointer!important;
+                    font-size: 17px!important; /* Taille de l'icône */
+                    color: #b51818!important; /* Couleur de l'icône */
+                }
                 
+                .btn-arrow:hover {
+                    color: #b700ff !important; /* Couleur au survol */
+                }
+                </style>
                 
                 @endsection
                 {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}

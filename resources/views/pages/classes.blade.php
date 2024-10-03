@@ -69,11 +69,11 @@
                         <div class="modal-dialog">
                           <div class="modal-content">
                             <div class="modal-header">
-                              <h1 class="modal-title fs-5" id="exampleModalLabel">Confirmation de suppression</h1>
+                              <h1 class="modal-title fs-5" id="exampleModalLabel">Confirmation de suspension</h1>
                               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                              Êtes-vous sûr de vouloir supprimer ce contrat ?
+                              Êtes-vous sûr de vouloir suspendre ce contrat ?
                             </div>
                             <div class="modal-footer">
                               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>

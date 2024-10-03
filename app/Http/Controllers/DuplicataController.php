@@ -102,11 +102,17 @@ class DuplicataController extends Controller
         return view('pages.Etats.pdfduplicatacontrat', compact('nomcompeleve', 'classeeleve', 'nomecole', 'ifuEcole', 'logo', 'factureIns'));
     }
 
-    public function pdfduplicatapaie($idfacture)
+    public function pdfduplicatapaie($counters)
     {
+        $counters1 = substr_replace(preg_replace('/_/', '/', $counters, 1), ' ', -2, 0);
+        // dd($counters1);
+
+
         $facturePaie = DB::table('facturenormalises')
-            ->where('idcontrat', $idfacture)
+            ->where('counters', $counters1)
             ->first();
+
+            // dd($facturePaie);
 
         $infoecole = DB::table('params2')->first();
         $nomecole = $infoecole->NOMETAB;

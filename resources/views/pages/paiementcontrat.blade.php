@@ -1,8 +1,31 @@
+
 @extends('layouts.master')
 @section('content')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+  .btn-arrow {
+      position: absolute;
+      top: 0px; /* Ajustez la position verticale */
+      left: 0px; /* Positionnez à gauche */
+      background-color: transparent !important;
+      border:1px !important;
+      text-transform: uppercase !important;
+      font-weight: bold !important;
+      cursor: pointer!important;
+      font-size: 17px!important; /* Taille de l'icône */
+      color: #b51818!important; /* Couleur de l'icône */
+  }
+  
+  .btn-arrow:hover {
+      color: #b700ff !important; /* Couleur au survol */
+  }
+  </style>
     <div class="col-lg-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
+       <button class="btn btn-arrow" onclick="window.history.back();">
+            <i class="fas fa-arrow-left"></i> Retour
+        </button>
 
                                   {{-- erreur concernant le paiement --}}
                                   @if($errors->any())
@@ -57,20 +80,30 @@
                     <div class="col-md-8 mx-auto grid-margin stretch-card">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="card-title">Mois a payer</h4>
+                                <h4 class="card-title">Mois impayés</h4>
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
+                                                {{-- @php
+                                                    if (count($moisCorrespondants) <= 0) {
+                                                        $nommois = "l'eleve est a jour";
+                                                    }
+                                                @endphp --}}
+                                                {{-- @if (count($moisCorrespondants) <= 0)
+                                                    <h5>L'eleve est a jour</h5>
+                                                @else --}}
+                                                    {{-- <p>{{ $nommois }}</p> --}}
                                                 @foreach ($moisCorrespondants as $id_moiscontrat => $nom_moiscontrat)
-                                                    <div class="form-check">
-                                                        <label class="form-check-label">
-                                                            <input type="checkbox" name="moiscontrat[]" class="form-check-input checkbox-mois"
-                                                                value="{{ $id_moiscontrat }}">
-                                                            {{ $nom_moiscontrat }}
-                                                        </label>
-                                                    </div>
+                                                <div class="form-check">
+                                                    <label class="form-check-label">
+                                                        <input type="checkbox" name="moiscontrat[]" class="form-check-input checkbox-mois"
+                                                        value="{{ $id_moiscontrat }}">
+                                                        {{ $nom_moiscontrat }}
+                                                    </label>
+                                                </div>
                                                 @endforeach
-                    
+                                                {{-- @endif --}}
+                                                    
                                             </div>
                                         </div>
                                     </div>

@@ -1,19 +1,31 @@
 @extends('layouts.master')
 
 @section('content')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+  .btn-arrow {
+      position: absolute;
+      top: 0px; /* Ajustez la position verticale */
+      left: 0px; /* Positionnez à gauche */
+      background-color: transparent !important;
+      border:1px !important;
+      text-transform: uppercase !important;
+      font-weight: bold !important;
+      cursor: pointer!important;
+      font-size: 17px!important; /* Taille de l'icône */
+      color: #b51818!important; /* Couleur de l'icône */
+  }
+  
+  .btn-arrow:hover {
+      color: #b700ff !important; /* Couleur au survol */
+  }
+  </style>
     <div class="card">
         <div class="card-body">
-            <div class="tab-content col-md-12" id="nav-tabContent">
-                <!-- Onglet principal -->
-                <div class="tab-pane fade show active" id="nav-cantine" role="tabpanel" aria-labelledby="nav-cantine-tab">
-                    <nav>
-                        <div class="nav nav-tabs" id="nav-tab1" role="tablist">
-                            <button class="nav-link active" id="nav-etatdroitconstate-tab" data-bs-toggle="tab"
-                                data-bs-target="#nav-etatdroitconstate" type="button" role="tab"
-                                aria-controls="nav-etatdroitconstate" aria-selected="true">Duplicata Facture</button>
-                        </div>
-                    </nav>
-                    <br><br>
+       <button class="btn btn-arrow" onclick="window.history.back();">
+            <i class="fas fa-arrow-left"></i> Retour
+        </button>
+        <br></br>
 
                     <!-- Affichage des messages d'erreur -->
                     @if ($errors->any())
@@ -44,15 +56,15 @@
                                 </select>
                             </div>
 
-                            <!-- Sélection du type de facture -->
-                            <div class="col-3">
-                                <select class="js-example-basic-multiple w-100" id="facture-type-select"
-                                    name="facture_type">
-                                    <option value="">Sélectionnez un type de facture</option>
-                                    <option value="facturenormalises">Facture de paiement</option>
-                                    <option value="contrat">Facture d'inscription</option>
-                                </select>
-                            </div>
+        <!-- Sélection du type de facture -->
+        <div class="col-4"> <!-- Augmentation de la largeur -->
+            <select class="js-example-basic-multiple w-100" id="facture-type-select"
+                name="facture_type">
+                <option value="">Sélectionnez un type de facture</option>
+                <option value="facturenormalises">Facture de paiement</option>
+                <option value="contrat">Facture d'inscription</option>
+            </select>
+        </div>
 
                             <!-- Bouton pour afficher les résultats -->
                             <div class="col-3">
@@ -90,7 +102,7 @@
                                                     </td>
                                                     <td>{{ $facture->montant_total }}</td>
                                                     <td>
-                                                        <a href="{{ url('pdfduplicatapaie/' . $facture->idcontrat) }}"
+                                                        <a href="{{ url('pdfduplicatapaie/' . str_replace(' ', '', preg_replace('/\//', '_', trim($facture->counters), 1))) }}"
                                                             class="btn btn-primary">
                                                             Imprimer
                                                         </a>

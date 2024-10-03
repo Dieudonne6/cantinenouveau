@@ -267,62 +267,74 @@ class ClassesController extends Controller
                 // dd($moisCorrespondants);
 
 
-
-                if (($CODECLAS === "MAT1") || ($CODECLAS === "MAT2")  || ($CODECLAS === "MAT2II")  || ($CODECLAS === "MAT3")  || ($CODECLAS === "MAT3II")  || ($CODECLAS === "PREMATER")) {
-
-                    // echo("oui l'eleve est de la maternelle");
-
-                    $pramcontrat = Paramcontrat::first();
-                    $fraismensuelle = $pramcontrat->fraisinscription2_paramcontrat;
-                    // dd($fraismensuelle);
-
-                    if($inscriptioncontrats){
-                        // echo("le contrat existe dans la table inscriptioncontrat");
-                        // dd($inscriptioncontrat);
-                        // dd($moiscontrat);
-                        
-                        return view('pages.paiementcontrat')->with('fraismensuelle', $fraismensuelle)->with('moisCorrespondants', $moisCorrespondants)->with('nomCompletEleveCon', $nomCompletEleveCon);
-
-                    }
-                    else {
-                        // $moisCorrespondants = Moiscontrat::pluck('nom_moiscontrat', 'id_moiscontrat')->toArray();
-
-                        // echo("le contrat n'existe pas dans la table inscriptioncontrat");
-                        
-                        return view('pages.paiementcontrat')->with('fraismensuelle', $fraismensuelle)->with('moisCorrespondants', $moisCorrespondants)->with('nomCompletEleveCon', $nomCompletEleveCon);
-
-                    }
-
-
+                if (count($moisCorrespondants) <= 0){
+                    return redirect()->back()->with('status','L\'eleve est a jour');
+                    // dd('moisCorrespondants > 0');
                 }else{
+                    if (($CODECLAS === "MAT1") || ($CODECLAS === "MAT2")  || ($CODECLAS === "MAT2II")  || ($CODECLAS === "MAT3")  || ($CODECLAS === "MAT3II")  || ($CODECLAS === "PREMATER")) {
 
-                    // echo("non l'eleve n'est pas de la maternelle");
+                        // echo("oui l'eleve est de la maternelle");
 
-                    $pramcontrat = Paramcontrat::first();
-                    $fraismensuelle = $pramcontrat->coutmensuel_paramcontrat;
-                    // dd($fraismensuelle);
+                        $pramcontrat = Paramcontrat::first();
+                        $fraismensuelle = $pramcontrat->fraisinscription2_paramcontrat;
+                        // dd($fraismensuelle);
 
-                    if($inscriptioncontrats){
-                        // echo("le contrat existe dans la table inscriptioncontrat");
-                        // dd($inscriptioncontrat);
-                        // dd($moiscontrat);
+                        if($inscriptioncontrats){
+                            // echo("le contrat existe dans la table inscriptioncontrat");
+                            // dd($inscriptioncontrat);
+                            // dd($moiscontrat);
+                            // dd($moisCorrespondants);
+                            return view('pages.paiementcontrat')->with('fraismensuelle', $fraismensuelle)->with('moisCorrespondants', $moisCorrespondants)->with('nomCompletEleveCon', $nomCompletEleveCon);
+
+                        }
+                        else {
+                            // dd($moisCorrespondants);
+
+                            // $moisCorrespondants = Moiscontrat::pluck('nom_moiscontrat', 'id_moiscontrat')->toArray();
+
+                            // echo("le contrat n'existe pas dans la table inscriptioncontrat");
+                            
+                            return view('pages.paiementcontrat')->with('fraismensuelle', $fraismensuelle)->with('moisCorrespondants', $moisCorrespondants)->with('nomCompletEleveCon', $nomCompletEleveCon);
+
+                        }
+
+
+                    }else{
+
+                        // echo("non l'eleve n'est pas de la maternelle");
+
+                        $pramcontrat = Paramcontrat::first();
+                        $fraismensuelle = $pramcontrat->coutmensuel_paramcontrat;
+                        // dd($fraismensuelle);
+
+                        if($inscriptioncontrats){
+                            // dd($moisCorrespondants);
+
+                            // echo("le contrat existe dans la table inscriptioncontrat");
+                            // dd($inscriptioncontrat);
+                            // dd($moiscontrat);
+                            
+                            return view('pages.paiementcontrat')->with('fraismensuelle', $fraismensuelle)->with('moisCorrespondants', $moisCorrespondants)->with('nomCompletEleveCon', $nomCompletEleveCon);
+
+                        }
+                        else {
+                            // dd($moisCorrespondants);
+
+                            // $moisCorrespondants = Moiscontrat::pluck('nom_moiscontrat', 'id_moiscontrat')->toArray();
+
+                            return view('pages.paiementcontrat')->with('fraismensuelle', $fraismensuelle)->with('moisCorrespondants', $moisCorrespondants)->with('nomCompletEleveCon', $nomCompletEleveCon);
+
+                        }
+
                         
-                        return view('pages.paiementcontrat')->with('fraismensuelle', $fraismensuelle)->with('moisCorrespondants', $moisCorrespondants)->with('nomCompletEleveCon', $nomCompletEleveCon);
+
+
+                        // return view('pages.paiementcontrat')->with('fraismensuelle', $fraismensuelle);
 
                     }
-                    else {
-                        // $moisCorrespondants = Moiscontrat::pluck('nom_moiscontrat', 'id_moiscontrat')->toArray();
-
-                        return view('pages.paiementcontrat')->with('fraismensuelle', $fraismensuelle)->with('moisCorrespondants', $moisCorrespondants)->with('nomCompletEleveCon', $nomCompletEleveCon);
-
-                    }
-
-                    
-
-
-                    // return view('pages.paiementcontrat')->with('fraismensuelle', $fraismensuelle);
-
                 }
+            
+
             } else {
                 // return view('pages.inscriptioncontrat');
                 return back()->with('status','Le contrat n\'existe pas.Veuillez créer un contrat pour l\'eleve');

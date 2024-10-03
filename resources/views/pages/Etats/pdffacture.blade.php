@@ -17,7 +17,16 @@
     
         font-size: 15px;
     }
-    
+
+    /* .bas{
+        bottom: 4rem;
+    } */
+    /*.footer {
+        position: fixed; 
+        bottom: 0;
+        width: 100%;
+        z-index: 10; 
+    }*/
     
     
     
@@ -92,7 +101,7 @@
     
     .invoice {
         width: 60%;
-        height: 59rem;
+        height: 62.9rem;
         background-color: #ffff;
         padding: 0;
         page-break-before: always;
@@ -356,7 +365,9 @@
 </style>
 
 
-<body>
+{{-- <body> --}}
+<div class="col-lg-12 grid-margin stretch-card">
+
     <a class="telecharger btn btn-success" href="{{ url('/facturenormalise/' . $nomcompleteleve) }}" target="_blank">Imprimer</a>
 
     <div class="invoice">
@@ -435,7 +446,7 @@
                         </table>
                     </div>
                 </div>
-            </section>
+    </section>
 
             <div class="table2">
                 <table id="customers">
@@ -545,7 +556,8 @@
             <p class="textremerciement"><i>Merci d'avoir choisi le {{ $NOMETAB }}</i></p>
         </div>
     </div>
-</body>
+</div>
+{{-- </body> --}}
 
-    @endsection
+@endsection
 
