@@ -1869,8 +1869,19 @@ public function etat() {
     
     //     return back()->with('status','Contrat enregistré avec succès');
     // }
+    public function verifyContrat(Request $request){
+        $eleveId = $request->input('eleve_contrat');
 
+    // Vérification si un contrat existe déjà pour cet élève
+    $contratExistant = Contrat::where('eleve_contrat', $eleveId)
+                               ->where('statut_contrat', 0)
+                               ->first();
 
+    // Retourner la réponse JSON
+    return response()->json([
+        'contratExistant' => $contratExistant ? true : false
+    ]);
+    }
     public function creercontrat(InscriptionCantineRequest $request){
         // Récupérer les informations de la requête
 
@@ -1935,6 +1946,7 @@ public function etat() {
                                             //    dd($ifu);
                     if ($contratExistant) {
                         // Mettre à jour le contrat existant
+                        
                         $contratExistant->cout_contrat = $montant;
                         $contratExistant->id_usercontrat = $idUserContrat;
                         $contratExistant->statut_contrat = 1;
@@ -1990,12 +2002,6 @@ public function etat() {
                 }
 
             // }
-
-
-
-
-         
-        
     }
     
    
@@ -2112,7 +2118,7 @@ public function etat() {
                         // Récupérer le nom de l'élève à partir de la table Eleve
                         $eleve = Eleve::where('MATRICULE', $matriculeEleve)->first();
                         $users = User::where('id', '=', $iduser)->first();
-                        // dd($users);
+                        //dd($users);
 
                         if ($eleve) {
                             $moisContrat = Moiscontrat::where('id_moiscontrat', $paiement->mois_paiementcontrat)->first();
@@ -2135,7 +2141,7 @@ public function etat() {
             
                             // Ajouter les informations de paiement avec le nom de l'élève à la collection
                             $paiementsAvecEleves->push([
-                                // dd($user->login),
+                                // dd($users->login),
                                 'user' => $users->login,
                                 'id_contrat' => $idContrat,
                                 'nomcomplet_eleve' => $eleve->NOM .' '. $eleve->PRENOM,
@@ -2168,7 +2174,7 @@ public function etat() {
 
                 if ($paiementsAvecEleves->isEmpty()) {
                     // Aucun paiement trouvé pour les dates spécifiées
-                    return redirect('etatpaiement')->with('status', 'Aucun paiement trouvé pour la periode spécifiées.')->with('paiementsAvecEleves', $paiementsAvecEleves);
+                    return redirect('etat')->with('status', 'Aucun paiement trouvé pour la periode spécifiées.')->with('paiementsAvecEleves', $paiementsAvecEleves);
                 } else {
                     // Afficher les résultats avec les noms des élèves
                     return view('pages.etatpaiement1')->with('paiementsAvecEleves', $paiementsAvecEleves)->with('dateFormateedebut', $dateFormateedebut)->with('dateFormateefin', $dateFormateefin);
