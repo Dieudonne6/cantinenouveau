@@ -26,6 +26,7 @@ Route::get('/inscriptioncantine', [PagesController::class, 'inscriptioncantine']
 Route::get('/get-eleves/{codeClass}', [PagesController::class, 'getEleves']);
 Route::get('/get-montant/{codeClass}', [PagesController::class, 'getMontant']);
 Route::post('/verifyContrat', [ClassesController::class, 'verifyContrat']);
+Route::post('/eleve/verifyContrat', [ClassesController::class, 'verifyContrat']);
 
 Route::get('/nouveaucontrat', [PagesController::class, 'nouveaucontrat']);
 Route::get('/paiement', [PagesController::class, 'paiement']);

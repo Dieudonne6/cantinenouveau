@@ -376,7 +376,6 @@ $(document).ready(function(){
     $(document).ready(function () {
     $('#enregistrerBtn').click(function (e) {
         e.preventDefault();
-        console.log('pop');
         // Récupérer les données du formulaire pour l'identifier (par exemple l'élève)
         var eleveId = $('#eleveSelect').val();
         
@@ -399,7 +398,30 @@ $(document).ready(function(){
             }
         });
     });
-
+    $('#enregistrerBt').click(function (e) {
+        e.preventDefault();
+        // Récupérer les données du formulaire pour l'identifier (par exemple l'élève)
+        var eleveId = $('#eleveSelect').val();
+        
+        // Requête AJAX pour vérifier si un contrat existe déjà
+        $.ajax({
+            url: '/eleve/verifyContrat',
+            type: 'POST',
+            data: {
+              _token: '{{ csrf_token() }}',
+                eleve_contrat: eleveId
+            },
+            success: function (response) {
+                if (response.contratExistant) {
+                    // Si un contrat existe, on affiche la modal
+                    $('#confirmationModal').modal('show');
+                } else {
+                    // Sinon, on soumet directement le formulaire
+                    $('#myModalForm').submit();
+                }
+            }
+        });
+    });
     // Quand l'utilisateur confirme "Oui" dans la modal
     $('#confirmYesBtn').click(function () {
         // Soumission du formulaire après confirmation
