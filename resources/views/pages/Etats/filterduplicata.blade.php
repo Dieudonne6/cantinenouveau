@@ -26,7 +26,17 @@
             <i class="fas fa-arrow-left"></i> Retour
         </button>
         <br></br>
-
+        <div class="tab-content col-md-12" id="nav-tabContent">
+            <!-- Onglet principal -->
+            <div class="tab-pane fade show active" id="nav-cantine" role="tabpanel" aria-labelledby="nav-cantine-tab">
+                <nav>
+                    <div class="nav nav-tabs" id="nav-tab1" role="tablist">
+                        <button class="nav-link active" id="nav-etatdroitconstate-tab" data-bs-toggle="tab"
+                            data-bs-target="#nav-etatdroitconstate" type="button" role="tab"
+                            aria-controls="nav-etatdroitconstate" aria-selected="true">Duplicata Facture</button>
+                    </div>
+                </nav>
+                <br><br>
                     <!-- Affichage des messages d'erreur -->
                     @if ($errors->any())
                         <div class="alert alert-danger">
