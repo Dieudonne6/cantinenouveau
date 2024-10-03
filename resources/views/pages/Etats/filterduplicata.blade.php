@@ -97,8 +97,8 @@
                                                     </td>
                                                 </tr>
                                             @else
-                                                <div class="col" style="background-color: red; color: white; text-align: center;">
-                                                    <p>Aucun contrat trouvé pour l'élève sélectionné.</p>
+                                                <div class="alert alert-warning">
+                                                    Aucun contrat trouvé pour l'élève sélectionné.
                                                 </div>
                                             @endif
                                         @endforeach
@@ -144,8 +144,8 @@
                                                     </td>
                                                 </tr>
                                             @else
-                                                <div class="col" style="background-color: red; color: white; text-align: center;">
-                                                    <p>Aucun contrat trouvé pour l'élève sélectionné.</p>
+                                                <div class="alert alert-warning">
+                                                    Aucun contrat trouvé pour l'élève sélectionné.
                                                 </div>
                                             @endif
                                         @endforeach

@@ -1,140 +1,162 @@
-<?php
+@extends('layouts.master')
 
-namespace App\Http\Controllers;
+@section('content')
+    <div class="card">
+        <div class="card-body">
+            <div class="tab-content col-md-12" id="nav-tabContent">
+                <!-- Onglet principal -->
+                <div class="tab-pane fade show active" id="nav-cantine" role="tabpanel" aria-labelledby="nav-cantine-tab">
+                    <nav>
+                        <div class="nav nav-tabs" id="nav-tab1" role="tablist">
+                            <button class="nav-link active" id="nav-etatdroitconstate-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-etatdroitconstate" type="button" role="tab"
+                                aria-controls="nav-etatdroitconstate" aria-selected="true">Duplicata Facture</button>
+                        </div>
+                    </nav>
+                    <br><br>
 
-use Illuminate\Http\Request;
-use App\Models\Facturenormalise;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Session;
-use App\Models\Contrat;
-use App\Models\Eleve;
-use App\Models\Params2;
-use Illuminate\Support\Facades\Validator;
+                    <!-- Affichage des messages d'erreur -->
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            {{ $errors->first() }}
+                        </div>
+                    @endif
 
-class DuplicataController extends Controller
-{
-    // Afficher le formulaire avec les données nécessaires
-    public function showForm()
-    {
-        $eleves = Eleve::all();
-        $facturesPaiement = Facturenormalise::all();
-        $facturesInscription = Contrat::all();
+                    @if (isset($message))
+                        <div class="alert alert-warning">
+                            {{ $message }}
+                        </div>
+                    @endif
 
-        return view('pages.Etats.filterduplicata', [
-            'eleves' => $eleves,
-            'facturesPaiement' => $facturesPaiement,
-            'facturesInscription' => $facturesInscription,
-        ]);
-    }
+                    <!-- Formulaire de filtrage -->
+                    <form method="POST" action="{{ route('filterduplicata') }}">
+                        @csrf
+                        <div class="row">
+                            <!-- Sélection de l'élève -->
+                            <div class="col-3">
+                                <select class="js-example-basic-multiple w-100" id="eleve-select" name="eleve_id">
+                                    <option value="">Sélectionnez un élève</option>
+                                    @foreach ($eleves as $eleve)
+                                        <option value="{{ $eleve->MATRICULE }}">
+                                            {{ $eleve->NOM }} {{ $eleve->PRENOM }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-    public function filterduplicata(Request $request)
-    {
-        // Validation des données du formulaire
-        $validator = Validator::make($request->all(), [
-            'eleve_id' => 'required_if:facture_type,!=,',
-            'facture_type' => 'required_if:eleve_id,!=,',
-        ]);
+                            <!-- Sélection du type de facture -->
+                            <div class="col-3">
+                                <select class="js-example-basic-multiple w-100" id="facture-type-select"
+                                    name="facture_type">
+                                    <option value="">Sélectionnez un type de facture</option>
+                                    <option value="facturenormalises">Facture de paiement</option>
+                                    <option value="contrat">Facture d'inscription</option>
+                                </select>
+                            </div>
 
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
+                            <!-- Bouton pour afficher les résultats -->
+                            <div class="col-3">
+                                <button type="submit" id="afficher-btn" class="btn btn-primary w-100">Afficher</button>
+                            </div>
+                        </div>
+                    </form>
 
-        $idEleve = $request->input('eleve_id');
-        $factureType = $request->input('facture_type');
+                    <!-- Tableau pour afficher les factures -->
+                    @if (isset($factures) && $factures->count() > 0)
+                        <div class="table-responsive pt-3">
+                            <div id="mytable">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>N° de facture</th>
+                                            <th>Date de facture</th>
+                                            <th>Montant Total</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($factures as $facture)
+                                            @if ($facture->montant_total > 0)
+                                                <tr>
+                                                    <td>{{ $facture->nim }}/{{ $facture->counters }}</td>
+                                                    <td>
+                                                        {{
+                                                            \Carbon\Carbon::hasFormat($facture->dateHeure, 'Y-m-d H:i:s') 
+                                                            ? \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $facture->dateHeure)->format('d/m/Y') 
+                                                            : (\Carbon\Carbon::hasFormat($facture->dateHeure, 'd/m/Y H:i:s') 
+                                                            ? \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', $facture->dateHeure)->format('d/m/Y') 
+                                                            : 'Format de date non supporté')
+                                                          }}
+                                                    </td>
+                                                    <td>{{ $facture->montant_total }}</td>
+                                                    <td>
+                                                        <a href="{{ url('pdfduplicatapaie/' . $facture->idcontrat) }}"
+                                                            class="btn btn-primary">
+                                                            Imprimer
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            {{-- @else
+                                                <div class="col" style="text-align: center;">
+                                                    <p>Aucun contrat trouvé pour l'élève sélectionné.</p>
+                                                </div> --}}
+                                            @endif
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    @endif
 
-        $facture = null;
-        $contrat = null;
-        $message = null;
 
-        // Vérification et récupération des données en fonction du type de facture
-        if ($factureType) {
-            if ($factureType === 'facturenormalises') {
-                $facture = Facturenormalise::where('MATRICULE', $idEleve)->get();
-                if ($facture->isEmpty()) {
-                    $message = 'Aucune facture de paiement trouvée pour l\'élève sélectionné.';
-                }
-            } elseif ($factureType === 'contrat') {
-                $contrat = Contrat::where('eleve_contrat', $idEleve)->get();
-                if ($contrat->isEmpty()) {
-                    $message = 'Aucun contrat trouvé pour l\'élève sélectionné.';
-                }
-            }
-        } else {
-            $message = 'Veuillez sélectionner un type de facture.';
-        }
+                    @if (isset($contrats) && $contrats->count() > 0)
+                        <div class="table-responsive pt-3">
+                            <div id="mytable">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>N° de facture</th>
+                                            <th>Date de facture</th>
+                                            <th>Montant Total</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($contrats as $contrat)
+                                            @if ($contrat->cout_contrat > 0)
+                                                <tr>
+                                                    <td>{{ $contrat->eleve_contrat }}</td>
+                                                    <td>
+                                                        {{
+                                                            \Carbon\Carbon::hasFormat($contrat->datecreation_contrat, 'Y-m-d H:i:s') 
+                                                            ? \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $contrat->datecreation_contrat)->format('d/m/Y ') 
+                                                            : (\Carbon\Carbon::hasFormat($contrat->datecreation_contrat, 'd/m/Y H:i:s') 
+                                                            ? \Carbon\Carbon::createFromFormat('d/m/Y H:i:s', $contrat->datecreation_contrat)->format('d/m/Y ') 
+                                                            : 'Format de date non supporté')
+                                                          }}
+                                                    </td>
+                                                    <td>{{ $contrat->cout_contrat }}</td>
+                                                    <td>
+                                                        <a href="{{ url('pdfduplicatacontrat/' . $contrat->id_contrat) }}"
+                                                            class="btn btn-primary">
+                                                            Imprimer
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            {{-- @else
+                                                <div class="col" style="text-align: center;">
+                                                    <p>Aucun contrat trouvé pour l'élève sélectionné.</p>
+                                                </div> --}}
+                                            @endif
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    @endif
 
-        $eleves = Eleve::all();
-        $facturesPaiement = Facturenormalise::all();
-        $facturesInscription = Contrat::all();
-
-        return view('pages.Etats.filterduplicata', [
-            'eleves' => $eleves,
-            'facturesPaiement' => $facturesPaiement,
-            'facturesInscription' => $facturesInscription,
-            'factures' => $facture,
-            'contrats' => $contrat,
-            'message' => $message,
-        ]);
-    }
-
-    public function pdfduplicatacontrat($idcontrat)
-    {
-        $factureIns = Contrat::where('id_contrat', $idcontrat)->first();
-        $infoeleves = Eleve::where('MATRICULE', $factureIns->eleve_contrat)->first();
-        $nomcompeleve = $infoeleves->NOM . ' ' . $infoeleves->PRENOM;
-        $classeeleve = $infoeleves->CODECLAS;
-        $infoecole = Params2::first();
-        $nomecole = $infoecole->NOMETAB;
-        $ifuEcole = $infoecole->ifu;
-        $logo = $infoecole->logoimage;
-
-        Session::put('factureIns', $factureIns);
-
-        return view('pages.Etats.pdfduplicatacontrat', compact('nomcompeleve', 'classeeleve', 'nomecole', 'ifuEcole', 'logo', 'factureIns'));
-    }
-
-    public function pdfduplicatapaie($idfacture)
-    {
-        $facturePaie = DB::table('facturenormalises')->where('idcontrat', $idfacture)->first();
-
-        $infoecole = DB::table('params2')->first();
-        $nomecole = $infoecole->NOMETAB;
-        $logo = $infoecole->logoimage;
-
-        return view('pages.Etats.pdfduplicatapaie', compact('nomecole', 'logo', 'facturePaie'));
-    }
-
-    public function duplicatainscription2()
-    {
-        $amount = Session::get('amount');
-        $classe = Session::get('classe');
-        $logoUrl = Session::get('logoUrl');
-        $dateContrat = Session::get('dateContrat');
-        $elevyo = Session::get('elevyo');
-        $data = [
-            'amount' => $amount,
-            'classe' => $classe,
-            'logoUrl' => $logoUrl,
-            'dateContrat' => $dateContrat,
-            'elevyo' => $elevyo,
-        ];
-
-        $factureIns = Session::get('factureIns');
-
-        $fileName = $elevyo . time() . '.pdf';
-        $filePaths = public_path('pdfs/' . $fileName);
-
-        if (!file_exists(public_path('pdfs'))) {
-            mkdir(public_path('pdfs'), 0755, true);
-        }
-
-        return view('pages.Etats.duplicatainscription2', [
-            'amount' => $amount,
-            'classe' => $classe,
-            'logoUrl' => $logoUrl,
-            'dateContrat' => $dateContrat,
-            'elevyo' => $elevyo,
-            'factureIns' => $factureIns,
-        ]);
-    }
-}
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
