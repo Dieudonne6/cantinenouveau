@@ -4,21 +4,41 @@
 <div class="col-lg-12 grid-margin stretch-card">
   <div class="card">
     <div class="card-body">
-        <button class="btn btn-arrow" onclick="window.history.back();">
+      <div class="d-flex justify-content-between">
+        <div>
+          <button class="btn btn-arrow" onclick="window.history.back();">
             <i class="fas fa-arrow-left"></i> Retour
-        </button>
-      <h4 class="card-title" style="text-align: center;">Liste des contrats disponibles</h4>
-        @if(Session::has('status'))
-            <div id="statusAlert" class="alert alert-success btn-primary">
-            {{ Session::get('status')}}
-            </div>
-        @endif
-                @if(Session::has('erreur'))
-            <div id="statusAlert" class="alert alert-danger btn-primary">
-            {{ Session::get('erreur')}}
-            </div>
-        @endif
-
+          </button>
+        </div>
+        
+        <div class="card-title"> Liste des contrats disponibles </div>
+        <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">Aide</button>
+        
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasRightLabel">Liste des contrats</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <p>1-Sélectionner une classe: Affiche uniquement la liste des élèves de la classe ayant un contrat. </p>
+            <p>2-Possibilité de rechercher un élève. 
+            </p>
+            <p>3-Nouveau contrat: Permet de créer un nouveau contrat. 
+            </p>
+          </div>
+        </div> 
+      </div>
+      @if(Session::has('status'))
+      <div id="statusAlert" class="alert alert-success btn-primary">
+        {{ Session::get('status')}}
+      </div>
+      @endif
+      @if(Session::has('erreur'))
+      <div id="statusAlert" class="alert alert-danger btn-primary">
+        {{ Session::get('erreur')}}
+      </div>
+      @endif
+      
       <div class="form-group row">
         <div class="col-3">
           <select class="js-example-basic-multiple w-100" onchange="window.location.href=this.value">
@@ -210,7 +230,7 @@
         </div>
       </div>
     </div>
-
+    
     <div class="modal fade" id="exampleInscrire" tabindex="-1" aria-labelledby="exampleInscrireLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -276,73 +296,73 @@
         </div>
       </div>
     </div>
-     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script> 
     
-   
-
+    
+    
     <script>
       // $(document).ready(function() {
-        //     $('#nouveaucontrat').on('hidden.bs.modal', function () {
-          //         // Réinitialiser les champs du formulaire
-          //         $('#myModalForm')[0].reset();
-          
-          //         // Réinitialiser les selects
-          //         $('#myModalForm select').each(function() {
-            //             $(this).prop('selectedIndex', 0);
-            //         });
-            //     });
-            // });
-            
-            document.addEventListener('DOMContentLoaded', function() {
-              var myModal = new bootstrap.Modal(document.getElementById('nouveaucontrat'));
-              
-              @if ($errors->any())
-              myModal.show();
-              @endif
-              
-              // Réinitialiser les champs du formulaire à la fermeture du modal
-              document.getElementById('nouveaucontrat').addEventListener('hidden.bs.modal', function () {
-                document.getElementById('myModalForm').reset();
-                document.querySelectorAll('#myModalForm .form-control').forEach(input => input.value = '');
-              });
-            });
-            
-            // document.addEventListener('DOMContentLoaded', function() {
-              //     var myModal = document.getElementById('nouveaucontrat');
-              //     myModal.addEventListener('hidden.bs.modal', function () {
-                //         // Réinitialiser les champs du formulaire
-                //         document.getElementById('myModalForm').reset();
-                
-                //         // Réinitialiser les champs de sélection
-                //         var selects = document.querySelectorAll('#myModalForm select');
-                //         selects.forEach(function(select) {
-                  //             select.selectedIndex = 0;
-                  //         });
-                  //     });
-                  // });
-                </script>
-              <style>
-                .btn-arrow {
-                    position: absolute;
-                    top: 0px; /* Ajustez la position verticale */
-                    left: 0px; /* Positionnez à gauche */
-                    background-color: transparent !important;
-                    border:1px !important;
-                    text-transform: uppercase !important;
-                    font-weight: bold !important;
-                    cursor: pointer!important;
-                    font-size: 17px!important; /* Taille de l'icône */
-                    color: #b51818!important; /* Couleur de l'icône */
-                }
-                
-                .btn-arrow:hover {
-                    color: #b700ff !important; /* Couleur au survol */
-                }
-                </style>
-                
-                @endsection
-                {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
-                {{-- <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script> --}}
-                
-                
-                
+      //     $('#nouveaucontrat').on('hidden.bs.modal', function () {
+      //         // Réinitialiser les champs du formulaire
+      //         $('#myModalForm')[0].reset();
+      
+      //         // Réinitialiser les selects
+      //         $('#myModalForm select').each(function() {
+      //             $(this).prop('selectedIndex', 0);
+      //         });
+      //     });
+      // });
+      
+      document.addEventListener('DOMContentLoaded', function() {
+        var myModal = new bootstrap.Modal(document.getElementById('nouveaucontrat'));
+        
+        @if ($errors->any())
+        myModal.show();
+        @endif
+        
+        // Réinitialiser les champs du formulaire à la fermeture du modal
+        document.getElementById('nouveaucontrat').addEventListener('hidden.bs.modal', function () {
+          document.getElementById('myModalForm').reset();
+          document.querySelectorAll('#myModalForm .form-control').forEach(input => input.value = '');
+        });
+      });
+      
+      // document.addEventListener('DOMContentLoaded', function() {
+      //     var myModal = document.getElementById('nouveaucontrat');
+      //     myModal.addEventListener('hidden.bs.modal', function () {
+      //         // Réinitialiser les champs du formulaire
+      //         document.getElementById('myModalForm').reset();
+      
+      //         // Réinitialiser les champs de sélection
+      //         var selects = document.querySelectorAll('#myModalForm select');
+      //         selects.forEach(function(select) {
+      //             select.selectedIndex = 0;
+      //         });
+      //     });
+      // });
+    </script>
+    <style>
+      .btn-arrow {
+        position: absolute;
+        top: 0px; /* Ajustez la position verticale */
+        left: 0px; /* Positionnez à gauche */
+        background-color: transparent !important;
+        border:1px !important;
+        text-transform: uppercase !important;
+        font-weight: bold !important;
+        cursor: pointer!important;
+        font-size: 17px!important; /* Taille de l'icône */
+        color: #b51818!important; /* Couleur de l'icône */
+      }
+      
+      .btn-arrow:hover {
+        color: #b700ff !important; /* Couleur au survol */
+      }
+    </style>
+    
+    @endsection
+    {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
+    {{-- <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script> --}}
+    
+    
+    
