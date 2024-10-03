@@ -1574,6 +1574,8 @@ public function show($id)
         $nometab = Session::get('nometab');
         $ifu = Session::get('ifu');
 
+        // dd($nometab);
+
 
         $data = [
             'amount' => $amount,
@@ -1871,6 +1873,8 @@ public function etat() {
                                                $logoUrl = $paramse ? $paramse->logoimage: null; 
                                                $nometab = $paramse->NOMETAB; 
                                                $ifu = $paramse->ifu; 
+
+                                            //    dd($ifu);
                     if ($contratExistant) {
                         // Mettre à jour le contrat existant
                         $contratExistant->cout_contrat = $montant;
@@ -1910,6 +1914,8 @@ public function etat() {
                         Session::put('logoUrl', $logoUrl);
                         Session::put('dateContrat', $dateContrat);
                         Session::put('elevyo', $elevyo);
+                        Session::put('nometab', $nometab);
+                        Session::put('ifu', $ifu);
                         return view('pages.Etats.pdfinscription')
                         ->with('amount', $montant)
                         ->with('classe', $classes )
@@ -2072,7 +2078,7 @@ public function etat() {
                             // Ajouter les informations de paiement avec le nom de l'élève à la collection
                             $paiementsAvecEleves->push([
                                 // dd($user->login),
-                                // 'user' => $users->login,
+                                'user' => $users->login,
                                 'id_contrat' => $idContrat,
                                 'nomcomplet_eleve' => $eleve->NOM .' '. $eleve->PRENOM,
                                 'classe_eleve' => $eleve->CODECLAS,
