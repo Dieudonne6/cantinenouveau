@@ -57,20 +57,30 @@
                     <div class="col-md-8 mx-auto grid-margin stretch-card">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="card-title">Mois a payer</h4>
+                                <h4 class="card-title">Mois impayés</h4>
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
+                                                {{-- @php
+                                                    if (count($moisCorrespondants) <= 0) {
+                                                        $nommois = "l'eleve est a jour";
+                                                    }
+                                                @endphp --}}
+                                                {{-- @if (count($moisCorrespondants) <= 0)
+                                                    <h5>L'eleve est a jour</h5>
+                                                @else --}}
+                                                    {{-- <p>{{ $nommois }}</p> --}}
                                                 @foreach ($moisCorrespondants as $id_moiscontrat => $nom_moiscontrat)
-                                                    <div class="form-check">
-                                                        <label class="form-check-label">
-                                                            <input type="checkbox" name="moiscontrat[]" class="form-check-input checkbox-mois"
-                                                                value="{{ $id_moiscontrat }}">
-                                                            {{ $nom_moiscontrat }}
-                                                        </label>
-                                                    </div>
+                                                <div class="form-check">
+                                                    <label class="form-check-label">
+                                                        <input type="checkbox" name="moiscontrat[]" class="form-check-input checkbox-mois"
+                                                        value="{{ $id_moiscontrat }}">
+                                                        {{ $nom_moiscontrat }}
+                                                    </label>
+                                                </div>
                                                 @endforeach
-                    
+                                                {{-- @endif --}}
+                                                    
                                             </div>
                                         </div>
                                     </div>

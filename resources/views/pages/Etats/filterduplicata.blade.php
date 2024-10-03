@@ -90,7 +90,7 @@
                                                     </td>
                                                     <td>{{ $facture->montant_total }}</td>
                                                     <td>
-                                                        <a href="{{ url('pdfduplicatapaie/' . $facture->idcontrat) }}"
+                                                        <a href="{{ url('pdfduplicatapaie/' . str_replace(' ', '', preg_replace('/\//', '_', trim($facture->counters), 1))) }}"
                                                             class="btn btn-primary">
                                                             Imprimer
                                                         </a>

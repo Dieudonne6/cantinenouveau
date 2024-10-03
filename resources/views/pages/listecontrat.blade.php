@@ -5,7 +5,7 @@
     <div class="card-body">
       <h4 class="card-title">Liste des contrats disponible</h4>
         @if(Session::has('status'))
-            <div id="statusAlert" class="alert alert-succes btn-primary">
+            <div id="statusAlert" class="alert alert-success btn-primary">
             {{ Session::get('status')}}
             </div>
         @endif

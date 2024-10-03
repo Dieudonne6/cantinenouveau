@@ -115,7 +115,7 @@ Route::get('/dowloadduplfac/{id}', [PagesController::class, 'dowloadduplfac']);
 Route::get('/duplicatafacture', [DuplicataController::class, 'showForm'])->name('duplicata.showForm');
 Route::post('/filterduplicata', [DuplicataController::class, 'filterduplicata'])->name('filterduplicata');
 Route::get('/pdfduplicatacontrat/{idcontrat}', [DuplicataController::class, 'pdfduplicatacontrat']);
-Route::get('/pdfduplicatapaie/{idfacture}', [DuplicataController::class, 'pdfduplicatapaie']);
+Route::get('/pdfduplicatapaie/{counters}', [DuplicataController::class, 'pdfduplicatapaie']);
 Route::get('/duplicatainscription2/{idcontrat}',[DuplicataController::class,'duplicatainscription2']);
 
 

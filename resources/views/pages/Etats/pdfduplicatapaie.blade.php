@@ -391,7 +391,23 @@
                     </div>
                 </div>
                 <div class="info">
+                    @php
+                        $typefa = $facturePaie->counters;
+
+                        // echo($typefa)
+                    @endphp
+                    @if ( substr(($typefa), -2) === 'FA' )
+
+                    <h1><strong>FACTURE D'AVOIR</strong></h1>
+                    
+                    @else
+                    
                     <h1><strong>FACTURE DE VENTE</strong></h1>
+
+                    @endif
+                    
+
+
                     <p><strong>Facture # {{ $facturePaie->id }} </strong></p>
                     <p>Date :
                         {{ \Carbon\Carbon::hasFormat($facturePaie->datepaiementcontrat, 'Y-m-d H:i:s')
