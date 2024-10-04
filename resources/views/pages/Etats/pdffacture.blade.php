@@ -1,8 +1,24 @@
 @extends('layouts.master')
 @section('content')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 <style>
-
+  .btn-arrow {
+      position: absolute;
+      top: 0px; /* Ajustez la position verticale */
+      left: 0px; /* Positionnez à gauche */
+      background-color: transparent !important;
+      border:1px !important;
+      text-transform: uppercase !important;
+      font-weight: bold !important;
+      cursor: pointer!important;
+      font-size: 17px!important; /* Taille de l'icône */
+      color: #b51818!important; /* Couleur de l'icône */
+  }
+  
+  .btn-arrow:hover {
+      color: #b700ff !important; /* Couleur au survol */
+  }
     body {
         font-family: Arial, sans-serif;
     }
@@ -358,19 +374,19 @@
         width: 8rem;
         height: 2.4rem;
         text-align: center;
-        margin-top: 20px;
+        margin-top: 40px;
         margin-left: 10px;
     }
     
 </style>
 
-
 {{-- <body> --}}
-<div class="col-lg-12 grid-margin stretch-card">
-
-    <a class="telecharger btn btn-success" href="{{ url('/facturenormalise/' . $nomcompleteleve) }}" target="_blank">Imprimer</a>
-
-    <div class="invoice">
+    <div class="col-lg-12 grid-margin stretch-card">
+        <button class="btn btn-arrow" onclick="window.history.back();">
+            <i class="fas fa-arrow-left"></i> Retour
+        </button>
+        <br><br> <!-- Espacement entre les boutons -->
+        <a class="telecharger btn btn-success" href="{{ url('/facturenormalise/' . $nomcompleteleve) }}" target="_blank">Imprimer</a>   <div class="invoice">
 
         <section>
 
