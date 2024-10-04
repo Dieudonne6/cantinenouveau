@@ -20,11 +20,20 @@
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
           </div>
           <div class="offcanvas-body">
-            <p>1-Sélectionner une classe: Affiche uniquement la liste des élèves de la classe ayant un contrat. </p>
-            <p>2-Possibilité de rechercher un élève. 
+            <p><strong> 1-Sélectionner une classe:</strong> Affiche uniquement la liste des élèves de la classe ayant un contrat. </p>
+            <p><strong> 2-Possibilité de rechercher un élève.</strong> 
             </p>
-            <p>3-Nouveau contrat: Permet de créer un nouveau contrat. 
+            <p><strong> 3-Nouveau contrat:</strong> Permet de créer un nouveau contrat. <br>
+              Le montant affiché correspond aux frais d’inscription de cantine de la classe sélectionnée.
             </p>
+            <p><strong>4-Paiement:</strong></br>	
+              Remplir les informations de paiement (Date, montant) </br>
+              Sélectionner le (les) mois à payer. </br>
+              Le coût total est affiché automatiquement. </br>
+              <strong>Enregistrer:</strong> Génère la facture normalisée. </br>
+              <strong>Annuler:</strong> Réinitialise les informations entrées. 
+            </p>
+            <p><strong>5-Suspendre:</strong> Suspend le contrat. </p>
           </div>
         </div> 
       </div>
