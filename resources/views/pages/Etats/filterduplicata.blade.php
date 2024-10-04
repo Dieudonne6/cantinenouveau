@@ -19,12 +19,38 @@
   .btn-arrow:hover {
       color: #b700ff !important; /* Couleur au survol */
   }
+  .offcanvas-body p {
+    font-size: 1rem;
+  }
   </style>
     <div class="card">
         <div class="card-body">
-       <button class="btn btn-arrow" onclick="window.history.back();">
-            <i class="fas fa-arrow-left"></i> Retour
-        </button>
+        <div class="d-flex justify-content-between">
+            <div>
+                <button class="btn btn-arrow" onclick="window.history.back();">
+                    <i class="fas fa-arrow-left"></i> Retour
+                </button>
+            </div>
+           
+            <div>
+                <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">Aide</button>
+        
+                <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+                  <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="offcanvasRightLabel">Duplicata facture</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                  </div>
+                  <div class="offcanvas-body">
+                    <p>Pour télécharger une facture qui exite déja <br>il faut:</p>
+                    <p> 1- Sélectionner l’élève </p>
+                    <p> 2- Sélectionner le type de facture </p>
+                    <p> 3- Cliquer sur Afficher </p>
+                    <p> 4- Cliquer "Imprimer" si vous voulez imprimer</p>
+
+                  </div>
+                </div>             
+            </div>
+        </div>
         <br></br>
         <div class="tab-content col-md-12" id="nav-tabContent">
             <!-- Onglet principal -->
